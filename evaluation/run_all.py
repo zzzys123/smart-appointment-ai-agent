@@ -36,20 +36,21 @@ async def run_all_evaluations(fast_mode: bool = False):
     
     # 1. 意图分类评估
     print("\n" + "━" * 60)
-    print("  [1/3] 意图分类准确率评估")
+    print("  [1/4] 意图分类准确率评估")
     print("━" * 60 + "\n")
     
     from evaluation.eval_classification import evaluate_classification
     results["classification"] = await evaluate_classification()
     
     if fast_mode:
-        print("\n⏩ Fast 模式：跳过 RAG 和预约流程评估")
+        print("\n⏩ Fast 模式：跳过 RAG、预约流程和 RAG 质量评估")
         results["rag"] = None
         results["appointment"] = None
+        results["rag_quality"] = None
     else:
         # 2. RAG 检索评估
         print("\n\n" + "━" * 60)
-        print("  [2/3] RAG 检索召回率评估")
+        print("  [2/4] RAG 检索召回率评估")
         print("━" * 60 + "\n")
         
         from evaluation.eval_rag_retrieval import evaluate_rag_retrieval
@@ -57,11 +58,19 @@ async def run_all_evaluations(fast_mode: bool = False):
         
         # 3. 预约流程评估
         print("\n\n" + "━" * 60)
-        print("  [3/3] 预约流程完成率评估")
+        print("  [3/4] 预约流程完成率评估")
         print("━" * 60 + "\n")
         
         from evaluation.eval_appointment_flow import evaluate_appointment_flow
         results["appointment"] = await evaluate_appointment_flow()
+
+        # 4. RAG 生成质量评估（Faithfulness / Answer Relevancy）
+        print("\n\n" + "━" * 60)
+        print("  [4/4] RAG 生成质量评估（忠实度 / 相关性）")
+        print("━" * 60 + "\n")
+
+        from evaluation.eval_rag_quality import evaluate_rag_quality
+        results["rag_quality"] = await evaluate_rag_quality(sample_size=3)
     
     # 综合报告
     elapsed = time.time() - start_time
@@ -103,7 +112,17 @@ def print_summary_report(results: dict, elapsed: float):
               f"   ({appt_result.get('correct', 0)}/{appt_result.get('total', 0)})".ljust(29) + "║")
     else:
         print("║  ⏩ 预约流程准确率:     (跳过)".ljust(59) + "║")
-    
+
+    # RAG 生成质量结果（Faithfulness / Answer Relevancy）
+    rq_result = results.get("rag_quality")
+    if rq_result:
+        faith = rq_result.get("faithfulness", 0)
+        rel = rq_result.get("answer_relevancy", 0)
+        rq_icon = "✅" if faith >= 0.7 else "⚠️" if faith >= 0.5 else "❌"
+        print(f"║  {rq_icon} RAG 忠实度/相关性:  {faith:.2f} / {rel:.2f}".ljust(56) + "║")
+    else:
+        print("║  ⏩ RAG 生成质量:       (跳过)".ljust(59) + "║")
+
     print("╠" + "═" * 58 + "╣")
     print(f"║  ⏱️  总耗时: {elapsed:.1f}s".ljust(60) + "║")
     print("╚" + "═" * 58 + "╝")

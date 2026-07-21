@@ -1,13 +1,16 @@
 # services/knowledge_service.py
 
-import numpy as np
-import faiss
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Optional
 from db.db_router import DatabaseRouter
 from .text_embedding import embed_input
+from .retriever import create_retriever
 import logging
 
 logger = logging.getLogger(__name__)
+
+# 向后兼容：保留 RRF_K / _tokenize_zh 的引用（真实实现已迁移到 retriever 模块）
+from .retriever import RRF_K, _tokenize_zh  # noqa: E402,F401
+
 
 class KnowledgeService:
     """知识库服务类 - 结合数据库存储和向量检索"""
@@ -16,9 +19,11 @@ class KnowledgeService:
         # 使用统一的DatabaseRouter，符合架构设计
         self.db_router = DatabaseRouter(db_path)
         self.db = self.db_router.knowledge  # 通过router访问knowledge repository
-        self.index = None
-        self.document_ids = []  # 维护文档ID与索引位置的映射
         self.initialized = False
+
+        # 可插拔检索器（dense / hybrid，由 RETRIEVER_STRATEGY 决定）
+        # 检索逻辑（向量/BM25/RRF/rerank）全部委托给检索器，本类只负责数据管理
+        self.retriever = create_retriever()
         
         # 默认知识库内容
         self.default_knowledge = [
@@ -116,84 +121,50 @@ class KnowledgeService:
                 logger.error(f"添加默认知识失败: {e}")
 
     async def _build_vector_index(self):
-        """构建向量索引"""
+        """确保文档 embedding 就绪，并委托检索器构建索引。
+
+        数据管理职责（生成/回写 embedding）留在本类；索引构建交给可插拔检索器。
+        """
         try:
             documents = self.db.get_all_documents()
             if not documents:
                 logger.warning("没有文档可用于构建索引")
                 return
 
-            embeddings = []
-            self.document_ids = []
-            
+            # 确保每条文档都有 embedding（缺失则生成并回写数据库）
             for doc in documents:
-                if doc.get('embedding'):
-                    embeddings.append(doc['embedding'])
-                    self.document_ids.append(doc['id'])
-                else:
-                    # 如果没有嵌入向量，生成一个
+                if not doc.get('embedding'):
                     logger.warning(f"文档 {doc['id']} 缺少嵌入向量，正在生成...")
                     text_for_embedding = f"{doc['content']} {' '.join(doc.get('keywords', []))}"
                     embedding = embed_input(text_for_embedding)
-                    
-                    # 更新数据库
                     self.db.update_document(doc['id'], embedding=embedding)
-                    
-                    embeddings.append(embedding)
-                    self.document_ids.append(doc['id'])
+                    doc['embedding'] = embedding
 
-            if embeddings:
-                # 创建FAISS索引
-                embeddings_array = np.array(embeddings).astype('float32')
-                dimension = embeddings_array.shape[1]
-                self.index = faiss.IndexFlatIP(dimension)  # 内积相似度
-                self.index.add(embeddings_array)
-                logger.info(f"构建向量索引完成，包含 {len(embeddings)} 个向量")
-            else:
-                logger.warning("没有有效的嵌入向量，无法构建索引")
+            # 委托检索器构建索引（dense / hybrid）
+            self.retriever.build_index(documents)
+            logger.info(
+                f"索引构建完成：strategy={self.retriever.name}, docs={self.retriever.num_docs}"
+            )
 
         except Exception as e:
-            logger.error(f"构建向量索引失败: {e}")
+            logger.error(f"构建索引失败: {e}")
             raise
 
     async def search(self, query: str, top_k: int = 3, category: str = None) -> List[Dict]:
-        """搜索相关文档"""
-        if not self.initialized or self.index is None:
-            logger.warning("知识库服务未初始化或索引不可用")
-            return []
+        """搜索相关文档（委托给可插拔检索器）。
 
-        try:
-            # 生成查询的嵌入向量
-            query_embedding = embed_input(query)
-            query_array = np.array([query_embedding]).astype('float32')
-            
-            # 向量搜索
-            scores, indices = self.index.search(query_array, min(top_k * 2, len(self.document_ids)))  # 多检索一些候选
-            
-            results = []
-            for score, idx in zip(scores[0], indices[0]):
-                if idx < len(self.document_ids):
-                    doc_id = self.document_ids[idx]
-                    doc = self.db.get_document(doc_id)
-                    
-                    if doc:
-                        # 如果指定了分类过滤
-                        if category and doc.get('category') != category:
-                            continue
-                            
-                        doc['score'] = float(score)
-                        doc['rank'] = len(results) + 1
-                        results.append(doc)
-                        
-                        # 达到所需数量就停止
-                        if len(results) >= top_k:
-                            break
-            
-            return results
-            
-        except Exception as e:
-            logger.error(f"搜索知识库失败: {e}")
+        检索策略与是否精排由检索器决定：
+        - RETRIEVER_STRATEGY=dense|hybrid
+        - RERANK_ENABLED=true|false
+        """
+        if not self.initialized:
+            logger.warning("知识库服务未初始化")
             return []
+        return await self.retriever.search(query, top_k=top_k, category=category)
+
+    def get_last_trace(self):
+        """返回最近一次检索的链路追踪（RetrievalTrace），未检索过则为 None。"""
+        return getattr(self.retriever, "last_trace", None)
 
     async def add_document(self, content: str, category: str, keywords: List[str] = None) -> bool:
         """添加新文档"""

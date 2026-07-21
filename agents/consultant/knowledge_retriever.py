@@ -31,13 +31,18 @@ class KnowledgeRetriever:
         # 搜索相关知识
         relevant_docs = await self.knowledge_service.search(query, top_k=top_k)
         
-        # 记录检索日志
+        # 记录检索日志（含结构化链路追踪）
         self._log_search_results(query, relevant_docs)
         
         return relevant_docs or []
     
     def _log_search_results(self, query: str, relevant_docs: List[Dict[str, Any]]):
-        """记录搜索结果日志"""
+        """记录搜索结果日志，并打印检索链路追踪（可观测）。"""
+        # 打印结构化链路追踪：dense/sparse 召回 → RRF 融合 → rerank 各阶段
+        trace = self.knowledge_service.get_last_trace()
+        if trace is not None:
+            print(trace.summary())
+
         if relevant_docs:
             print(f"🔍 知识库检索结果 (查询: '{query}'):")
             for i, doc in enumerate(relevant_docs, 1):
