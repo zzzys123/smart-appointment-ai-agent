@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from datetime import datetime
 
 Base = declarative_base()
 
@@ -31,9 +30,26 @@ class KnowledgeDocument(Base):
     category = Column(String, nullable=False)
     keywords = Column(JSON, nullable=True)  # 存储关键词列表
     embedding = Column(JSON, nullable=True)  # 存储嵌入向量
+    # 文档导入/分块元数据。旧的手工知识条目允许这些字段为空，以保持兼容。
+    source_id = Column(String(64), nullable=True, index=True)
+    source_name = Column(String(255), nullable=True)
+    title = Column(String(255), nullable=True)
+    chunk_index = Column(Integer, nullable=True)
+    chunk_count = Column(Integer, nullable=True)
+    content_hash = Column(String(64), nullable=True, index=True)
+    version = Column(String(64), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = Column(Integer, default=1)  # 软删除标记
+
+
+class KnowledgeIndexState(Base):
+    """知识库内容代数，供多个应用进程惰性同步各自的内存索引。"""
+
+    __tablename__ = 'knowledge_index_state'
+    id = Column(Integer, primary_key=True, default=1)
+    generation = Column(Integer, nullable=False, default=0)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class UserBehavior(Base):
     __tablename__ = 'user_behaviors'

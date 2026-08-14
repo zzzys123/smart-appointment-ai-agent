@@ -138,9 +138,10 @@ class LocalKnowledgeDB:
         self.session_manager = SessionManager(db_path)
         self.repo = KnowledgeRepository(self.session_manager)
 
-    def add_document(self, content: str, category: str, keywords: Optional[List[str]] = None, embedding: Optional[List[float]] = None) -> int:
+    def add_document(self, content: str, category: str, keywords: Optional[List[str]] = None,
+                     embedding: Optional[List[float]] = None, **metadata) -> int:
         """兼容性方法：添加知识文档"""
-        return self.repo.add_document(content, category, keywords, embedding)
+        return self.repo.add_document(content, category, keywords, embedding, **metadata)
 
     def get_document(self, doc_id: int) -> Dict[str, Any]:
         """兼容性方法：获取指定文档"""

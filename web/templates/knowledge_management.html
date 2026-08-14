@@ -460,6 +460,75 @@
             border-left: 4px solid #f093fb;
             color: #721c24;
         }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .import-hint {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.7;
+            margin: -8px 0 18px;
+        }
+
+        .source-toolbar {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .source-toolbar .form-group {
+            width: min(420px, 100%);
+            margin-bottom: 0;
+        }
+
+        .source-group-header {
+            background: #f8f9fa;
+            padding: 14px 18px;
+            font-weight: 600;
+            color: #3d4a5d;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .source-badge,
+        .chunk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .source-badge {
+            background: rgba(118, 75, 162, 0.1);
+            color: #68428d;
+        }
+
+        .chunk-badge {
+            background: rgba(79, 172, 254, 0.12);
+            color: #2877a8;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+            transform: none;
+        }
+
+        @media (max-width: 720px) {
+            .nav-tabs { flex-wrap: wrap; }
+            .nav-tab { flex: 1 1 45%; }
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+            .source-toolbar { align-items: stretch; flex-direction: column; }
+            .knowledge-meta { align-items: flex-start; flex-direction: column; gap: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -471,10 +540,11 @@
         
         <div class="content">
             <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showTab('overview')">📊 概览</button>
-                <button class="nav-tab" onclick="showTab('search')">🔍 搜索测试</button>
-                <button class="nav-tab" onclick="showTab('manage')">📝 知识管理</button>
-                <button class="nav-tab" onclick="showTab('add')">➕ 添加知识</button>
+                <button class="nav-tab active" onclick="showTab('overview', this)">📊 概览</button>
+                <button class="nav-tab" onclick="showTab('search', this)">🔍 搜索测试</button>
+                <button class="nav-tab" onclick="showTab('manage', this)">📝 知识管理</button>
+                <button class="nav-tab" onclick="showTab('import', this)">📄 文档导入</button>
+                <button class="nav-tab" onclick="showTab('add', this)">➕ 添加知识</button>
             </div>
         
         <!-- 概览标签页 -->
@@ -528,7 +598,53 @@
         <!-- 知识管理标签页 -->
         <div id="manage" class="tab-content">
             <h3>📝 所有知识</h3>
+            <div class="source-toolbar">
+                <div class="form-group">
+                    <label for="sourceFilter">按来源文档查看分块：</label>
+                    <select id="sourceFilter" class="form-control" onchange="renderKnowledgeList()">
+                        <option value="">全部来源</option>
+                    </select>
+                </div>
+                <div id="sourceSummary" style="color: #666; font-size: 14px;"></div>
+            </div>
             <div id="knowledgeList" class="loading">加载中...</div>
+        </div>
+
+        <!-- 文档导入标签页 -->
+        <div id="import" class="tab-content">
+            <div class="search-section">
+                <h3>📄 导入并自动分块</h3>
+                <p class="import-hint">支持 Markdown（.md、.markdown）和纯文本（.txt）。系统会按标题、段落和句子边界切分，重叠内容有助于保留上下文。</p>
+                <div id="importAlert"></div>
+                <form id="importDocumentForm">
+                    <div class="form-group">
+                        <label for="importFile">选择文档：</label>
+                        <input type="file" id="importFile" name="file" class="form-control" accept=".md,.markdown,.txt,text/markdown,text/plain" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="importSourceId">来源编号（可选）：</label>
+                        <input type="text" id="importSourceId" name="source_id" class="form-control" maxlength="64" list="sourceIdOptions" placeholder="更新同一文档时填写相同编号；Markdown 也可写在 front matter 中">
+                        <datalist id="sourceIdOptions"></datalist>
+                        <p class="import-hint">留空会安全地创建内容寻址编号；要替换 TXT 或普通 Markdown 的旧版本，请选择已有来源编号。</p>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="importCategory">分类：</label>
+                            <input type="text" id="importCategory" name="category" class="form-control" placeholder="如：健康指南" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="chunkSize">分块大小（字符）：</label>
+                            <input type="number" id="chunkSize" name="chunk_size" class="form-control" value="500" min="100" max="4000" step="50" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="chunkOverlap">重叠大小（字符）：</label>
+                            <input type="number" id="chunkOverlap" name="chunk_overlap" class="form-control" value="100" min="0" max="1000" step="10" required>
+                        </div>
+                    </div>
+                    <button type="submit" id="importButton" class="btn btn-success">📥 导入文档</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearImportForm()">🗑️ 清空表单</button>
+                </form>
+            </div>
         </div>
         
         <!-- 添加知识标签页 -->
@@ -593,6 +709,7 @@
             // 绑定表单提交事件
             document.getElementById('addKnowledgeForm').addEventListener('submit', handleAddKnowledge);
             document.getElementById('editKnowledgeForm').addEventListener('submit', handleEditKnowledge);
+            document.getElementById('importDocumentForm').addEventListener('submit', handleImportDocument);
         });
         
         // 加载知识库数据
@@ -600,25 +717,101 @@
             try {
                 const response = await fetch('/api/knowledge');
                 const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(getApiErrorMessage(data, '加载知识库失败'));
+                }
                 
-                knowledgeData = data.documents;
-                categories = data.categories;
+                knowledgeData = data.documents || [];
+                categories = data.categories || [];
                 
                 updateStats(data);
                 renderOverview();
-                renderKnowledgeList();
                 updateCategorySelects();
+                updateSourceFilter();
+                renderKnowledgeList();
                 
             } catch (error) {
                 console.error('加载数据失败:', error);
-                showAlert('加载数据失败', 'error');
+                showAlert(error.message || '加载数据失败', 'error');
             }
         }
         
         // 更新统计信息
         function updateStats(data) {
-            document.getElementById('totalCount').textContent = data.total_count;
-            document.getElementById('categoryCount').textContent = data.categories.length;
+            document.getElementById('totalCount').textContent = data.total_count ?? knowledgeData.length;
+            document.getElementById('categoryCount').textContent = (data.categories || []).length;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function getApiErrorMessage(payload, fallback) {
+            if (!payload) return fallback;
+            if (typeof payload.detail === 'string') return payload.detail;
+            if (Array.isArray(payload.detail)) {
+                return payload.detail
+                    .map(item => item && item.msg ? item.msg : String(item))
+                    .join('；') || fallback;
+            }
+            return payload.message || fallback;
+        }
+
+        function getMetadata(doc) {
+            if (!doc || !doc.metadata) return {};
+            if (typeof doc.metadata === 'object') return doc.metadata;
+            try {
+                return JSON.parse(doc.metadata);
+            } catch (_) {
+                return {};
+            }
+        }
+
+        function getDocField(doc, field, fallback = null) {
+            const metadata = getMetadata(doc);
+            return doc[field] ?? metadata[field] ?? fallback;
+        }
+
+        function formatDate(value) {
+            if (!value) return '-';
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
+        }
+
+        function renderDocumentIdentity(doc) {
+            const sourceId = getDocField(doc, 'source_id');
+            const sourceName = getDocField(doc, 'source_name');
+            const title = getDocField(doc, 'title');
+            const chunkIndex = getDocField(doc, 'chunk_index');
+            const chunkCount = getDocField(doc, 'chunk_count');
+            const parts = [];
+
+            if (sourceName) {
+                parts.push(`<span class="source-badge"><i class="fas fa-file-lines"></i>${escapeHtml(sourceName)}</span>`);
+            }
+            if (sourceId) {
+                const compactSourceId = String(sourceId).length > 20
+                    ? `${String(sourceId).slice(0, 20)}…`
+                    : String(sourceId);
+                parts.push(`<span title="来源编号：${escapeHtml(sourceId)}"><i class="fas fa-fingerprint"></i> ${escapeHtml(compactSourceId)}</span>`);
+            }
+            if (title) {
+                parts.push(`<span title="章节标题"><i class="fas fa-heading"></i> ${escapeHtml(title)}</span>`);
+            }
+            if (chunkIndex !== null && chunkIndex !== undefined) {
+                const humanIndex = Number.isFinite(Number(chunkIndex)) ? Number(chunkIndex) + 1 : chunkIndex;
+                const chunkLabel = chunkCount !== null && chunkCount !== undefined
+                    ? `${humanIndex}/${chunkCount}`
+                    : `${humanIndex}`;
+                parts.push(`<span class="chunk-badge"><i class="fas fa-layer-group"></i>分块 ${escapeHtml(chunkLabel)}</span>`);
+            }
+
+            return parts.join('');
         }
         
         // 渲染概览页面
@@ -640,18 +833,19 @@
                 html += `
                     <div class="knowledge-list" style="margin-bottom: 20px;">
                         <div style="background: #f8f9fa; padding: 15px; font-weight: bold; font-size: 16px;">
-                            📁 ${category} (${docs.length}条)
+                            📁 ${escapeHtml(category)} (${docs.length}条)
                         </div>
                         ${docs.map(doc => `
                             <div class="knowledge-item">
-                                <div class="knowledge-content">${doc.content}</div>
+                                <div class="knowledge-content">${escapeHtml(doc.content)}</div>
                                 <div class="knowledge-meta">
-                                    <span>ID: ${doc.id}</span>
-                                    <span>更新: ${new Date(doc.updated_at).toLocaleString()}</span>
+                                    <span>ID: ${escapeHtml(doc.id)}</span>
+                                    ${renderDocumentIdentity(doc)}
+                                    <span>更新: ${formatDate(doc.updated_at)}</span>
                                 </div>
                                 ${doc.keywords && doc.keywords.length > 0 ? `
                                     <div style="margin-top: 8px;">
-                                        ${doc.keywords.map(keyword => `<span class="keywords-tag">${keyword}</span>`).join('')}
+                                        ${doc.keywords.map(keyword => `<span class="keywords-tag">${escapeHtml(keyword)}</span>`).join('')}
                                     </div>
                                 ` : ''}
                             </div>
@@ -666,45 +860,93 @@
         // 渲染知识列表
         function renderKnowledgeList() {
             const list = document.getElementById('knowledgeList');
+            const selectedSource = document.getElementById('sourceFilter').value;
+            const visibleDocs = selectedSource
+                ? knowledgeData.filter(doc => (getDocField(doc, 'source_name') || '') === selectedSource)
+                : knowledgeData;
+            const summary = document.getElementById('sourceSummary');
+
+            summary.textContent = selectedSource
+                ? `“${selectedSource}” 共 ${visibleDocs.length} 个分块`
+                : `当前显示 ${visibleDocs.length} 条知识`;
             
-            if (knowledgeData.length === 0) {
-                list.innerHTML = '<div class="loading">暂无知识数据</div>';
+            if (visibleDocs.length === 0) {
+                list.innerHTML = '<div class="loading">暂无符合条件的知识数据</div>';
                 return;
             }
-            
-            const html = knowledgeData.map(doc => `
-                <div class="knowledge-item">
-                    <div class="knowledge-content">${doc.content}</div>
-                    <div class="knowledge-meta">
-                        <span>ID: ${doc.id}</span>
-                        <span class="category-badge">${doc.category || '未分类'}</span>
-                        <span>创建: ${new Date(doc.created_at).toLocaleString()}</span>
-                        <span>更新: ${new Date(doc.updated_at).toLocaleString()}</span>
-                    </div>
-                    ${doc.keywords && doc.keywords.length > 0 ? `
-                        <div style="margin-top: 8px;">
-                            ${doc.keywords.map(keyword => `<span class="keywords-tag">${keyword}</span>`).join('')}
+
+            const groups = new Map();
+            visibleDocs.forEach(doc => {
+                const sourceName = getDocField(doc, 'source_name');
+                const title = getDocField(doc, 'title');
+                const key = sourceName ? `${sourceName}::${title || ''}` : '__manual__';
+                if (!groups.has(key)) groups.set(key, { sourceName, title, docs: [] });
+                groups.get(key).docs.push(doc);
+            });
+
+            list.innerHTML = Array.from(groups.values()).map(group => {
+                group.docs.sort((a, b) => Number(getDocField(a, 'chunk_index', 0)) - Number(getDocField(b, 'chunk_index', 0)));
+                const heading = group.sourceName
+                    ? `📄 ${escapeHtml(group.sourceName)}${group.title ? ` · ${escapeHtml(group.title)}` : ''}（${group.docs.length} 个分块）`
+                    : `📝 手工知识（${group.docs.length} 条）`;
+                const items = group.docs.map(doc => `
+                    <div class="knowledge-item">
+                        <div class="knowledge-content">${escapeHtml(doc.content)}</div>
+                        <div class="knowledge-meta">
+                            <span>ID: ${escapeHtml(doc.id)}</span>
+                            <span class="category-badge">${escapeHtml(doc.category || '未分类')}</span>
+                            ${renderDocumentIdentity(doc)}
+                            <span>创建: ${formatDate(doc.created_at)}</span>
+                            <span>更新: ${formatDate(doc.updated_at)}</span>
                         </div>
-                    ` : ''}
-                    <div class="knowledge-actions">
-                        <button class="btn btn-primary" onclick="editKnowledge(${doc.id})">✏️ 编辑</button>
-                        <button class="btn btn-danger" onclick="deleteKnowledge(${doc.id})">🗑️ 删除</button>
+                        ${doc.keywords && doc.keywords.length > 0 ? `
+                            <div style="margin-top: 8px;">
+                                ${doc.keywords.map(keyword => `<span class="keywords-tag">${escapeHtml(keyword)}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        <div class="knowledge-actions">
+                            <button class="btn btn-primary" onclick="editKnowledge(${Number(doc.id)})">✏️ 编辑</button>
+                            <button class="btn btn-danger" onclick="deleteKnowledge(${Number(doc.id)})">🗑️ 删除</button>
+                        </div>
                     </div>
-                </div>
-            `).join('');
-            
-            list.innerHTML = `<div class="knowledge-list">${html}</div>`;
+                `).join('');
+                return `<div class="knowledge-list" style="margin-bottom: 20px;"><div class="source-group-header">${heading}</div>${items}</div>`;
+            }).join('');
         }
         
         // 更新分类选择框
         function updateCategorySelects() {
             const searchCategory = document.getElementById('searchCategory');
             searchCategory.innerHTML = '<option value="">全部分类</option>' + 
-                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+                categories.map(cat => `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`).join('');
+        }
+
+        function updateSourceFilter() {
+            const sourceFilter = document.getElementById('sourceFilter');
+            const sourceIdOptions = document.getElementById('sourceIdOptions');
+            const previousValue = sourceFilter.value;
+            const sources = [...new Set(
+                knowledgeData.map(doc => getDocField(doc, 'source_name')).filter(Boolean)
+            )].sort((a, b) => String(a).localeCompare(String(b), 'zh-CN'));
+
+            sourceFilter.innerHTML = '<option value="">全部来源（含手工知识）</option>' +
+                sources.map(source => `<option value="${escapeHtml(source)}">${escapeHtml(source)}</option>`).join('');
+            if (sources.includes(previousValue)) sourceFilter.value = previousValue;
+
+            const sourceEntries = new Map();
+            knowledgeData.forEach(doc => {
+                const sourceId = getDocField(doc, 'source_id');
+                if (sourceId && !sourceEntries.has(sourceId)) {
+                    sourceEntries.set(sourceId, getDocField(doc, 'source_name') || '已有来源');
+                }
+            });
+            sourceIdOptions.innerHTML = Array.from(sourceEntries.entries())
+                .map(([sourceId, sourceName]) => `<option value="${escapeHtml(sourceId)}">${escapeHtml(sourceName)}</option>`)
+                .join('');
         }
         
         // 标签页切换
-        function showTab(tabName) {
+        function showTab(tabName, button) {
             // 隐藏所有标签页
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -715,7 +957,7 @@
             
             // 显示选中的标签页
             document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+            button.classList.add('active');
         }
         
         // 执行搜索
@@ -743,24 +985,28 @@
                 });
                 
                 const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(getApiErrorMessage(data, '搜索失败'));
+                }
                 displaySearchResults(data);
                 
             } catch (error) {
                 console.error('搜索失败:', error);
-                showAlert('搜索失败', 'error', 'searchResults');
+                showAlert(error.message || '搜索失败', 'error', 'searchResults');
             }
         }
         
         // 显示搜索结果
         function displaySearchResults(data) {
             const container = document.getElementById('searchResults');
+            const results = data.results || [];
             
-            if (data.results.length === 0) {
+            if (results.length === 0) {
                 container.innerHTML = `
                     <div class="knowledge-list">
                         <div class="knowledge-item">
                             <div style="text-align: center; color: #666;">
-                                🔍 未找到与 "${data.query}" 相关的知识
+                                🔍 未找到与 "${escapeHtml(data.query)}" 相关的知识
                             </div>
                         </div>
                     </div>
@@ -769,23 +1015,24 @@
             }
             
             const html = `
-                <h4>🎯 搜索结果 (查询: "${data.query}", 找到 ${data.total_found} 条)</h4>
+                <h4>🎯 搜索结果 (查询: "${escapeHtml(data.query)}", 找到 ${data.total_found ?? results.length} 条)</h4>
                 <div class="knowledge-list">
-                    ${data.results.map((doc, index) => `
+                    ${results.map((doc, index) => `
                         <div class="knowledge-item search-result">
                             <div class="knowledge-content">
-                                ${doc.content}
-                                <span class="score-badge">相似度: ${(doc.score || 0).toFixed(3)}</span>
+                                ${escapeHtml(doc.content)}
+                                <span class="score-badge">相似度: ${Number(doc.score || 0).toFixed(3)}</span>
                             </div>
                             <div class="knowledge-meta">
                                 <span>#${index + 1}</span>
-                                <span>ID: ${doc.id}</span>
-                                <span class="category-badge">${doc.category || '未分类'}</span>
-                                <span>排名: ${doc.rank || index + 1}</span>
+                                <span>ID: ${escapeHtml(doc.id)}</span>
+                                <span class="category-badge">${escapeHtml(doc.category || '未分类')}</span>
+                                ${renderDocumentIdentity(doc)}
+                                <span>排名: ${escapeHtml(doc.rank || index + 1)}</span>
                             </div>
                             ${doc.keywords && doc.keywords.length > 0 ? `
                                 <div style="margin-top: 8px;">
-                                    ${doc.keywords.map(keyword => `<span class="keywords-tag">${keyword}</span>`).join('')}
+                                    ${doc.keywords.map(keyword => `<span class="keywords-tag">${escapeHtml(keyword)}</span>`).join('')}
                                 </div>
                             ` : ''}
                         </div>
@@ -837,7 +1084,7 @@
                     clearAddForm();
                     await loadKnowledgeData(); // 重新加载数据
                 } else {
-                    showAlert(result.message || '添加失败', 'error', 'addAlert');
+                    showAlert(getApiErrorMessage(result, '添加失败'), 'error', 'addAlert');
                 }
                 
             } catch (error) {
@@ -852,6 +1099,106 @@
             document.getElementById('newCategory').value = '';
             document.getElementById('newKeywords').value = '';
             document.getElementById('addAlert').innerHTML = '';
+        }
+
+        // 导入 Markdown/TXT 文档并由后端完成分块、去重及索引更新
+        async function handleImportDocument(event) {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('importFile');
+            const category = document.getElementById('importCategory').value.trim();
+            const sourceId = document.getElementById('importSourceId').value.trim();
+            const chunkSize = Number(document.getElementById('chunkSize').value);
+            const chunkOverlap = Number(document.getElementById('chunkOverlap').value);
+            const importButton = document.getElementById('importButton');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showAlert('请选择要导入的 .md 或 .txt 文档', 'error', 'importAlert');
+                return;
+            }
+            if (!/\.(md|markdown|txt)$/i.test(file.name)) {
+                showAlert('目前仅支持 .md、.markdown 和 .txt 文档', 'error', 'importAlert');
+                return;
+            }
+            if (!category) {
+                showAlert('请填写文档分类', 'error', 'importAlert');
+                return;
+            }
+            if (sourceId.length > 64) {
+                showAlert('来源编号不能超过 64 个字符', 'error', 'importAlert');
+                return;
+            }
+            if (!Number.isInteger(chunkSize) || chunkSize < 100 || chunkSize > 4000) {
+                showAlert('分块大小应为 100～4000 的整数', 'error', 'importAlert');
+                return;
+            }
+            if (!Number.isInteger(chunkOverlap) || chunkOverlap < 0 || chunkOverlap > Math.floor(chunkSize / 2)) {
+                showAlert('重叠大小应为非负整数，且不能超过分块大小的 50%', 'error', 'importAlert');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('category', category);
+            if (sourceId) formData.append('source_id', sourceId);
+            formData.append('chunk_size', String(chunkSize));
+            formData.append('chunk_overlap', String(chunkOverlap));
+
+            importButton.disabled = true;
+            importButton.textContent = '⏳ 正在分块并建立索引...';
+            document.getElementById('importAlert').innerHTML = '';
+
+            try {
+                const response = await fetch('/api/knowledge/import', {
+                    method: 'POST',
+                    body: formData
+                });
+                let result = {};
+                try {
+                    result = await response.json();
+                } catch (_) {
+                    result = {};
+                }
+
+                if (!response.ok) {
+                    showAlert(getApiErrorMessage(result, '文档导入失败'), 'error', 'importAlert');
+                    return;
+                }
+
+                const created = result.created_chunks ?? result.created ?? 0;
+                const skipped = result.skipped_chunks ?? result.skipped ?? 0;
+                const deactivated = result.deactivated_chunks ?? result.removed_chunks ?? 0;
+                const total = result.total_chunks ?? result.total ?? (Number(created) + Number(skipped));
+                const resolvedSourceId = result.data && result.data.source_id
+                    ? String(result.data.source_id)
+                    : sourceId;
+                const replacementSummary = Number(deactivated) > 0
+                    ? `，停用旧版本分块 ${deactivated} 个`
+                    : '';
+                const sourceSummary = resolvedSourceId
+                    ? `，来源编号 ${resolvedSourceId}`
+                    : '';
+                showAlert(
+                    `文档“${file.name}”导入成功：共 ${total} 个分块，新建 ${created} 个，跳过重复 ${skipped} 个${replacementSummary}${sourceSummary}。`,
+                    'success',
+                    'importAlert'
+                );
+                await loadKnowledgeData();
+            } catch (error) {
+                console.error('导入文档失败:', error);
+                showAlert('导入失败，请检查网络或服务状态', 'error', 'importAlert');
+            } finally {
+                importButton.disabled = false;
+                importButton.textContent = '📥 导入文档';
+            }
+        }
+
+        function clearImportForm() {
+            document.getElementById('importDocumentForm').reset();
+            document.getElementById('chunkSize').value = '500';
+            document.getElementById('chunkOverlap').value = '100';
+            document.getElementById('importAlert').innerHTML = '';
         }
         
         // 编辑知识
@@ -906,7 +1253,7 @@
                         loadKnowledgeData();
                     }, 1000);
                 } else {
-                    showAlert(result.message || '更新失败', 'error', 'editAlert');
+                    showAlert(getApiErrorMessage(result, '更新失败'), 'error', 'editAlert');
                 }
                 
             } catch (error) {
@@ -937,7 +1284,7 @@
                     showAlert('知识删除成功', 'success');
                     await loadKnowledgeData();
                 } else {
-                    showAlert(result.message || '删除失败', 'error');
+                    showAlert(getApiErrorMessage(result, '删除失败'), 'error');
                 }
                 
             } catch (error) {
@@ -949,37 +1296,7 @@
         // 显示提示信息
         function showAlert(message, type, containerId = null) {
             const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
-            const alertHtml = `<div class="alert ${alertClass}">${message}</div>`;
-            
-            if (containerId) {
-                document.getElementById(containerId).innerHTML = alertHtml;
-            } else {
-                // 在页面顶部显示
-                const container = document.querySelector('.container');
-                const alertDiv = document.createElement('div');
-                alertDiv.innerHTML = alertHtml;
-                container.insertBefore(alertDiv, container.firstChild);
-                
-                // 3秒后自动消失
-                setTimeout(() => {
-                    alertDiv.remove();
-                }, 3000);
-            }
-        }
-        
-        // 点击模态框外部关闭
-        window.onclick = function(event) {
-            const modal = document.getElementById('editModal');
-            if (event.target == modal) {
-                closeEditModal();
-            }
-        }
-    </script>
-    </div>
-</body>
-</html>
-            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
-            const alertHtml = `<div class="alert ${alertClass}">${message}</div>`;
+            const alertHtml = `<div class="alert ${alertClass}">${escapeHtml(message)}</div>`;
             
             if (containerId) {
                 document.getElementById(containerId).innerHTML = alertHtml;
@@ -1005,5 +1322,6 @@
             }
         }
     </script>
+    </div>
 </body>
 </html>

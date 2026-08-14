@@ -3,11 +3,13 @@ Web界面路由
 
 处理前端页面渲染和聊天功能
 """
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from api.chat_handler import ProcessUserInput_stream
+from services.chat_session_service import resolve_session_id
+from services.redis_service import get_redis_service
 import logging
 
 # 创建logger实例
@@ -21,6 +23,7 @@ router = APIRouter(tags=["Web界面"])
 class ChatRequest(BaseModel):
     message: str
     state: str | None = None
+    session_id: str | None = None
 
 @router.get("/", response_class=HTMLResponse, summary="主页")
 async def read_root(request: Request):
@@ -28,20 +31,54 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @router.post("/chat/stream", summary="流式聊天")
-async def chat_stream_endpoint(chat: ChatRequest):
+async def chat_stream_endpoint(chat: ChatRequest, request: Request):
     """处理流式聊天请求"""
+    session_id = resolve_session_id(
+        chat.session_id, request.headers.get("X-Session-ID")
+    )
+    redis_service = get_redis_service()
+    if not await redis_service.allow_chat_request(session_id):
+        raise HTTPException(status_code=429, detail="请求过于频繁，请稍后再试")
+
     async def token_generator():
-        async for token in ProcessUserInput_stream(chat.message):
-            yield token
-    return StreamingResponse(token_generator(), media_type="text/plain")
+        async with redis_service.chat_lock(session_id) as acquired:
+            if not acquired:
+                yield "[ERROR]当前会话已有请求正在处理，请稍后重试"
+                return
+            async for token in ProcessUserInput_stream(
+                chat.message, session_id=session_id
+            ):
+                yield token
+    return StreamingResponse(
+        token_generator(),
+        media_type="text/plain",
+        headers={"X-Session-ID": session_id},
+    )
 
 @router.post("/chat", summary="兼容性聊天接口")
-async def chat_endpoint(chat: ChatRequest):
+async def chat_endpoint(chat: ChatRequest, request: Request):
     """兼容性聊天接口，建议使用/chat/stream"""
+    session_id = resolve_session_id(
+        chat.session_id, request.headers.get("X-Session-ID")
+    )
+    redis_service = get_redis_service()
+    if not await redis_service.allow_chat_request(session_id):
+        raise HTTPException(status_code=429, detail="请求过于频繁，请稍后再试")
+
     async def token_generator():
-        async for token in ProcessUserInput_stream(chat.message):
-            yield token
-    return StreamingResponse(token_generator(), media_type="text/plain")
+        async with redis_service.chat_lock(session_id) as acquired:
+            if not acquired:
+                yield "[ERROR]当前会话已有请求正在处理，请稍后重试"
+                return
+            async for token in ProcessUserInput_stream(
+                chat.message, session_id=session_id
+            ):
+                yield token
+    return StreamingResponse(
+        token_generator(),
+        media_type="text/plain",
+        headers={"X-Session-ID": session_id},
+    )
 
 @router.get("/user_behavior", response_class=HTMLResponse, summary="用户行为分析页面")
 async def user_behavior_page(request: Request):

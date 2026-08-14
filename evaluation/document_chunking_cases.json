@@ -1,0 +1,121 @@
+[
+  {
+    "id": "semantic_neck_metaphor",
+    "group": "dense_semantic",
+    "query": "脖子像上了发条，低头一天以后该了解哪个项目？",
+    "expected_source_id": "KB-GUIDE-009",
+    "expected_contains": "肩颈推拿"
+  },
+  {
+    "id": "semantic_foot_fatigue",
+    "group": "dense_semantic",
+    "query": "逛街后腿脚像灌了铅，想歇一歇",
+    "expected_source_id": "KB-GUIDE-009",
+    "expected_contains": "足底按摩"
+  },
+  {
+    "id": "semantic_whole_body",
+    "group": "dense_semantic",
+    "query": "哪儿都紧，想从头到脚整体松一松",
+    "expected_source_id": "KB-GUIDE-009",
+    "expected_contains": "全身推拿"
+  },
+  {
+    "id": "semantic_back_sitting",
+    "group": "dense_semantic",
+    "query": "坐了一整天，背上像一直背着包",
+    "expected_source_id": "KB-GUIDE-009",
+    "expected_contains": "背部推拿"
+  },
+  {
+    "id": "exact_technician_008",
+    "group": "bm25_exact",
+    "query": "工号 JS-008 的技师擅长哪些项目？",
+    "expected_source_id": "KB-TECH-006",
+    "expected_contains": "头部按摩和足疗"
+  },
+  {
+    "id": "exact_technician_009",
+    "group": "bm25_exact",
+    "query": "JS-009 是重手法方向吗？",
+    "expected_source_id": "KB-TECH-006",
+    "expected_contains": "适合喜欢重手法的客户"
+  },
+  {
+    "id": "exact_membership_code",
+    "group": "bm25_exact",
+    "query": "MB-1000 实付和到账分别是多少？",
+    "expected_source_id": "KB-MEMBER-004",
+    "expected_contains": "到账 1150 元"
+  },
+  {
+    "id": "exact_cancel_code",
+    "group": "bm25_exact",
+    "query": "BK-CANCEL-2H 代表提前多久？",
+    "expected_source_id": "KB-BOOKING-005",
+    "expected_contains": "至少提前 2 小时"
+  },
+  {
+    "id": "exact_parking_code",
+    "group": "bm25_exact",
+    "query": "PARK-B2-06 是固定保留车位吗？",
+    "expected_source_id": "KB-STORE-007",
+    "expected_contains": "不代表保留车位"
+  },
+  {
+    "id": "rerank_neck_price",
+    "group": "rerank_interference",
+    "query": "肩颈推拿一次多少钱，做多长时间？",
+    "expected_source_id": "KB-SERVICE-001",
+    "expected_contains": "80 元与 30 分钟"
+  },
+  {
+    "id": "rerank_neck_experience",
+    "group": "rerank_interference",
+    "query": "肩颈推拿主要聚焦肩部、颈后和上背吗，通常是什么体验？",
+    "expected_source_id": "KB-SERVICE-002",
+    "expected_contains": "聚焦肩部、颈后和上背"
+  },
+  {
+    "id": "rerank_neck_injury",
+    "group": "rerank_interference",
+    "query": "肩膀刚扭伤还红肿，可以马上做肩颈按摩吗？",
+    "expected_source_id": "KB-SAFETY-003",
+    "expected_contains": "不进行对应区域的按摩"
+  },
+  {
+    "id": "rerank_medical_promise",
+    "group": "rerank_interference",
+    "query": "门店能保证一次按摩解决持续疼痛吗？",
+    "expected_source_id": "KB-FAQ-010",
+    "expected_contains": "不能"
+  },
+  {
+    "id": "chunk_booking_cross_section",
+    "group": "chunking_cross_section",
+    "query": "明晚六点的预约下午四点前改期，之后还要确认哪些信息？",
+    "expected_source_id": "KB-BOOKING-005",
+    "expected_contains": "新的日期、时间、项目、时长和技师"
+  },
+  {
+    "id": "chunk_complaint_cross_section",
+    "group": "chunking_cross_section",
+    "query": "服务后一直不舒服，CS-24H 是否保证一天内退款？",
+    "expected_source_id": "KB-AFTERCARE-008",
+    "expected_contains": "只代表首次人工响应目标"
+  },
+  {
+    "id": "chunk_store_last_start",
+    "group": "chunking_cross_section",
+    "query": "晚上十点还能开始做一个小时的全身项目吗？",
+    "expected_source_id": "KB-STORE-007",
+    "expected_contains": "22:00 是结束营业时间"
+  },
+  {
+    "id": "chunk_pregnancy_heat",
+    "group": "chunking_cross_section",
+    "query": "孕期可以做带明显热刺激的热石项目吗？",
+    "expected_source_id": "KB-SAFETY-003",
+    "expected_contains": "不使用热石"
+  }
+]

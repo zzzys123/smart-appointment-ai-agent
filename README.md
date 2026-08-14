@@ -1,6 +1,6 @@
 # Smart Appointment AI Agent
 
-一个面向按摩门店场景的智能预约与咨询系统。基于 FastAPI、LangChain、LangGraph、FAISS 和 SQLite，用多 Agent 协作架构模拟智能前台：自动理解用户意图，分发给对应 Agent 处理，完成预约、咨询、支付、统计等高频业务。
+一个面向按摩门店场景的智能预约与咨询系统。基于 FastAPI、LangChain、LangGraph、FAISS、SQLite 和 Redis，用多 Agent 协作架构模拟智能前台：自动理解用户意图，分发给对应 Agent 处理，完成预约、咨询、支付、统计等高频业务。
 
 ![System Architecture](./architecture%20.jpg)
 
@@ -17,6 +17,7 @@
 - **Structured Output**：用 `with_structured_output` + Pydantic Schema 替代 JSON Prompt，输出格式 100% 合法
 - **对话持久化**：AsyncSqliteSaver checkpointer，服务重启后多轮对话不丢失
 - **多用户隔离**：`thread_id` 机制，不同用户的对话状态完全独立
+- **Redis 协调**：共享预约草稿、会话级限流、分布式锁与幂等键，支持多进程部署
 - **量化评估**：意图分类准确率 96.9%、RAG Top-3 召回率 100%、预约流程通过率 100%，并自研 LLM-as-judge 评估器（Faithfulness / Answer Relevancy）
 
 ---
@@ -30,6 +31,7 @@
 | 大模型接入 | OpenAI 兼容协议（Qwen、DeepSeek、Zhipu、OpenAI、Azure OpenAI） |
 | 检索（RAG） | FAISS + text-embedding-v3（Dense）、rank_bm25 + jieba（Sparse）、RRF 融合、LLM Rerank |
 | 数据库 | SQLite、SQLAlchemy |
+| 缓存与协调 | Redis（可选启用）、会话 TTL、限流、分布式锁、预约幂等 |
 | 外部工具 | OpenWeatherMap（天气）、MCP |
 | 前端 | Jinja2 模板、静态 CSS |
 
@@ -76,13 +78,24 @@ START → classify_node（LLM 意图分类）
 - **可切换**：`RETRIEVER_STRATEGY=dense` 可一键回退纯向量检索
 - **可观测**：每次检索记录各阶段中间态与耗时，`KnowledgeService.get_last_trace()` 可取用
 
+### 文档导入与中文分块
+
+- 支持在知识库管理页上传 UTF-8 Markdown / TXT 文档
+- 按 Markdown 标题、段落和中文句末边界递归分块，默认 `chunk_size=500`、`chunk_overlap=100`
+- 每个分块保留来源、章节、顺序和 SHA-256 内容哈希；沿用同一 `source_id` 可去重并替换旧版本
+- `knowledge_documents/` 提供 10 篇用于展示 Dense、BM25、Rerank 和 Chunking 差异的演示长文
+- 一键导入：`.\.venv\Scripts\python.exe scripts\import_demo_knowledge.py`
+- 离线分块对比：`.\.venv\Scripts\python.exe evaluation\eval_document_chunking.py`
+
+详细说明见 [`docs/RAG_DOCUMENT_INGESTION.md`](docs/RAG_DOCUMENT_INGESTION.md)。
+
 ---
 
 ## 快速开始
 
 ### 环境要求
 
-- Python 3.10+
+- Python 3.10～3.12
 - 一个支持 OpenAI 兼容协议的大模型 API Key（推荐阿里云百炼 Qwen，有免费额度）
 
 ### 安装
@@ -99,6 +112,12 @@ source .venv/bin/activate
 
 # 2. 安装依赖
 pip install -r requirements.txt
+```
+
+如果需要运行测试，再安装开发依赖：
+
+```bash
+pip install -r requirements-dev.txt
 ```
 
 ### 配置
@@ -134,6 +153,19 @@ RERANKER_PROVIDER=llm       # llm（复用 Chat 模型打分）| cross-encoder�
 
 > 使用 Qwen 时，聊天和 Embedding 用同一个 API Key 即可。其他提供商见 `.env.example` 注释。
 > RAG 检索相关配置留空即用默认值，无需额外 Key。
+
+可选启用 Redis（共享会话、限流和预约锁）：
+
+```bash
+docker compose up -d redis
+```
+
+```env
+REDIS_ENABLED=true
+REDIS_URL=redis://localhost:6379/0
+```
+
+未启用或连接失败时会退化为单进程内存锁。完整说明见 [`docs/REDIS_INTEGRATION.md`](docs/REDIS_INTEGRATION.md)。
 
 ### 启动
 

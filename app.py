@@ -7,7 +7,7 @@ FastAPI应用程序
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from services.knowledge_service import KnowledgeService
+from services.knowledge_service import get_shared_knowledge_service
 from services.technician_service import TechnicianService
 from services.recommendation_service import RecommendationService
 from typing import List, Optional
@@ -40,11 +40,14 @@ async def initialize_system():
     """系统启动时自动初始化"""
     try:
         logger.info("🚀 正在初始化智能预约系统...")
+
+        # Redis is optional. Connection failures fall back to local coordination.
+        from services.redis_service import get_redis_service
+        await get_redis_service().connect()
         
         # 初始化知识库服务
         logger.info("📚 初始化知识库服务...")
-        knowledge_service = KnowledgeService()
-        await knowledge_service.initialize()
+        await get_shared_knowledge_service()
         
         # 初始化技师服务
         logger.info("👨‍⚕️ 初始化技师服务...")
@@ -83,6 +86,7 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["X-Session-ID"],
     )
 
     # 注册异常处理器
@@ -104,6 +108,11 @@ def create_app() -> FastAPI:
     async def startup_event():
         """应用启动时自动初始化系统"""
         await initialize_system()
+
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        from services.redis_service import get_redis_service
+        await get_redis_service().close()
 
     return app
 
