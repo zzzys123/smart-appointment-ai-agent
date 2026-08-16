@@ -96,6 +96,7 @@ START → classify_node（LLM 意图分类）
 ### 环境要求
 
 - Python 3.10～3.12
+- Node.js 20.19+（React 前端开发与构建）
 - 一个支持 OpenAI 兼容协议的大模型 API Key（推荐阿里云百炼 Qwen，有免费额度）
 
 ### 安装
@@ -169,13 +170,51 @@ REDIS_URL=redis://localhost:6379/0
 
 ### 启动
 
+推荐使用单命令启动（自动判断是否需要重新构建前端）：
+
+```powershell
+.\start.cmd
+```
+
+开发后端时可启用自动重载：
+
+```powershell
+.\start.cmd -Reload
+```
+
+启动后直接访问 http://127.0.0.1:8000，系统会进入 React 工作台。旧版 Jinja 页面保留在 http://127.0.0.1:8000/legacy。
+
+也可以分别启动后端与前端开发服务器：
+
+后端：
+
 ```bash
 python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-启动后访问：
-- **Web 界面**：http://127.0.0.1:8000
+React 前端开发服务器（另开一个终端）：
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+开发环境访问：
+- **React 工作台**：http://127.0.0.1:5173/ui/
+- **旧版 Web 界面**：http://127.0.0.1:8000/legacy
 - **API 文档**：http://127.0.0.1:8000/docs
+
+生产模式先构建前端，再启动 FastAPI：
+
+```bash
+cd frontend
+npm run build
+cd ..
+python -m uvicorn app:app --host 127.0.0.1 --port 8000
+```
+
+构建完成后，React 工作台由 FastAPI 托管在 http://127.0.0.1:8000/ui/。旧版 Jinja 页面暂时保留，便于迁移期间对照和回退。
 
 ---
 

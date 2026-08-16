@@ -4,7 +4,7 @@ Web界面路由
 处理前端页面渲染和聊天功能
 """
 from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from api.chat_handler import ProcessUserInput_stream
@@ -25,9 +25,15 @@ class ChatRequest(BaseModel):
     state: str | None = None
     session_id: str | None = None
 
-@router.get("/", response_class=HTMLResponse, summary="主页")
+@router.get("/", response_class=RedirectResponse, summary="React 工作台")
 async def read_root(request: Request):
-    """渲染主页聊天界面"""
+    """默认进入 React 工作台。"""
+    return RedirectResponse(url="/ui/", status_code=307)
+
+
+@router.get("/legacy", response_class=HTMLResponse, summary="旧版主页")
+async def legacy_page(request: Request):
+    """保留旧版 Jinja 聊天页用于迁移期对照。"""
     return templates.TemplateResponse("index.html", {"request": request})
 
 @router.post("/chat/stream", summary="流式聊天")
