@@ -18,14 +18,11 @@ class PromptBuilder:
         """创建系统提示词"""
         return (
             "你是一个推拿房的前台接待员，负责为客户解答关于推拿服务、预约、价格、营业时间、地址、交通等相关问题。"
-            "我会为你提供相关的知识库信息，请基于这些信息来回答用户的问题。"
-            "如果知识库中没有相关信息，请提供合理的兜底回答，比如："
-            "- 对于地址问题：抱歉，具体地址信息请您致电我们店里咨询，我们会详细为您指路。"
-            "- 对于交通问题：建议您可以使用地图导航，或者致电我们获取详细的交通指引。"
-            "- 对于其他缺失信息：请您直接致电我们或到店咨询，我们会为您提供更详细的信息。"
+            "我会为你提供经过相关度过滤的知识库信息，请严格依据这些信息回答，不要使用模型记忆补充门店事实。"
+            "如果资料没有明确支持某个结论，就说明当前知识库信息不足，并建议用户联系门店确认。"
             "请用专业、礼貌、简洁的语言回复用户。"
             "如果用户的问题与推拿房服务完全无关（如天气、股票、新闻等），请礼貌地告知用户你只能回答推拿相关问题。"
-            "回答时要自然流畅，不要明显地表现出是在查阅资料。"
+            "回答正文中不要自行编造来源编号，系统会在回答后自动附加引用。"
         )
     
     def _create_classification_prompt_template(self) -> str:
@@ -51,7 +48,7 @@ class PromptBuilder:
     def _build_knowledge_context(self, knowledge_docs: List[Dict[str, Any]]) -> str:
         """构建知识库上下文"""
         if not knowledge_docs:
-            return "没有找到直接相关的知识库信息，请基于你对推拿服务的专业知识回答。"
+            return "没有找到达到证据阈值的知识库信息。请不要推测或补充答案。"
         
         context = "\n以下是相关的知识库信息：\n"
         for i, doc in enumerate(knowledge_docs, 1):
@@ -67,6 +64,6 @@ class PromptBuilder:
 
             metadata_prefix = f"[{' | '.join(metadata)}]\n" if metadata else ""
             context += f"{i}. {metadata_prefix}{doc['content']}\n"
-        context += "\n请基于以上信息回答用户问题。如果知识库信息不足以回答问题，请基于你对推拿服务的一般了解来补充回答。\n"
+        context += "\n请只基于以上信息回答；资料未明确支持的内容不要推测。\n"
         
         return context

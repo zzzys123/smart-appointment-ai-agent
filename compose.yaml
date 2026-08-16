@@ -1,10 +1,32 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: smart-appointment-ai-agent:local
+    container_name: smart-appointment-app
+    init: true
+    env_file:
+      - .env
+    environment:
+      REDIS_ENABLED: "true"
+      REDIS_URL: redis://redis:6379/0
+      CHECKPOINT_DB_PATH: /app/data/langgraph_checkpoints.db
+    ports:
+      - "8000:8000"
+    volumes:
+      - app-data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
   redis:
     image: redis:7-alpine
     container_name: smart-appointment-redis
     command: redis-server --appendonly yes
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis-data:/data
     healthcheck:
@@ -15,4 +37,5 @@ services:
     restart: unless-stopped
 
 volumes:
+  app-data:
   redis-data:

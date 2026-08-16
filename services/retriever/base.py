@@ -34,6 +34,9 @@ class BaseRetriever(ABC):
         ).strip().lower() in ("1", "true", "yes", "on")
         self._reranker = None  # 延迟初始化
         self.last_trace: Optional[RetrievalTrace] = None  # 最近一次检索的链路追踪
+        # 子类在每次 recall 时填充原始通道分数，供无答案判定使用。
+        # RRF 分数只表达名次融合，不能直接充当相关度阈值。
+        self._last_recall_metadata: Dict[int, Dict] = {}
 
     # ---- 子类需实现 ----
     @property
@@ -111,6 +114,11 @@ class BaseRetriever(ABC):
                     continue
                 doc = dict(doc)
                 doc["score"] = float(score)
+                doc["retrieval"] = {
+                    "strategy": self.name,
+                    "score": float(score),
+                    **self._last_recall_metadata.get(doc_id, {}),
+                }
                 candidates.append(doc)
                 if len(candidates) >= candidate_limit:
                     break

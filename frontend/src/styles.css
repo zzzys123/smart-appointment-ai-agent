@@ -71,6 +71,11 @@ button, textarea, input { font: inherit; }
 .thought-step { display: flex; align-items: flex-start; gap: 7px; line-height: 1.55; }
 .thought-step + .thought-step { margin-top: 8px; }
 .thought-step .ant-tag { flex: 0 0 auto; margin: 0; font-size: 10px; }
+.citation-panel { width: 100%; margin-top: 6px; padding: 10px 12px; border: 1px solid #dbe7ff; border-radius: 10px; background: #f7faff; }
+.citation-panel > .ant-typography { color: #334155; font-size: 12px; }
+.citation-list { display: grid; gap: 6px; margin-top: 8px; }
+.citation-item { display: flex; align-items: flex-start; color: #475569; font-size: 12px; line-height: 1.55; }
+.citation-item .ant-tag { flex: 0 0 auto; margin-top: 1px; }
 .message-bubble p { margin: 0 0 8px; }
 .message-bubble p:last-child { margin-bottom: 0; }
 .message-bubble ul, .message-bubble ol { margin: 6px 0; padding-left: 22px; }

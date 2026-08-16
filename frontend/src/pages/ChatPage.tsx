@@ -41,7 +41,13 @@ export default function ChatPage() {
       const migrated = parsed.map((item) => {
         if (item.role !== "assistant" || item.thoughts) return item;
         const result = parseAgentStream(item.content);
-        return { ...item, content: result.reply, thoughts: result.thoughts, agent: result.agent };
+        return {
+          ...item,
+          content: result.reply,
+          thoughts: result.thoughts,
+          agent: result.agent,
+          sources: result.sources
+        };
       });
       return migrated.length ? migrated : [initialMessage];
     } catch {
@@ -111,6 +117,7 @@ export default function ChatPage() {
                   content: parsed.reply,
                   thoughts: parsed.thoughts,
                   agent: parsed.agent,
+                  sources: parsed.sources,
                   pending: !parsed.reply
                 }
               : item
@@ -127,6 +134,7 @@ export default function ChatPage() {
                 content: completed.reply || "处理已完成，但没有返回可展示的回复。",
                 thoughts: completed.thoughts,
                 agent: completed.agent,
+                sources: completed.sources,
                 pending: false
               }
             : item
@@ -223,6 +231,29 @@ export default function ChatPage() {
                       ))}
                     </div>
                   </details>
+                )}
+                {item.role === "assistant" && Boolean(item.sources?.length) && (
+                  <div className="citation-panel">
+                    <Typography.Text strong>参考来源</Typography.Text>
+                    <div className="citation-list">
+                      {item.sources?.map((source, index) => {
+                        const label = source.source_name || source.source_id || source.category || `知识条目 #${source.document_id}`;
+                        const chunk = source.chunk_number && source.chunk_count
+                          ? ` · 分块 ${source.chunk_number}/${source.chunk_count}`
+                          : "";
+                        return (
+                          <div className="citation-item" key={`${source.source_id || source.document_id}-${source.chunk_number || index}`}>
+                            <Tag color="blue" bordered={false}>{index + 1}</Tag>
+                            <span>
+                              <strong>{label}</strong>
+                              {source.title ? ` · ${source.title}` : ""}
+                              {chunk}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
                 {item.role === "assistant" && item.content && !item.pending && item.id !== "welcome" && (
                   <Space size={4} className="message-actions">

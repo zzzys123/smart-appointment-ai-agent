@@ -1,3 +1,5 @@
+import type { CitationSource } from "./types";
+
 export interface AgentThought {
   agent: string;
   content: string;
@@ -7,10 +9,11 @@ export interface ParsedAgentStream {
   reply: string;
   thoughts: AgentThought[];
   agent?: string;
+  sources: CitationSource[];
 }
 
-const markerPattern = /\[(THOUGHT|REPLY|SIGNAL|STATE)\](?:\[([^\]]+)\])?/g;
-const protocolMarkers = ["[THOUGHT]", "[REPLY]", "[SIGNAL]", "[STATE]"];
+const markerPattern = /\[(THOUGHT|REPLY|SIGNAL|STATE|SOURCES)\](?:\[([^\]]+)\])?/g;
+const protocolMarkers = ["[THOUGHT]", "[REPLY]", "[SIGNAL]", "[STATE]", "[SOURCES]"];
 
 function removeTrailingMarkerFragment(value: string): string {
   const bracketIndex = value.lastIndexOf("[");
@@ -28,12 +31,13 @@ export function parseAgentStream(raw: string): ParsedAgentStream {
     const reply = protocolMarkers.some((marker) => marker.startsWith(raw.trim()))
       ? ""
       : removeTrailingMarkerFragment(raw);
-    return { reply, thoughts: [] };
+    return { reply, thoughts: [], sources: [] };
   }
 
   const thoughts: AgentThought[] = [];
   const replyParts: string[] = [];
   let replyAgent: string | undefined;
+  let sources: CitationSource[] = [];
 
   markers.forEach((match, index) => {
     const type = match[1];
@@ -47,12 +51,20 @@ export function parseAgentStream(raw: string): ParsedAgentStream {
     } else if (type === "REPLY") {
       replyAgent = agent;
       if (content) replyParts.push(content);
+    } else if (type === "SOURCES" && content) {
+      try {
+        const parsed = JSON.parse(content) as unknown;
+        if (Array.isArray(parsed)) sources = parsed as CitationSource[];
+      } catch {
+        // Streaming may split the JSON payload; the next chunk is parsed again.
+      }
     }
   });
 
   return {
     reply: replyParts.join("\n").trim(),
     thoughts,
-    agent: replyAgent
+    agent: replyAgent,
+    sources
   };
 }

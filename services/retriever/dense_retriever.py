@@ -53,6 +53,7 @@ class DenseRetriever(BaseRetriever):
     def _recall(
         self, query: str, candidate_k: int, trace: Optional[RetrievalTrace] = None
     ) -> List[Tuple[int, float]]:
+        self._last_recall_metadata = {}
         if self.index is None or not self.document_ids:
             return []
         t0 = time.perf_counter()
@@ -64,6 +65,10 @@ class DenseRetriever(BaseRetriever):
             for score, idx in zip(scores[0], indices[0])
             if 0 <= idx < len(self.document_ids)
         ]
+        self._last_recall_metadata = {
+            doc_id: {"dense_score": score, "dense_rank": rank}
+            for rank, (doc_id, score) in enumerate(ranked, start=1)
+        }
         if trace is not None:
             trace.add_stage(
                 "dense_recall", [d for d, _ in ranked], (time.perf_counter() - t0) * 1000
