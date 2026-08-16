@@ -1,24 +1,25 @@
 # Smart Appointment AI Agent
 
-一个面向按摩门店场景的智能预约与咨询系统。基于 FastAPI、LangChain、LangGraph、FAISS、SQLite 和 Redis，用多 Agent 协作架构模拟智能前台：自动理解用户意图，分发给对应 Agent 处理，完成预约、咨询、支付、统计等高频业务。
+一个面向按摩门店场景的智能预约与咨询系统。React 工作台通过 FastAPI 流式接口连接 LangGraph 多 Agent，完成预约、咨询、支付确认和服务统计；知识问答采用 Dense + BM25 + RRF 的 Hybrid RAG，并支持中文长文分块导入、可选 Redis 协调和可复现检索评估。
 
-![System Architecture](./architecture%20.jpg)
+[![CI](https://github.com/zzzys123/smart-appointment-ai-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/zzzys123/smart-appointment-ai-agent/actions/workflows/ci.yml)
 
 ---
 
 ## 核心特性
 
 - **多 Agent 协作**：任务分类 → 预约 / 咨询 / 支付 / 统计 / 无关处理，5 类意图全覆盖
-- **LangGraph 编排**：用 StateGraph 替代手写状态机，图定义集中，扩展一个新 Agent 只需改 1 处
+- **LangGraph 编排**：用 StateGraph 替代手写状态机，分类与业务节点的路由关系集中定义
 - **混合检索 RAG**：Dense 向量（FAISS + Qwen Embedding）+ BM25 稀疏（jieba 分词）双路召回，RRF 融合，兼顾语义匹配与专有名词/数字精确匹配
 - **两段式精排**：混合召回后可选接 LLM Rerank 精排（`with_structured_output` 打分重排，异常自动回退粗排），"粗排泛召回 → 精排精过滤"
 - **可插拔检索器**：`BaseRetriever` 抽象（工厂 + 模板方法），`dense` / `hybrid` 策略通过配置一键切换，零代码改动，新增策略只需实现两个方法
 - **链路可观测**：检索全链路 Trace，记录 dense / sparse / RRF / rerank 各阶段输出与耗时，RAG 从黑盒变白盒
-- **Structured Output**：用 `with_structured_output` + Pydantic Schema 替代 JSON Prompt，输出格式 100% 合法
-- **对话持久化**：AsyncSqliteSaver checkpointer，服务重启后多轮对话不丢失
+- **证据约束与引用**：使用 Dense/BM25 原始分阈值触发无答案兜底，回答后展示来源、章节和分块编号
+- **Structured Output**：用 `with_structured_output` + Pydantic Schema 约束预约字段，并由业务代码继续做值校验与标准化
+- **会话状态管理**：AsyncSqliteSaver 持久化 LangGraph 图状态；启用 Redis 后可共享预约草稿并提供 TTL
 - **多用户隔离**：`thread_id` 机制，不同用户的对话状态完全独立
 - **Redis 协调**：共享预约草稿、会话级限流、分布式锁与幂等键，支持多进程部署
-- **量化评估**：意图分类准确率 96.9%、RAG Top-3 召回率 100%、预约流程通过率 100%，并自研 LLM-as-judge 评估器（Faithfulness / Answer Relevancy）
+- **量化评估**：17 条严格证据用例中 Hybrid Evidence Recall@10 达到 100%，并提供 Whole/Chunked 上下文成本对比
 
 ---
 
@@ -33,21 +34,58 @@
 | 数据库 | SQLite、SQLAlchemy |
 | 缓存与协调 | Redis（可选启用）、会话 TTL、限流、分布式锁、预约幂等 |
 | 外部工具 | OpenWeatherMap（天气）、MCP |
-| 前端 | Jinja2 模板、静态 CSS |
+| 前端 | React 19、TypeScript、Ant Design、TanStack Query、React Router、Vite；Jinja2 作为 Legacy 回退页 |
+| 测试与 CI | Pytest、GitHub Actions、TypeScript/Vite 生产构建 |
 
 ---
 
 ## 系统架构
 
-采用严格五层架构，下层不能反向调用上层：
+主调用链遵循 `Web → API → Agents → Services → DB` 的分层方向；Redis、模型服务和天气服务是跨层依赖。架构图使用 Mermaid 维护，避免静态图片随代码演进而过期。
 
+```mermaid
+flowchart TB
+    Browser[浏览器]
+    React[React / TypeScript 工作台<br/>/ui/]
+    Legacy[Jinja2 Legacy 页面<br/>/legacy]
+    FastAPI[FastAPI / Uvicorn<br/>页面托管 + 流式接口]
+    API[API Layer<br/>聊天、知识、技师、用户行为]
+    Graph[LangGraph StateGraph<br/>意图分类与条件路由]
+    Agents[Business Agents<br/>预约 / 咨询 / 支付 / 统计 / 兜底]
+    Services[Services Layer<br/>业务逻辑、知识服务、推荐]
+    Retriever[Hybrid Retriever<br/>FAISS Dense + BM25 + RRF<br/>可选 LLM Rerank]
+    SQL[(SQLite / SQLAlchemy<br/>业务数据、知识、Embedding)]
+    Checkpoint[(SQLite Checkpointer<br/>LangGraph 图状态)]
+    Redis[(Redis，可选<br/>草稿、限流、锁、幂等)]
+    Model[Qwen / OpenAI-compatible<br/>Chat + Embedding]
+    Weather[OpenWeatherMap]
+
+    Browser --> React
+    Browser --> Legacy
+    React --> FastAPI
+    Legacy --> FastAPI
+    FastAPI --> API
+    API --> Graph
+    Graph --> Agents
+    Agents --> Services
+    Services --> Retriever
+    Services --> SQL
+    Retriever --> SQL
+    Retriever --> Model
+    Graph <--> Checkpoint
+    Graph <--> Redis
+    Services <--> Redis
+    Agents --> Model
+    Agents --> Weather
 ```
-Web Layer      →  app.py, web/：页面路由、启动入口
-API Layer      →  api/：接口编排、请求处理
-Agents Layer   →  agents/：LangGraph StateGraph + 各 Agent
-Services Layer →  services/：业务逻辑、可插拔检索器（retriever/）、重排、推荐算法
-DB Layer       →  db/：SQLAlchemy 模型、Repository 模式
-```
+
+职责边界：
+
+- **Web**：React 负责交互状态和流式展示；FastAPI 在生产模式托管 `frontend/dist`，Jinja 页面保留用于迁移回退。
+- **API**：校验请求、解析 `session_id`、限流并返回流式响应，不承载核心业务规则。
+- **Agents**：LangGraph 管理意图路由和多轮状态，各 Agent 负责编排业务步骤。
+- **Services**：实现预约并发控制、知识导入、检索、重排和推荐等可复用逻辑。
+- **DB/Redis**：SQL 数据库是业务事实源；Redis 只承担临时状态和跨进程协调，未启用时退化为单进程能力。
 
 ### LangGraph 编排图
 
@@ -61,7 +99,7 @@ START → classify_node（LLM 意图分类）
               └── other        → unrelated_node    → END
 ```
 
-多轮对话通过 `active_agent` 字段 + SQLite checkpointer 实现跨请求状态保持。
+多轮对话通过 `active_agent` + `thread_id` 隔离。SQLite Checkpointer 保存图状态；预约 Agent 的详细草稿在启用 Redis 后可跨进程共享。Redis 未启用时，本地锁和进程内 Agent 只适合单实例开发。
 
 ### RAG 检索流水线
 
@@ -69,7 +107,7 @@ START → classify_node（LLM 意图分类）
 
 ```
               ┌─ Dense 召回（FAISS 向量，语义匹配）─┐
-用户问题  →   │                                     ├─ RRF 融合 → 候选池 →（可选）LLM Rerank 精排 → Top-K → LLM 生成
+用户问题  →   │                                     ├─ RRF 融合 → 候选池 →（可选）LLM Rerank → Top-K → 带来源生成
               └─ BM25 召回（jieba 分词，精确匹配）─┘
 ```
 
@@ -81,13 +119,16 @@ START → classify_node（LLM 意图分类）
 ### 文档导入与中文分块
 
 - 支持在知识库管理页上传 UTF-8 Markdown / TXT 文档
-- 按 Markdown 标题、段落和中文句末边界递归分块，默认 `chunk_size=500`、`chunk_overlap=100`
+- 按 Markdown 标题、段落、换行、中文句末和字符回退顺序分块，默认 `chunk_size=500`、`chunk_overlap=100`
 - 每个分块保留来源、章节、顺序和 SHA-256 内容哈希；沿用同一 `source_id` 可去重并替换旧版本
+- 单文件限制 2 MB / 200 个分块，overlap 不得超过 chunk size 的 50%，避免病态输入耗尽内存
+- 数据库维护索引 generation；多 worker 查询前发现版本落后会惰性刷新本地索引
 - `knowledge_documents/` 提供 10 篇用于展示 Dense、BM25、Rerank 和 Chunking 差异的演示长文
 - 一键导入：`.\.venv\Scripts\python.exe scripts\import_demo_knowledge.py`
 - 离线分块对比：`.\.venv\Scripts\python.exe evaluation\eval_document_chunking.py`
 
 详细说明见 [`docs/RAG_DOCUMENT_INGESTION.md`](docs/RAG_DOCUMENT_INGESTION.md)。
+无答案阈值和流式引用协议见 [`docs/RAG_GROUNDING_AND_CITATIONS.md`](docs/RAG_GROUNDING_AND_CITATIONS.md)。
 
 ---
 
@@ -150,12 +191,15 @@ OPENWEATHER_API_KEY=your_openweather_api_key_here  # 可选
 RETRIEVER_STRATEGY=hybrid   # dense（纯向量）| hybrid（向量 + BM25 + RRF），默认 hybrid
 RERANK_ENABLED=false        # 是否在召回后加一层精排，默认 false（避免增加实时延迟/额度）
 RERANKER_PROVIDER=llm       # llm（复用 Chat 模型打分）| cross-encoder（本地模型，待实现）
+RAG_NO_ANSWER_ENABLED=true  # 低证据候选不交给 LLM，直接返回无答案提示
+RAG_DENSE_MIN_SCORE=0.60    # Dense 原始内积分阈值
+RAG_BM25_MIN_SCORE=8.0      # BM25 原始分阈值
 ```
 
 > 使用 Qwen 时，聊天和 Embedding 用同一个 API Key 即可。其他提供商见 `.env.example` 注释。
 > RAG 检索相关配置留空即用默认值，无需额外 Key。
 
-可选启用 Redis（共享会话、限流和预约锁）：
+宿主机开发时可只启动 Redis（共享会话、限流和预约锁）：
 
 ```bash
 docker compose up -d redis
@@ -216,17 +260,39 @@ python -m uvicorn app:app --host 127.0.0.1 --port 8000
 
 构建完成后，React 工作台由 FastAPI 托管在 http://127.0.0.1:8000/ui/。旧版 Jinja 页面暂时保留，便于迁移期间对照和回退。
 
+### Docker Compose 一键启动
+
+仓库包含多阶段 `Dockerfile`：Node 20 阶段构建 React，Python 3.11 slim 阶段安装后端依赖并运行 Uvicorn。完整 Compose 同时启动 App 和 Redis，并分别持久化 SQLite 与 Redis 数据。
+
+先创建并填写 `.env`，然后执行：
+
+```bash
+docker compose up --build -d
+docker compose logs -f app
+```
+
+访问 http://127.0.0.1:8000；`GET /health` 用于容器健康检查。停止容器但保留数据：
+
+```bash
+docker compose down
+```
+
+只有明确需要清空本地数据库和 Redis 数据时才使用 `docker compose down -v`。`.env`、本地数据库、虚拟环境、前端依赖和面试笔记均由 `.dockerignore` 排除，不会进入镜像。
+
 ---
 
 ## 主要页面
 
 | 页面 | 地址 | 功能 |
 |------|------|------|
-| 聊天预约 | `/` | 主对话入口，支持预约、咨询、意图切换 |
-| 技师管理 | `/technician` | 查看所有技师信息 |
-| 技师排班 | `/technician_schedule` | 今日排班与忙碌时段 |
-| 知识库管理 | `/knowledge` | 增删改查知识条目，自动重建向量索引 |
-| 用户行为分析 | `/user_behavior` | 偏好分析、个性化回访提醒 |
+| React 工作台入口 | `/`、`/ui/` | `/` 自动跳转到 React 工作台 |
+| 流式聊天 | `/ui/chat` | 预约、咨询、意图切换、处理过程、停止生成 |
+| 知识库管理 | `/ui/knowledge` | CRUD、检索、Markdown/TXT 文档导入和来源分组 |
+| 技师管理 | `/ui/technicians` | 查看技师资料与技能信息 |
+| 今日排班 | `/ui/schedule` | 技师忙碌时段与排班状态 |
+| 用户洞察 | `/ui/behavior` | 偏好分析和回访提醒 |
+| Legacy 页面 | `/legacy` | 旧版 Jinja 聊天页，供迁移对照和回退 |
+| API 文档 | `/docs` | FastAPI OpenAPI / Swagger UI |
 
 ---
 
@@ -257,28 +323,42 @@ AI：📋 订单号：ORD4082031 | 技师：张伟 | 项目：全身推拿 | 金
 
 ## 评估结果
 
+评估采用两种口径：基础 Agent 评估需要真实 LLM，结果可能受模型版本和网络影响；下表优先展示已经保存逐用例 JSON、可复现的知识库回归结果。
+
+### Dense 与 Hybrid 严格证据对比
+
+测试快照：90 条有效知识（10 条默认知识 + 10 篇长文的 80 个分块）、17 条查询、Qwen `text-embedding-v3`，关闭 Rerank 以隔离检索策略变量。只有返回结果同时满足正确 `source_id` 且具体分块包含答案片段，才算 Evidence 命中。
+
+| 指标 | Dense | Hybrid |
+|------|------:|-------:|
+| Evidence Recall@1 | 88.2% | 88.2% |
+| Evidence Recall@3 | 94.1% | 94.1% |
+| Evidence Recall@5 | 94.1% | **100.0%** |
+| Evidence Recall@10 | 94.1% | **100.0%** |
+| Evidence MRR@10 | 0.912 | **0.924** |
+
+### Whole Document 与 Chunked Passage 对比
+
+| 指标 | Whole | Chunked |
+|------|------:|--------:|
+| Evidence Recall@1 | **88.2%** | 76.5% |
+| Evidence Recall@3 / @10 | 100.0% | 100.0% |
+| 平均 Top-3 上下文字符数 | 2985.5 | **389.5** |
+
+分块没有保证 BM25 Top-1 上升，但在保持 Top-3/Top-10 证据召回的同时把平均 Top-3 上下文压缩 **87.0%**。完整方法、逐用例结果和局限见 [`docs/RAG_RETRIEVAL_COMPARISON.md`](docs/RAG_RETRIEVAL_COMPARISON.md)。
+
+```powershell
+# 不访问外部 API：Whole vs Chunked
+.\.venv\Scripts\python.exe evaluation\eval_document_chunking.py
+
+# 调用 Qwen Embedding：Dense vs Hybrid
+.\.venv\Scripts\python.exe evaluation\eval_retrieval_strategies.py
+
+# 不访问外部 API 的确定性回归
+.\.venv\Scripts\python.exe -m pytest tests\test_document_ingestion.py tests\test_redis_integration.py tests\test_retriever_category_filter.py tests\test_shared_knowledge_service.py -q
 ```
-运行评估：python -m evaluation.run_all
-```
 
-| 评估维度 | 测试数量 | 结果 |
-|---------|---------|------|
-| 意图分类准确率 | 32 条 | **96.9%**（31/32） |
-| RAG 检索 Top-3 召回率 | 12 组 | **100%**（12/12） |
-| 预约流程场景通过率 | 8 个场景 | **100%**（8/8） |
-| RAG 忠实度（Faithfulness） | 4 条 | **1.00**（无编造） |
-| RAG 答案相关性（Answer Relevancy） | 4 条 | **1.00**（不跑题） |
-
-### 混合检索 / 重排的受控对比
-
-现有知识库仅 10 条、主题区分度高，纯向量已能把正确文档排第 1（召回率饱和）。为验证混合检索与重排的真实价值，构造了针对性实验：
-
-| 场景 | 对比 | MRR 变化 |
-|------|------|---------|
-| 高混淆合成库（模板一致、仅工号不同的技师简介，精确编号查询） | Dense → Hybrid(BM25+RRF) | **0.75 → 1.00** |
-| 主库对抗性用例（话题相关但意图不同，如问价格 vs 问效果） | Hybrid → Hybrid + LLM Rerank | **0.917 → 1.00** |
-
-> 结论：在"语义相近、区分点在精确 token"场景，BM25 + RRF 修复了纯向量的漏排；在"话题相关但意图不同"场景，LLM Rerank 纠正了粗排错误。对比脚本见 `evaluation/eval_bm25_synthetic.py`、`evaluation/eval_rerank_compare.py`。
+当前确定性回归结果为 **31 passed**；GitHub Actions 会在 Push 和 Pull Request 中重复执行后端测试、React 生产构建、Compose 配置校验与 Docker 镜像构建，不使用真实 API Key。
 
 ---
 
@@ -294,9 +374,14 @@ AI：📋 订单号：ORD4082031 | 技师：张伟 | 项目：全身推拿 | 金
 │   ├── appointment/                # InputParser（Structured Output）
 │   ├── consultant/                 # 知识检索、回答生成
 │   └── user_behavior/              # 行为记录、偏好分析
-├── api/                            # 接口编排层
+├── api/                            # HTTP API 与聊天入口
+├── frontend/                       # React + TypeScript + Ant Design 工作台
+│   ├── src/pages/                  # 聊天、知识、技师、排班、用户洞察
+│   └── vite.config.ts              # /ui/ base 与开发代理
 ├── services/                       # 业务逻辑层
 │   ├── knowledge_service.py        # 知识库数据管理（持有可插拔检索器）
+│   ├── document_ingestion_service.py# 中文文档解析、分块与来源同步
+│   ├── redis_service.py            # 限流、会话锁、预约锁、幂等与降级
 │   ├── reranker.py                 # 重排器（LLMReranker + Cross-Encoder 占位）
 │   ├── text_embedding.py           # Qwen Embedding 封装
 │   └── retriever/                  # 可插拔检索器模块
@@ -307,26 +392,30 @@ AI：📋 订单号：ORD4082031 | 技师：张伟 | 项目：全身推拿 | 金
 │       └── trace.py                # 检索链路 Trace
 ├── db/                             # 数据持久化层（Repository 模式）
 ├── config/                         # 配置（模型工厂、数据库、常量）
-├── evaluation/                     # 量化评估模块
-│   ├── test_cases.py               # 测试用例
-│   ├── eval_classification.py      # 意图分类评估
-│   ├── eval_rag_retrieval.py       # RAG 检索评估
-│   ├── eval_appointment_flow.py    # 预约流程评估
-│   ├── eval_retrieval_compare.py   # Dense vs Hybrid 对比
-│   ├── eval_bm25_adversarial.py    # 精确匹配对抗性用例
-│   ├── eval_bm25_synthetic.py      # 高混淆合成库受控实验（证明 BM25+RRF 增益）
-│   ├── eval_rerank_compare.py      # Hybrid vs Hybrid+Rerank 对比
-│   ├── rag_evaluator.py            # 自研 LLM-as-judge 评估器
-│   ├── eval_rag_quality.py         # Faithfulness / Answer Relevancy 评估
-│   └── run_all.py                  # 一键评估
+├── evaluation/                     # Agent 与 RAG 量化评估
+│   ├── document_chunking_cases.json# 17 条严格证据用例
+│   ├── eval_document_chunking.py   # Whole vs Chunked 离线对比
+│   ├── eval_retrieval_strategies.py# 真实 Dense vs Hybrid 对比
+│   ├── eval_no_answer_gate.py      # 已知/未知问题门控冒烟评估
+│   └── results/                    # 可复核的逐用例 JSON
+├── knowledge_documents/            # 10 篇带 front matter 的演示长文
 ├── docs/
 │   ├── LANGGRAPH_MIGRATION.md      # LangGraph 改造详解
-│   └── STRUCTURED_OUTPUT_MIGRATION.md
-├── web/                            # Jinja2 模板 + 静态资源
+│   ├── RAG_DOCUMENT_INGESTION.md    # 文档导入与版本同步
+│   ├── RAG_RETRIEVAL_COMPARISON.md # 严格证据评估报告
+│   ├── RAG_GROUNDING_AND_CITATIONS.md# 无答案门控与引用协议
+│   └── REDIS_INTEGRATION.md         # Redis 能力与一致性边界
+├── web/                            # FastAPI 页面路由与 Legacy Jinja
 ├── data/                           # SQLite 数据库 + checkpointer
-├── tests/                          # 单元测试
+├── tests/                          # 单元与确定性集成测试
+├── .github/workflows/ci.yml        # 后端测试 + 前端生产构建
+├── Dockerfile                      # React 构建 + Python 运行时多阶段镜像
+├── .dockerignore                   # 镜像构建上下文排除规则
+├── compose.yaml                    # App + Redis 编排与持久化 Volume
+├── scripts/start.ps1               # 自动构建前端并启动后端
 ├── app.py                          # FastAPI 应用入口
-├── requirements.txt
+├── requirements.txt                # 运行依赖
+├── requirements-dev.txt            # 测试依赖
 └── .env.example
 ```
 
@@ -347,11 +436,13 @@ USE_LANGGRAPH=false  # 切换到旧版 TaskClassificationAgent
 
 | 改进项 | 核心变化 |
 |--------|---------|
-| LangGraph 编排 | 4 文件 400 行手写状态机 → 1 文件图定义，扩展性验证 |
-| Structured Output | JSON Prompt 容错 → Function Calling 协议，输出 100% 合法 |
-| 对话持久化 | 内存状态重启丢失 → SQLite checkpointer |
+| LangGraph 编排 | 分散的手写状态机 → 集中的图定义与条件路由，旧实现可配置回退 |
+| Structured Output | JSON Prompt 容错 → Tool Calling Schema + Pydantic 校验 + 业务值标准化 |
+| 会话状态 | 进程内状态 → SQLite 图快照；可选 Redis 共享预约草稿与 TTL |
 | 多用户隔离 | 全局单实例互串 → thread_id + 按 session 隔离 |
-| 量化评估 | 无指标 → 分类 97%、RAG 100%、预约 100% |
+| 量化评估 | 只看来源命中 → 17 条分块级严格 Evidence Recall/MRR + 上下文成本 |
 | 业务闭环 | 5 类意图 2 类有 handler → 全覆盖 |
 | RAG 检索升级 | 单阶段稠密检索 → 混合召回(BM25+RRF) + LLM Rerank 精排 + 可插拔检索器 + 链路 Trace |
-| RAG 质量评估 | 只算召回率 → 自研 LLM-as-judge（Faithfulness / Answer Relevancy） |
+| 长文知识库 | 手工短条目 → Markdown/TXT 分块、来源同步、哈希去重和索引代数 |
+| 前端工作台 | Jinja 页面 → React/TypeScript 主界面，Legacy 页面保留回退 |
+| 并发协调 | 单进程锁 → 可选 Redis 限流、聊天锁、预约锁与幂等 |

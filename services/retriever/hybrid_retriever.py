@@ -93,32 +93,37 @@ class HybridRetriever(BaseRetriever):
     def _recall(
         self, query: str, candidate_k: int, trace: Optional[RetrievalTrace] = None
     ) -> List[Tuple[int, float]]:
+        self._last_recall_metadata = {}
         candidate_n = min(max(candidate_k, 1), max(len(self.document_ids), len(self.bm25_doc_ids)))
 
         # 1. Dense 召回
         t0 = time.perf_counter()
         dense_ranking: List[int] = []
+        dense_score_map: Dict[int, float] = {}
         if self.index is not None and self.document_ids:
             n = min(candidate_n, len(self.document_ids))
             query_array = np.array([embed_input(query)]).astype("float32")
-            _, dense_indices = self.index.search(query_array, n)
-            dense_ranking = [
-                self.document_ids[idx]
-                for idx in dense_indices[0]
-                if 0 <= idx < len(self.document_ids)
-            ]
+            dense_scores, dense_indices = self.index.search(query_array, n)
+            for score, idx in zip(dense_scores[0], dense_indices[0]):
+                if 0 <= idx < len(self.document_ids):
+                    doc_id = self.document_ids[idx]
+                    dense_ranking.append(doc_id)
+                    dense_score_map[doc_id] = float(score)
         if trace is not None:
             trace.add_stage("dense_recall", dense_ranking, (time.perf_counter() - t0) * 1000)
 
         # 2. BM25 稀疏召回
         t1 = time.perf_counter()
         sparse_ranking: List[int] = []
+        sparse_score_map: Dict[int, float] = {}
         if self.bm25 is not None:
             bm25_scores = self.bm25.get_scores(_tokenize_zh(query))
             order = np.argsort(bm25_scores)[::-1][:candidate_n]
-            sparse_ranking = [
-                self.bm25_doc_ids[i] for i in order if bm25_scores[i] > 0
-            ]
+            for index in order:
+                if bm25_scores[index] > 0:
+                    doc_id = self.bm25_doc_ids[index]
+                    sparse_ranking.append(doc_id)
+                    sparse_score_map[doc_id] = float(bm25_scores[index])
         if trace is not None:
             trace.add_stage("sparse_recall", sparse_ranking, (time.perf_counter() - t1) * 1000)
 
@@ -130,6 +135,22 @@ class HybridRetriever(BaseRetriever):
                 fused[doc_id] = fused.get(doc_id, 0.0) + 1.0 / (RRF_K + rank)
 
         ranked = sorted(fused.items(), key=lambda kv: kv[1], reverse=True)
+        dense_rank_map = {
+            doc_id: rank for rank, doc_id in enumerate(dense_ranking, start=1)
+        }
+        sparse_rank_map = {
+            doc_id: rank for rank, doc_id in enumerate(sparse_ranking, start=1)
+        }
+        self._last_recall_metadata = {
+            doc_id: {
+                "dense_score": dense_score_map.get(doc_id),
+                "dense_rank": dense_rank_map.get(doc_id),
+                "bm25_score": sparse_score_map.get(doc_id),
+                "bm25_rank": sparse_rank_map.get(doc_id),
+                "rrf_score": score,
+            }
+            for doc_id, score in ranked
+        }
         if trace is not None:
             trace.add_stage(
                 "rrf_fusion", [d for d, _ in ranked], (time.perf_counter() - t2) * 1000

@@ -6,6 +6,7 @@
 
 from typing import List, Dict, Any, Optional
 from services.knowledge_service import KnowledgeService, get_shared_knowledge_service
+from services.retrieval_relevance import RetrievalRelevancePolicy
 
 
 class KnowledgeRetriever:
@@ -14,6 +15,7 @@ class KnowledgeRetriever:
     def __init__(self):
         self.knowledge_service: Optional[KnowledgeService] = None
         self.kb_initialized = False
+        self.relevance_policy = RetrievalRelevancePolicy()
     
     async def initialize(self):
         """初始化知识库服务"""
@@ -31,10 +33,18 @@ class KnowledgeRetriever:
             return []
         
         # 搜索相关知识
-        relevant_docs = await self.knowledge_service.search(query, top_k=top_k)
+        recalled_docs = await self.knowledge_service.search(query, top_k=top_k)
+        relevant_docs = self.relevance_policy.filter(recalled_docs or [])
         
         # 记录检索日志（含结构化链路追踪）
         self._log_search_results(query, relevant_docs)
+
+        if recalled_docs and not relevant_docs:
+            print(
+                "⚠️ 知识库检索: 候选均低于证据阈值，"
+                f"query={query!r}, dense>={self.relevance_policy.dense_min_score}, "
+                f"bm25>={self.relevance_policy.bm25_min_score}"
+            )
         
         return relevant_docs or []
     

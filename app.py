@@ -107,6 +107,11 @@ def create_app() -> FastAPI:
     app.add_exception_handler(BusinessException, api_exception_handler)
     app.add_exception_handler(Exception, general_exception_handler)
 
+    @app.get("/health", tags=["System"], summary="Container health check")
+    async def health_check():
+        """Lightweight liveness endpoint used by Docker and load balancers."""
+        return {"status": "ok"}
+
     # 注册API路由
     for router in api_routers:
         app.include_router(router)

@@ -49,4 +49,15 @@ export interface ChatMessage {
   pending?: boolean;
   agent?: string;
   thoughts?: Array<{ agent: string; content: string }>;
+  sources?: CitationSource[];
+}
+
+export interface CitationSource {
+  source_id?: string | null;
+  source_name?: string | null;
+  title?: string | null;
+  category?: string | null;
+  chunk_number?: number | null;
+  chunk_count?: number | null;
+  document_id?: number | null;
 }
