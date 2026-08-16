@@ -55,7 +55,18 @@ class PromptBuilder:
         
         context = "\n以下是相关的知识库信息：\n"
         for i, doc in enumerate(knowledge_docs, 1):
-            context += f"{i}. {doc['content']}\n"
+            metadata = []
+            if doc.get('source_name'):
+                metadata.append(f"来源: {doc['source_name']}")
+            if doc.get('title'):
+                metadata.append(f"章节: {doc['title']}")
+            chunk_index = doc.get('chunk_index')
+            chunk_count = doc.get('chunk_count')
+            if chunk_index is not None and chunk_count:
+                metadata.append(f"分块: {int(chunk_index) + 1}/{chunk_count}")
+
+            metadata_prefix = f"[{' | '.join(metadata)}]\n" if metadata else ""
+            context += f"{i}. {metadata_prefix}{doc['content']}\n"
         context += "\n请基于以上信息回答用户问题。如果知识库信息不足以回答问题，请基于你对推拿服务的一般了解来补充回答。\n"
         
         return context

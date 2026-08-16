@@ -20,6 +20,7 @@ import os
 import uuid
 import sqlite3
 import logging
+from pathlib import Path
 from typing import TypedDict, Literal, Annotated
 from operator import add
 
@@ -137,6 +138,11 @@ async def appointment_node(state: AgentState) -> dict:
     session_id = state.get("session_id", "default")
     agent = _get_appointment_agent(session_id)
     user_input = state["user_input"]
+    from services.redis_service import get_redis_service
+
+    redis_service = get_redis_service()
+    session_state = await redis_service.get_session(session_id)
+    agent.restore_snapshot(session_state.get("appointment_agent"))
     
     tokens = []
     tokens.append("[THOUGHT][归类机器人] 归类机器人：我发现这是一个预约任务，我将转给预约机器人处理。")
@@ -147,9 +153,12 @@ async def appointment_node(state: AgentState) -> dict:
     except Exception as e:
         tokens.append(f"[ERROR]预约处理失败: {str(e)}")
         return {"output_tokens": tokens, "active_agent": "none"}
+    finally:
+        session_state["appointment_agent"] = agent.create_snapshot()
+        await redis_service.save_session(session_id, session_state)
     
     # 判断预约是否完成：如果 agent.finished 或者状态回到 CLASSIFY
-    if agent.finished:
+    if agent.finished or agent.last_run_completed:
         return {"output_tokens": tokens, "active_agent": "none"}
     else:
         # 预约流程还没结束（多轮对话中），标记 active_agent 为 appointment
@@ -448,6 +457,8 @@ async def _get_checkpointer() -> AsyncSqliteSaver:
     """
     global _checkpointer
     if _checkpointer is None:
+        checkpoint_parent = Path(CHECKPOINT_DB_PATH).expanduser().parent
+        checkpoint_parent.mkdir(parents=True, exist_ok=True)
         conn = await aiosqlite.connect(CHECKPOINT_DB_PATH)
         _checkpointer = AsyncSqliteSaver(conn)
         await _checkpointer.setup()
@@ -494,6 +505,10 @@ async def process_user_input_graph(user_input: str, session_id: str = None):
         session_id = str(uuid.uuid4())
     
     compiled = await get_compiled_graph()
+
+    from services.redis_service import get_redis_service
+    redis_service = get_redis_service()
+    redis_state = await redis_service.get_session(session_id)
     
     # 构造初始状态
     # 注意：active_agent 不再需要手动从全局变量读取
@@ -503,7 +518,7 @@ async def process_user_input_graph(user_input: str, session_id: str = None):
         "category": "",
         "output_tokens": [],
         "session_id": session_id,
-        "active_agent": "none",  # 默认值，checkpointer 会用上次保存的值覆盖
+        "active_agent": redis_state.get("active_agent", "none"),
     }
     
     # 使用 thread_id 配置实现多用户隔离
@@ -520,11 +535,19 @@ async def process_user_input_graph(user_input: str, session_id: str = None):
     try:
         prev_state = await compiled.aget_state(config)
         prev_token_count = len(prev_state.values.get("output_tokens", [])) if prev_state.values else 0
+        if "active_agent" not in redis_state and prev_state.values:
+            initial_state["active_agent"] = prev_state.values.get(
+                "active_agent", "none"
+            )
     except Exception:
         prev_token_count = 0
     
     # 执行 graph（checkpointer 自动恢复上次状态 + 保存本次结果）
     result = await compiled.ainvoke(initial_state, config=config)
+
+    latest_redis_state = await redis_service.get_session(session_id)
+    latest_redis_state["active_agent"] = result.get("active_agent", "none")
+    await redis_service.save_session(session_id, latest_redis_state)
     
     # 只 yield 本次新增的 tokens（跳过历史累积部分）
     all_tokens = result.get("output_tokens", [])

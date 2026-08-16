@@ -100,8 +100,8 @@ class KnowledgeDBRouter:
         self.db_router = DatabaseRouter(**kwargs)
         self.knowledge_repo = self.db_router.knowledge
 
-    def add_document(self, content: str, category: str, keywords=None, embedding=None) -> int:
-        return self.knowledge_repo.add_document(content, category, keywords, embedding)
+    def add_document(self, content: str, category: str, keywords=None, embedding=None, **metadata) -> int:
+        return self.knowledge_repo.add_document(content, category, keywords, embedding, **metadata)
 
     def get_document(self, doc_id: int):
         return self.knowledge_repo.get_document(doc_id)

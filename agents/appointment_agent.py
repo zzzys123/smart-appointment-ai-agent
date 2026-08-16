@@ -51,6 +51,7 @@ class AppointmentAgent:
         
         # 预约状态
         self.reset()
+        self.last_run_completed = False
 
     def _initialize_llm(self):
         """初始化通用聊天模型"""
@@ -82,6 +83,38 @@ class AppointmentAgent:
         """设置共享状态"""
         self.state = shared_state
 
+    def restore_snapshot(self, snapshot):
+        """Restore the serializable part of an appointment conversation."""
+        if not isinstance(snapshot, dict):
+            return
+        history = snapshot.get("appointment_history")
+        if isinstance(history, dict):
+            self.appointment_history.update(history)
+        self.finished = bool(snapshot.get("finished", False))
+
+        messages = snapshot.get("chat_messages")
+        if isinstance(messages, list):
+            self.chat_history.clear()
+            for message in messages[-10:]:
+                if not isinstance(message, dict):
+                    continue
+                content = str(message.get("content", ""))
+                if message.get("type") == "human":
+                    self.chat_history.add_user_message(content)
+                elif message.get("type") == "ai":
+                    self.chat_history.add_ai_message(content)
+
+    def create_snapshot(self):
+        """Return JSON-safe state for Redis-backed session persistence."""
+        return {
+            "appointment_history": dict(self.appointment_history),
+            "finished": self.finished,
+            "chat_messages": [
+                {"type": message.type, "content": str(message.content)}
+                for message in self.chat_history.messages[-10:]
+            ],
+        }
+
     async def run_stream(self, user_input=None):
         """
         流式处理用户预约请求的主函数
@@ -90,6 +123,7 @@ class AppointmentAgent:
         """
         if user_input is None:
             user_input = input("用户：")
+        self.last_run_completed = False
         
         # 1. 解析用户输入（内部 JSON，不向用户流式输出，避免英文字段名暴露在聊天界面）
         ai_content = ""
@@ -133,6 +167,7 @@ class AppointmentAgent:
                 # 只有在真正完成预约时才重置状态
                 if not recommendation_pending and not self.appointment_history.get('awaiting_confirmation'):
                     self._reset_state_after_appointment()
+                    self.last_run_completed = True
                 return
             
             # 5. 处理信息不完整的情况

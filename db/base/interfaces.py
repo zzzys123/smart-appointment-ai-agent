@@ -94,7 +94,7 @@ class BaseKnowledgeRepository(ABC):
     
     @abstractmethod
     def add_document(self, content: str, category: str, keywords: Optional[List[str]] = None, 
-                    embedding: Optional[List[float]] = None) -> int:
+                    embedding: Optional[List[float]] = None, **metadata) -> int:
         """添加知识文档"""
         pass
     

@@ -452,6 +452,13 @@
     const clearBtn = document.getElementById('clear-btn');
     const typingIndicator = document.getElementById('typing-indicator');
     let lastBotBubble = null;
+    const newSessionId = () => (
+        window.crypto && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}_${Math.random().toString(36).slice(2)}_${Math.random().toString(36).slice(2)}`
+    );
+    let chatSessionId = localStorage.getItem('chat_session_id') || newSessionId();
+    localStorage.setItem('chat_session_id', chatSessionId);
 
     function addMessage(text, sender) {
         const msgDiv = document.createElement('div');
@@ -567,9 +574,21 @@
         try {
             const res = await fetch('/chat/stream', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: text})
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Session-ID': chatSessionId
+                },
+                body: JSON.stringify({message: text, session_id: chatSessionId})
             });
+
+            if (!res.ok) {
+                throw new Error(`Chat request failed: ${res.status}`);
+            }
+            const responseSessionId = res.headers.get('X-Session-ID');
+            if (responseSessionId) {
+                chatSessionId = responseSessionId;
+                localStorage.setItem('chat_session_id', chatSessionId);
+            }
             
             hideTypingIndicator();
             
@@ -596,6 +615,8 @@
     }
 
     clearBtn.onclick = function() {
+        chatSessionId = newSessionId();
+        localStorage.setItem('chat_session_id', chatSessionId);
         // 保留欢迎消息，只清除其他对话
         const welcomeMessage = chatBox.querySelector('.message.bot').cloneNode(true);
         chatBox.innerHTML = '';

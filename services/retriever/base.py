@@ -85,12 +85,21 @@ class BaseRetriever(ABC):
         try:
             rerank_on = self.rerank_enabled
             # 候选池大小：开启 rerank 时召回更多候选供精排；否则留少量过滤余量
-            if rerank_on:
+            if category:
+                # 分类过滤发生在召回之后，必须先覆盖完整语料，否则目标分类可能
+                # 因全局排名靠后而被提前截断。
+                recall_k = self.num_docs
+            elif rerank_on:
                 recall_k = min(max(top_k * 4, 10), self.num_docs)
             else:
                 recall_k = min(max(top_k * 2, top_k), self.num_docs)
 
             ranked_ids = self._recall(query, recall_k, trace)
+
+            candidate_limit = min(
+                max(top_k * 4, 10) if rerank_on else top_k,
+                self.num_docs,
+            )
 
             # 取回候选文档（拷贝，避免污染缓存），应用分类过滤
             candidates: List[Dict] = []
@@ -103,7 +112,7 @@ class BaseRetriever(ABC):
                 doc = dict(doc)
                 doc["score"] = float(score)
                 candidates.append(doc)
-                if len(candidates) >= recall_k:
+                if len(candidates) >= candidate_limit:
                     break
 
             # 精排重排（可选）

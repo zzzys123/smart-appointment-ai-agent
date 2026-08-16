@@ -1,0 +1,1137 @@
+{
+  "evaluation": "dense_vs_hybrid_strict_evidence",
+  "database_url": "sqlite:///data/smart_appointment.db",
+  "document_count": 90,
+  "source_count": 10,
+  "case_count": 17,
+  "top_k": 10,
+  "rerank_enabled": false,
+  "strategies": [
+    {
+      "strategy": "dense",
+      "summary": {
+        "case_count": 17,
+        "evidence_recall_at_1": 0.8823529411764706,
+        "evidence_recall_at_3": 0.9411764705882353,
+        "evidence_recall_at_5": 0.9411764705882353,
+        "evidence_recall_at_10": 0.9411764705882353,
+        "evidence_mrr_at_10": 0.9117647058823529,
+        "source_recall_at_1": 0.9411764705882353,
+        "source_recall_at_3": 0.9411764705882353,
+        "source_recall_at_5": 0.9411764705882353,
+        "source_recall_at_10": 1.0,
+        "source_mrr_at_10": 0.9509803921568628,
+        "latency_ms_mean": 3109.172941176471,
+        "latency_ms_p50": 3527.75,
+        "top3_context_chars_mean": 336.4117647058824
+      },
+      "groups": {
+        "bm25_exact": {
+          "case_count": 5,
+          "evidence_recall_at_1": 0.8,
+          "evidence_recall_at_3": 1.0,
+          "evidence_recall_at_5": 1.0,
+          "evidence_recall_at_10": 1.0,
+          "evidence_mrr_at_10": 0.9,
+          "source_recall_at_1": 1.0,
+          "source_recall_at_3": 1.0,
+          "source_recall_at_5": 1.0,
+          "source_recall_at_10": 1.0,
+          "source_mrr_at_10": 1.0,
+          "latency_ms_mean": 2947.1580000000004,
+          "latency_ms_p50": 3527.75,
+          "top3_context_chars_mean": 357.8
+        },
+        "chunking_cross_section": {
+          "case_count": 4,
+          "evidence_recall_at_1": 0.75,
+          "evidence_recall_at_3": 0.75,
+          "evidence_recall_at_5": 0.75,
+          "evidence_recall_at_10": 0.75,
+          "evidence_mrr_at_10": 0.75,
+          "source_recall_at_1": 0.75,
+          "source_recall_at_3": 0.75,
+          "source_recall_at_5": 0.75,
+          "source_recall_at_10": 1.0,
+          "source_mrr_at_10": 0.7916666666666666,
+          "latency_ms_mean": 2947.4,
+          "latency_ms_p50": 2835.0150000000003,
+          "top3_context_chars_mean": 333.0
+        },
+        "dense_semantic": {
+          "case_count": 4,
+          "evidence_recall_at_1": 1.0,
+          "evidence_recall_at_3": 1.0,
+          "evidence_recall_at_5": 1.0,
+          "evidence_recall_at_10": 1.0,
+          "evidence_mrr_at_10": 1.0,
+          "source_recall_at_1": 1.0,
+          "source_recall_at_3": 1.0,
+          "source_recall_at_5": 1.0,
+          "source_recall_at_10": 1.0,
+          "source_mrr_at_10": 1.0,
+          "latency_ms_mean": 3251.7075,
+          "latency_ms_p50": 3177.8,
+          "top3_context_chars_mean": 325.25
+        },
+        "rerank_interference": {
+          "case_count": 4,
+          "evidence_recall_at_1": 1.0,
+          "evidence_recall_at_3": 1.0,
+          "evidence_recall_at_5": 1.0,
+          "evidence_recall_at_10": 1.0,
+          "evidence_mrr_at_10": 1.0,
+          "source_recall_at_1": 1.0,
+          "source_recall_at_3": 1.0,
+          "source_recall_at_5": 1.0,
+          "source_recall_at_10": 1.0,
+          "source_mrr_at_10": 1.0,
+          "latency_ms_mean": 3330.93,
+          "latency_ms_p50": 3381.0299999999997,
+          "top3_context_chars_mean": 324.25
+        }
+      },
+      "details": [
+        {
+          "id": "semantic_neck_metaphor",
+          "group": "dense_semantic",
+          "query": "脖子像上了发条，低头一天以后该了解哪个项目？",
+          "expected_source_id": "KB-GUIDE-009",
+          "expected_contains": "肩颈推拿",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3566.43,
+          "top3_context_chars": 309,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 1,
+              "title": "“脖子像落枕”“低头一天肩膀沉”"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 2,
+              "title": "肩颈推拿的体验重点"
+            },
+            {
+              "source_id": null,
+              "chunk_index": null,
+              "title": null
+            }
+          ]
+        },
+        {
+          "id": "semantic_foot_fatigue",
+          "group": "dense_semantic",
+          "query": "逛街后腿脚像灌了铅，想歇一歇",
+          "expected_source_id": "KB-GUIDE-009",
+          "expected_contains": "足底按摩",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 2789.17,
+          "top3_context_chars": 333,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 3,
+              "title": "“逛了一天脚底累”“小腿像灌了铅”"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 3,
+              "title": "足底按摩的体验重点"
+            },
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 1,
+              "title": "建议暂缓并优先就医的情况"
+            }
+          ]
+        },
+        {
+          "id": "semantic_whole_body",
+          "group": "dense_semantic",
+          "query": "哪儿都紧，想从头到脚整体松一松",
+          "expected_source_id": "KB-GUIDE-009",
+          "expected_contains": "全身推拿",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 4625.79,
+          "top3_context_chars": 320,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 4,
+              "title": "“哪儿都紧，想从头到脚松一松”"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 1,
+              "title": "全身推拿的体验重点"
+            },
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 5,
+              "title": "“我只想安静休息，不确定力度”"
+            }
+          ]
+        },
+        {
+          "id": "semantic_back_sitting",
+          "group": "dense_semantic",
+          "query": "坐了一整天，背上像一直背着包",
+          "expected_source_id": "KB-GUIDE-009",
+          "expected_contains": "背部推拿",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 2025.44,
+          "top3_context_chars": 339,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 2,
+              "title": "“背上像背着东西”“坐一天腰背发紧”"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 4,
+              "title": "背部推拿的体验重点"
+            },
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 1,
+              "title": "“脖子像落枕”“低头一天肩膀沉”"
+            }
+          ]
+        },
+        {
+          "id": "exact_technician_008",
+          "group": "bm25_exact",
+          "query": "工号 JS-008 的技师擅长哪些项目？",
+          "expected_source_id": "KB-TECH-006",
+          "expected_contains": "头部按摩和足疗",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3531.42,
+          "top3_context_chars": 299,
+          "top3": [
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 4,
+              "title": "工号 JS-008：吴婷"
+            },
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 5,
+              "title": "工号 JS-009：郑斌"
+            },
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 3,
+              "title": "工号 JS-007：周杰"
+            }
+          ]
+        },
+        {
+          "id": "exact_technician_009",
+          "group": "bm25_exact",
+          "query": "JS-009 是重手法方向吗？",
+          "expected_source_id": "KB-TECH-006",
+          "expected_contains": "适合喜欢重手法的客户",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 2069.63,
+          "top3_context_chars": 308,
+          "top3": [
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 5,
+              "title": "工号 JS-009：郑斌"
+            },
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 2,
+              "title": "工号 JS-002：王强"
+            },
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 4,
+              "title": "工号 JS-008：吴婷"
+            }
+          ]
+        },
+        {
+          "id": "exact_membership_code",
+          "group": "bm25_exact",
+          "query": "MB-1000 实付和到账分别是多少？",
+          "expected_source_id": "KB-MEMBER-004",
+          "expected_contains": "到账 1150 元",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3612.07,
+          "top3_context_chars": 423,
+          "top3": [
+            {
+              "source_id": "KB-MEMBER-004",
+              "chunk_index": 4,
+              "title": "精确查询示例"
+            },
+            {
+              "source_id": "KB-MEMBER-004",
+              "chunk_index": 1,
+              "title": "两个标准储值档位"
+            },
+            {
+              "source_id": "KB-FAQ-010",
+              "chunk_index": 3,
+              "title": "会员怎么充值"
+            }
+          ]
+        },
+        {
+          "id": "exact_cancel_code",
+          "group": "bm25_exact",
+          "query": "BK-CANCEL-2H 代表提前多久？",
+          "expected_source_id": "KB-BOOKING-005",
+          "expected_contains": "至少提前 2 小时",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3527.75,
+          "top3_context_chars": 385,
+          "top3": [
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 3,
+              "title": "取消或改期的时间规则"
+            },
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 6,
+              "title": "跨章节问答示例"
+            },
+            {
+              "source_id": null,
+              "chunk_index": null,
+              "title": null
+            }
+          ]
+        },
+        {
+          "id": "exact_parking_code",
+          "group": "bm25_exact",
+          "query": "PARK-B2-06 是固定保留车位吗？",
+          "expected_source_id": "KB-STORE-007",
+          "expected_contains": "不代表保留车位",
+          "source_rank": 1,
+          "evidence_rank": 2,
+          "latency_ms": 1994.92,
+          "top3_context_chars": 374,
+          "top3": [
+            {
+              "source_id": "KB-STORE-007",
+              "chunk_index": 4,
+              "title": "停车与设施"
+            },
+            {
+              "source_id": "KB-STORE-007",
+              "chunk_index": 6,
+              "title": "检索问题示例"
+            },
+            {
+              "source_id": "KB-MEMBER-004",
+              "chunk_index": 0,
+              "title": "会员储值档位、权益与核销规则"
+            }
+          ]
+        },
+        {
+          "id": "rerank_neck_price",
+          "group": "rerank_interference",
+          "query": "肩颈推拿一次多少钱，做多长时间？",
+          "expected_source_id": "KB-SERVICE-001",
+          "expected_contains": "80 元与 30 分钟",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3845.58,
+          "top3_context_chars": 390,
+          "top3": [
+            {
+              "source_id": "KB-SERVICE-001",
+              "chunk_index": 3,
+              "title": "价格相近但问题不同"
+            },
+            {
+              "source_id": null,
+              "chunk_index": null,
+              "title": null
+            },
+            {
+              "source_id": "KB-FAQ-010",
+              "chunk_index": 2,
+              "title": "有哪些项目"
+            }
+          ]
+        },
+        {
+          "id": "rerank_neck_experience",
+          "group": "rerank_interference",
+          "query": "肩颈推拿主要聚焦肩部、颈后和上背吗，通常是什么体验？",
+          "expected_source_id": "KB-SERVICE-002",
+          "expected_contains": "聚焦肩部、颈后和上背",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 2916.48,
+          "top3_context_chars": 297,
+          "top3": [
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 2,
+              "title": "肩颈推拿的体验重点"
+            },
+            {
+              "source_id": null,
+              "chunk_index": null,
+              "title": null
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 1,
+              "title": "全身推拿的体验重点"
+            }
+          ]
+        },
+        {
+          "id": "rerank_neck_injury",
+          "group": "rerank_interference",
+          "query": "肩膀刚扭伤还红肿，可以马上做肩颈按摩吗？",
+          "expected_source_id": "KB-SAFETY-003",
+          "expected_contains": "不进行对应区域的按摩",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 4590.46,
+          "top3_context_chars": 300,
+          "top3": [
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 2,
+              "title": "急性损伤与术后恢复"
+            },
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 1,
+              "title": "建议暂缓并优先就医的情况"
+            },
+            {
+              "source_id": null,
+              "chunk_index": null,
+              "title": null
+            }
+          ]
+        },
+        {
+          "id": "rerank_medical_promise",
+          "group": "rerank_interference",
+          "query": "门店能保证一次按摩解决持续疼痛吗？",
+          "expected_source_id": "KB-FAQ-010",
+          "expected_contains": "不能",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 1971.2,
+          "top3_context_chars": 310,
+          "top3": [
+            {
+              "source_id": "KB-FAQ-010",
+              "chunk_index": 5,
+              "title": "能保证解决疼痛吗"
+            },
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 1,
+              "title": "建议暂缓并优先就医的情况"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 7,
+              "title": "服务后的合理预期"
+            }
+          ]
+        },
+        {
+          "id": "chunk_booking_cross_section",
+          "group": "chunking_cross_section",
+          "query": "明晚六点的预约下午四点前改期，之后还要确认哪些信息？",
+          "expected_source_id": "KB-BOOKING-005",
+          "expected_contains": "新的日期、时间、项目、时长和技师",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 4504.14,
+          "top3_context_chars": 310,
+          "top3": [
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 6,
+              "title": "跨章节问答示例"
+            },
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 5,
+              "title": "预约变更后的确认"
+            },
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 0,
+              "title": "预约确认、迟到、改期与取消政策"
+            }
+          ]
+        },
+        {
+          "id": "chunk_complaint_cross_section",
+          "group": "chunking_cross_section",
+          "query": "服务后一直不舒服，CS-24H 是否保证一天内退款？",
+          "expected_source_id": "KB-AFTERCARE-008",
+          "expected_contains": "只代表首次人工响应目标",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 1949.19,
+          "top3_context_chars": 341,
+          "top3": [
+            {
+              "source_id": "KB-AFTERCARE-008",
+              "chunk_index": 6,
+              "title": "跨章节场景"
+            },
+            {
+              "source_id": "KB-FAQ-010",
+              "chunk_index": 8,
+              "title": "投诉多久能处理完"
+            },
+            {
+              "source_id": "KB-AFTERCARE-008",
+              "chunk_index": 3,
+              "title": "客诉登记流程"
+            }
+          ]
+        },
+        {
+          "id": "chunk_store_last_start",
+          "group": "chunking_cross_section",
+          "query": "晚上十点还能开始做一个小时的全身项目吗？",
+          "expected_source_id": "KB-STORE-007",
+          "expected_contains": "22:00 是结束营业时间",
+          "source_rank": 6,
+          "evidence_rank": null,
+          "latency_ms": 3720.84,
+          "top3_context_chars": 224,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 4,
+              "title": "“哪儿都紧，想从头到脚松一松”"
+            },
+            {
+              "source_id": null,
+              "chunk_index": null,
+              "title": null
+            },
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 5,
+              "title": "“我只想安静休息，不确定力度”"
+            }
+          ]
+        },
+        {
+          "id": "chunk_pregnancy_heat",
+          "group": "chunking_cross_section",
+          "query": "孕期可以做带明显热刺激的热石项目吗？",
+          "expected_source_id": "KB-SAFETY-003",
+          "expected_contains": "不使用热石",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 1615.43,
+          "top3_context_chars": 457,
+          "top3": [
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 4,
+              "title": "孕期及特殊健康状况"
+            },
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 6,
+              "title": "与项目效果页面的检索边界"
+            },
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 6,
+              "title": "先做风险分流"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "strategy": "hybrid",
+      "summary": {
+        "case_count": 17,
+        "evidence_recall_at_1": 0.8823529411764706,
+        "evidence_recall_at_3": 0.9411764705882353,
+        "evidence_recall_at_5": 1.0,
+        "evidence_recall_at_10": 1.0,
+        "evidence_mrr_at_10": 0.9235294117647058,
+        "source_recall_at_1": 0.9411764705882353,
+        "source_recall_at_3": 1.0,
+        "source_recall_at_5": 1.0,
+        "source_recall_at_10": 1.0,
+        "source_mrr_at_10": 0.9705882352941176,
+        "latency_ms_mean": 4303.821176470588,
+        "latency_ms_p50": 3842.36,
+        "top3_context_chars_mean": 344.11764705882354
+      },
+      "groups": {
+        "bm25_exact": {
+          "case_count": 5,
+          "evidence_recall_at_1": 0.8,
+          "evidence_recall_at_3": 1.0,
+          "evidence_recall_at_5": 1.0,
+          "evidence_recall_at_10": 1.0,
+          "evidence_mrr_at_10": 0.9,
+          "source_recall_at_1": 1.0,
+          "source_recall_at_3": 1.0,
+          "source_recall_at_5": 1.0,
+          "source_recall_at_10": 1.0,
+          "source_mrr_at_10": 1.0,
+          "latency_ms_mean": 5736.160000000001,
+          "latency_ms_p50": 4682.8,
+          "top3_context_chars_mean": 365.2
+        },
+        "chunking_cross_section": {
+          "case_count": 4,
+          "evidence_recall_at_1": 0.75,
+          "evidence_recall_at_3": 0.75,
+          "evidence_recall_at_5": 1.0,
+          "evidence_recall_at_10": 1.0,
+          "evidence_mrr_at_10": 0.8,
+          "source_recall_at_1": 0.75,
+          "source_recall_at_3": 1.0,
+          "source_recall_at_5": 1.0,
+          "source_recall_at_10": 1.0,
+          "source_mrr_at_10": 0.875,
+          "latency_ms_mean": 3742.7749999999996,
+          "latency_ms_p50": 3989.785,
+          "top3_context_chars_mean": 335.0
+        },
+        "dense_semantic": {
+          "case_count": 4,
+          "evidence_recall_at_1": 1.0,
+          "evidence_recall_at_3": 1.0,
+          "evidence_recall_at_5": 1.0,
+          "evidence_recall_at_10": 1.0,
+          "evidence_mrr_at_10": 1.0,
+          "source_recall_at_1": 1.0,
+          "source_recall_at_3": 1.0,
+          "source_recall_at_5": 1.0,
+          "source_recall_at_10": 1.0,
+          "source_mrr_at_10": 1.0,
+          "latency_ms_mean": 3838.79,
+          "latency_ms_p50": 3532.1800000000003,
+          "top3_context_chars_mean": 329.75
+        },
+        "rerank_interference": {
+          "case_count": 4,
+          "evidence_recall_at_1": 1.0,
+          "evidence_recall_at_3": 1.0,
+          "evidence_recall_at_5": 1.0,
+          "evidence_recall_at_10": 1.0,
+          "evidence_mrr_at_10": 1.0,
+          "source_recall_at_1": 1.0,
+          "source_recall_at_3": 1.0,
+          "source_recall_at_5": 1.0,
+          "source_recall_at_10": 1.0,
+          "source_mrr_at_10": 1.0,
+          "latency_ms_mean": 3539.475,
+          "latency_ms_p50": 3544.59,
+          "top3_context_chars_mean": 341.25
+        }
+      },
+      "details": [
+        {
+          "id": "semantic_neck_metaphor",
+          "group": "dense_semantic",
+          "query": "脖子像上了发条，低头一天以后该了解哪个项目？",
+          "expected_source_id": "KB-GUIDE-009",
+          "expected_contains": "肩颈推拿",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3222.0,
+          "top3_context_chars": 364,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 1,
+              "title": "“脖子像落枕”“低头一天肩膀沉”"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 2,
+              "title": "肩颈推拿的体验重点"
+            },
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 2,
+              "title": "“背上像背着东西”“坐一天腰背发紧”"
+            }
+          ]
+        },
+        {
+          "id": "semantic_foot_fatigue",
+          "group": "dense_semantic",
+          "query": "逛街后腿脚像灌了铅，想歇一歇",
+          "expected_source_id": "KB-GUIDE-009",
+          "expected_contains": "足底按摩",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3842.36,
+          "top3_context_chars": 310,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 3,
+              "title": "“逛了一天脚底累”“小腿像灌了铅”"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 3,
+              "title": "足底按摩的体验重点"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 7,
+              "title": "服务后的合理预期"
+            }
+          ]
+        },
+        {
+          "id": "semantic_whole_body",
+          "group": "dense_semantic",
+          "query": "哪儿都紧，想从头到脚整体松一松",
+          "expected_source_id": "KB-GUIDE-009",
+          "expected_contains": "全身推拿",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 1926.25,
+          "top3_context_chars": 320,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 4,
+              "title": "“哪儿都紧，想从头到脚松一松”"
+            },
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 5,
+              "title": "“我只想安静休息，不确定力度”"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 1,
+              "title": "全身推拿的体验重点"
+            }
+          ]
+        },
+        {
+          "id": "semantic_back_sitting",
+          "group": "dense_semantic",
+          "query": "坐了一整天，背上像一直背着包",
+          "expected_source_id": "KB-GUIDE-009",
+          "expected_contains": "背部推拿",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 6364.55,
+          "top3_context_chars": 325,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 2,
+              "title": "“背上像背着东西”“坐一天腰背发紧”"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 4,
+              "title": "背部推拿的体验重点"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 2,
+              "title": "肩颈推拿的体验重点"
+            }
+          ]
+        },
+        {
+          "id": "exact_technician_008",
+          "group": "bm25_exact",
+          "query": "工号 JS-008 的技师擅长哪些项目？",
+          "expected_source_id": "KB-TECH-006",
+          "expected_contains": "头部按摩和足疗",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 10496.11,
+          "top3_context_chars": 308,
+          "top3": [
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 4,
+              "title": "工号 JS-008：吴婷"
+            },
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 1,
+              "title": "工号 JS-001：张伟"
+            },
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 5,
+              "title": "工号 JS-009：郑斌"
+            }
+          ]
+        },
+        {
+          "id": "exact_technician_009",
+          "group": "bm25_exact",
+          "query": "JS-009 是重手法方向吗？",
+          "expected_source_id": "KB-TECH-006",
+          "expected_contains": "适合喜欢重手法的客户",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 9719.04,
+          "top3_context_chars": 300,
+          "top3": [
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 5,
+              "title": "工号 JS-009：郑斌"
+            },
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 2,
+              "title": "工号 JS-002：王强"
+            },
+            {
+              "source_id": "KB-TECH-006",
+              "chunk_index": 1,
+              "title": "工号 JS-001：张伟"
+            }
+          ]
+        },
+        {
+          "id": "exact_membership_code",
+          "group": "bm25_exact",
+          "query": "MB-1000 实付和到账分别是多少？",
+          "expected_source_id": "KB-MEMBER-004",
+          "expected_contains": "到账 1150 元",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 4682.8,
+          "top3_context_chars": 435,
+          "top3": [
+            {
+              "source_id": "KB-MEMBER-004",
+              "chunk_index": 4,
+              "title": "精确查询示例"
+            },
+            {
+              "source_id": "KB-MEMBER-004",
+              "chunk_index": 1,
+              "title": "两个标准储值档位"
+            },
+            {
+              "source_id": "KB-MEMBER-004",
+              "chunk_index": 3,
+              "title": "消费核销"
+            }
+          ]
+        },
+        {
+          "id": "exact_cancel_code",
+          "group": "bm25_exact",
+          "query": "BK-CANCEL-2H 代表提前多久？",
+          "expected_source_id": "KB-BOOKING-005",
+          "expected_contains": "至少提前 2 小时",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 1877.09,
+          "top3_context_chars": 429,
+          "top3": [
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 3,
+              "title": "取消或改期的时间规则"
+            },
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 6,
+              "title": "跨章节问答示例"
+            },
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 0,
+              "title": "预约确认、迟到、改期与取消政策"
+            }
+          ]
+        },
+        {
+          "id": "exact_parking_code",
+          "group": "bm25_exact",
+          "query": "PARK-B2-06 是固定保留车位吗？",
+          "expected_source_id": "KB-STORE-007",
+          "expected_contains": "不代表保留车位",
+          "source_rank": 1,
+          "evidence_rank": 2,
+          "latency_ms": 1905.76,
+          "top3_context_chars": 354,
+          "top3": [
+            {
+              "source_id": "KB-STORE-007",
+              "chunk_index": 4,
+              "title": "停车与设施"
+            },
+            {
+              "source_id": "KB-STORE-007",
+              "chunk_index": 6,
+              "title": "检索问题示例"
+            },
+            {
+              "source_id": "KB-STORE-007",
+              "chunk_index": 0,
+              "title": "门店营业时间、地址、交通与设施"
+            }
+          ]
+        },
+        {
+          "id": "rerank_neck_price",
+          "group": "rerank_interference",
+          "query": "肩颈推拿一次多少钱，做多长时间？",
+          "expected_source_id": "KB-SERVICE-001",
+          "expected_contains": "80 元与 30 分钟",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3444.51,
+          "top3_context_chars": 364,
+          "top3": [
+            {
+              "source_id": "KB-SERVICE-001",
+              "chunk_index": 3,
+              "title": "价格相近但问题不同"
+            },
+            {
+              "source_id": null,
+              "chunk_index": null,
+              "title": null
+            },
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 1,
+              "title": "“脖子像落枕”“低头一天肩膀沉”"
+            }
+          ]
+        },
+        {
+          "id": "rerank_neck_experience",
+          "group": "rerank_interference",
+          "query": "肩颈推拿主要聚焦肩部、颈后和上背吗，通常是什么体验？",
+          "expected_source_id": "KB-SERVICE-002",
+          "expected_contains": "聚焦肩部、颈后和上背",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 4465.49,
+          "top3_context_chars": 385,
+          "top3": [
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 2,
+              "title": "肩颈推拿的体验重点"
+            },
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 1,
+              "title": "“脖子像落枕”“低头一天肩膀沉”"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 1,
+              "title": "全身推拿的体验重点"
+            }
+          ]
+        },
+        {
+          "id": "rerank_neck_injury",
+          "group": "rerank_interference",
+          "query": "肩膀刚扭伤还红肿，可以马上做肩颈按摩吗？",
+          "expected_source_id": "KB-SAFETY-003",
+          "expected_contains": "不进行对应区域的按摩",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3644.67,
+          "top3_context_chars": 312,
+          "top3": [
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 2,
+              "title": "急性损伤与术后恢复"
+            },
+            {
+              "source_id": null,
+              "chunk_index": null,
+              "title": null
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 2,
+              "title": "肩颈推拿的体验重点"
+            }
+          ]
+        },
+        {
+          "id": "rerank_medical_promise",
+          "group": "rerank_interference",
+          "query": "门店能保证一次按摩解决持续疼痛吗？",
+          "expected_source_id": "KB-FAQ-010",
+          "expected_contains": "不能",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 2603.23,
+          "top3_context_chars": 304,
+          "top3": [
+            {
+              "source_id": "KB-FAQ-010",
+              "chunk_index": 5,
+              "title": "能保证解决疼痛吗"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 7,
+              "title": "服务后的合理预期"
+            },
+            {
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 0,
+              "title": "服务体验、作用边界与适用场景"
+            }
+          ]
+        },
+        {
+          "id": "chunk_booking_cross_section",
+          "group": "chunking_cross_section",
+          "query": "明晚六点的预约下午四点前改期，之后还要确认哪些信息？",
+          "expected_source_id": "KB-BOOKING-005",
+          "expected_contains": "新的日期、时间、项目、时长和技师",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 3973.6,
+          "top3_context_chars": 310,
+          "top3": [
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 6,
+              "title": "跨章节问答示例"
+            },
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 5,
+              "title": "预约变更后的确认"
+            },
+            {
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 0,
+              "title": "预约确认、迟到、改期与取消政策"
+            }
+          ]
+        },
+        {
+          "id": "chunk_complaint_cross_section",
+          "group": "chunking_cross_section",
+          "query": "服务后一直不舒服，CS-24H 是否保证一天内退款？",
+          "expected_source_id": "KB-AFTERCARE-008",
+          "expected_contains": "只代表首次人工响应目标",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 2188.21,
+          "top3_context_chars": 341,
+          "top3": [
+            {
+              "source_id": "KB-AFTERCARE-008",
+              "chunk_index": 6,
+              "title": "跨章节场景"
+            },
+            {
+              "source_id": "KB-FAQ-010",
+              "chunk_index": 8,
+              "title": "投诉多久能处理完"
+            },
+            {
+              "source_id": "KB-AFTERCARE-008",
+              "chunk_index": 3,
+              "title": "客诉登记流程"
+            }
+          ]
+        },
+        {
+          "id": "chunk_store_last_start",
+          "group": "chunking_cross_section",
+          "query": "晚上十点还能开始做一个小时的全身项目吗？",
+          "expected_source_id": "KB-STORE-007",
+          "expected_contains": "22:00 是结束营业时间",
+          "source_rank": 2,
+          "evidence_rank": 5,
+          "latency_ms": 4005.97,
+          "top3_context_chars": 246,
+          "top3": [
+            {
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 4,
+              "title": "“哪儿都紧，想从头到脚松一松”"
+            },
+            {
+              "source_id": "KB-STORE-007",
+              "chunk_index": 1,
+              "title": "营业时间"
+            },
+            {
+              "source_id": null,
+              "chunk_index": null,
+              "title": null
+            }
+          ]
+        },
+        {
+          "id": "chunk_pregnancy_heat",
+          "group": "chunking_cross_section",
+          "query": "孕期可以做带明显热刺激的热石项目吗？",
+          "expected_source_id": "KB-SAFETY-003",
+          "expected_contains": "不使用热石",
+          "source_rank": 1,
+          "evidence_rank": 1,
+          "latency_ms": 4803.32,
+          "top3_context_chars": 443,
+          "top3": [
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 4,
+              "title": "孕期及特殊健康状况"
+            },
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 6,
+              "title": "与项目效果页面的检索边界"
+            },
+            {
+              "source_id": "KB-SAFETY-003",
+              "chunk_index": 1,
+              "title": "建议暂缓并优先就医的情况"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

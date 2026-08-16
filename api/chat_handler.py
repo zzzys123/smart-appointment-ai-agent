@@ -11,14 +11,11 @@
 import os
 import uuid
 
-# 全局 session_id（单用户场景）
-global_session_id = str(uuid.uuid4())
-
 # 判断是否使用 LangGraph
 USE_LANGGRAPH = os.getenv("USE_LANGGRAPH", "true").lower() != "false"
 
 
-async def ProcessUserInput_stream(user_input, state=None, context=None):
+async def ProcessUserInput_stream(user_input, state=None, context=None, session_id=None):
     """
     处理用户输入的统一入口
 
@@ -30,10 +27,12 @@ async def ProcessUserInput_stream(user_input, state=None, context=None):
     Yields:
         str: 流式输出的 token
     """
+    session_id = session_id or str(uuid.uuid4())
+
     if USE_LANGGRAPH:
         # LangGraph 版本
         from agents.graph_agent import process_user_input_graph
-        async for token in process_user_input_graph(user_input, session_id=global_session_id):
+        async for token in process_user_input_graph(user_input, session_id=session_id):
             yield token
     else:
         # 传统版本（保留向后兼容）
@@ -42,15 +41,14 @@ async def ProcessUserInput_stream(user_input, state=None, context=None):
         from agents.consultant_agent import ConsultantAgent
 
         # 懒初始化传统 agent
-        global _legacy_task_agent
-        if "_legacy_task_agent" not in globals() or _legacy_task_agent is None:
-            _legacy_task_agent = TaskClassificationAgent(
-                AppointmentAgent(session_id=global_session_id),
-                ConsultantAgent(session_id=global_session_id)
+        if session_id not in _legacy_task_agents:
+            _legacy_task_agents[session_id] = TaskClassificationAgent(
+                AppointmentAgent(session_id=session_id),
+                ConsultantAgent(session_id=session_id)
             )
 
-        async for token in _legacy_task_agent.classify_task_stream(user_input):
+        async for token in _legacy_task_agents[session_id].classify_task_stream(user_input):
             yield token
 
 
-_legacy_task_agent = None
+_legacy_task_agents = {}

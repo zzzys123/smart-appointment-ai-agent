@@ -4,21 +4,21 @@
 负责从知识库中检索相关信息
 """
 
-from typing import List, Dict, Any
-from services.knowledge_service import KnowledgeService
+from typing import List, Dict, Any, Optional
+from services.knowledge_service import KnowledgeService, get_shared_knowledge_service
 
 
 class KnowledgeRetriever:
     """知识检索器"""
     
     def __init__(self):
-        self.knowledge_service = KnowledgeService()
+        self.knowledge_service: Optional[KnowledgeService] = None
         self.kb_initialized = False
     
     async def initialize(self):
         """初始化知识库服务"""
         if not self.kb_initialized:
-            await self.knowledge_service.initialize()
+            self.knowledge_service = await get_shared_knowledge_service()
             self.kb_initialized = True
             print("✅ 咨询机器人知识库服务已初始化")
     
@@ -27,6 +27,8 @@ class KnowledgeRetriever:
         # 确保知识库已初始化
         if not self.kb_initialized:
             await self.initialize()
+        if self.knowledge_service is None:
+            return []
         
         # 搜索相关知识
         relevant_docs = await self.knowledge_service.search(query, top_k=top_k)
@@ -39,7 +41,11 @@ class KnowledgeRetriever:
     def _log_search_results(self, query: str, relevant_docs: List[Dict[str, Any]]):
         """记录搜索结果日志，并打印检索链路追踪（可观测）。"""
         # 打印结构化链路追踪：dense/sparse 召回 → RRF 融合 → rerank 各阶段
-        trace = self.knowledge_service.get_last_trace()
+        trace = (
+            self.knowledge_service.get_last_trace()
+            if self.knowledge_service is not None
+            else None
+        )
         if trace is not None:
             print(trace.summary())
 

@@ -7,6 +7,7 @@
 3. 提供预约相关的数据服务
 """
 
+import hashlib
 import time
 from typing import Dict, Any, List, Optional
 from datetime import datetime
@@ -27,16 +28,49 @@ class AppointmentService:
                         session_id: str) -> bool:
         """保存预约信息到数据库"""
         try:
-            appointment_id = int(time.time() * 1000)
-            
-            # 保存预约到数据库
-            self.technician_repo.add_schedule(
-                technician_id=int(technician_id),
-                start_time=start_time,
-                end_time=end_time,
-                status="busy",
-                appointment_id=appointment_id
+            from services.redis_service import get_redis_service
+
+            technician_id_int = int(technician_id)
+            idempotency_source = (
+                f"{session_id}|{technician_id_int}|"
+                f"{start_time.isoformat()}|{end_time.isoformat()}"
             )
+            idempotency_key = hashlib.sha256(
+                idempotency_source.encode("utf-8")
+            ).hexdigest()
+            redis_service = get_redis_service()
+
+            # Serialize all writes for one technician. Availability is checked
+            # again inside the lock to close the check-then-insert race.
+            with redis_service.appointment_lock(
+                technician_id_int, "schedule"
+            ) as acquired:
+                if not acquired:
+                    logger.warning("预约锁获取超时：技师ID=%s", technician_id_int)
+                    return False
+                if redis_service.is_idempotent_appointment(idempotency_key):
+                    logger.info("忽略重复预约提交：%s", idempotency_key)
+                    return True
+                if not self.technician_repo.is_technician_available(
+                    technician_id_int, start_time, end_time
+                ):
+                    logger.warning(
+                        "预约时间已被占用：技师ID=%s, 时间=%s 到 %s",
+                        technician_id_int,
+                        start_time,
+                        end_time,
+                    )
+                    return False
+
+                appointment_id = int(time.time() * 1000)
+                self.technician_repo.add_schedule(
+                    technician_id=technician_id_int,
+                    start_time=start_time,
+                    end_time=end_time,
+                    status="busy",
+                    appointment_id=appointment_id,
+                )
+                redis_service.mark_idempotent_appointment(idempotency_key)
             
             logger.info(f"预约信息已保存到数据库：技师ID={technician_id}, 时间={start_time} 到 {end_time}, 预约ID={appointment_id}")
             return True
