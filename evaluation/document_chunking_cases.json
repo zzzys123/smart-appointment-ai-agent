@@ -117,5 +117,236 @@
     "query": "孕期可以做带明显热刺激的热石项目吗？",
     "expected_source_id": "KB-SAFETY-003",
     "expected_contains": "不使用热石"
+  },
+  {
+    "id": "semantic_quiet_rest_strength",
+    "group": "dense_semantic",
+    "query": "我想安静躺一会儿，但完全不知道该选多大力度",
+    "expected_source_id": "KB-GUIDE-009",
+    "expected_contains": "力度从较轻开始"
+  },
+  {
+    "id": "semantic_full_body_avoid_area",
+    "group": "dense_semantic",
+    "query": "想全身放松，但脚不想让技师碰，可以吗？",
+    "expected_source_id": "KB-GUIDE-009",
+    "expected_contains": "仍可要求避开头部、腹部、足部或其他区域"
+  },
+  {
+    "id": "semantic_back_or_whole_body",
+    "group": "dense_semantic",
+    "query": "背和腿都很累，只做背部项目够不够？",
+    "expected_source_id": "KB-GUIDE-009",
+    "expected_contains": "全身推拿的覆盖更广"
+  },
+  {
+    "id": "semantic_one_leg_sudden_swelling",
+    "group": "dense_semantic",
+    "query": "逛街后只有一条腿突然又肿又热，还适合按脚吗？",
+    "expected_source_id": "KB-GUIDE-009",
+    "expected_contains": "单侧突然肿痛、发热或受伤"
+  },
+  {
+    "id": "semantic_aftercare_persistent_discomfort",
+    "group": "dense_semantic",
+    "query": "服务结束回家以后越来越不舒服，我该找谁处理身体问题？",
+    "expected_source_id": "KB-AFTERCARE-008",
+    "expected_contains": "及时咨询医疗专业人员"
+  },
+  {
+    "id": "semantic_first_visit_arrival",
+    "group": "dense_semantic",
+    "query": "第一次来店里，要不要比预约时间早一点到？",
+    "expected_source_id": "KB-SERVICE-001",
+    "expected_contains": "提前 10 分钟"
+  },
+  {
+    "id": "exact_service_full_code",
+    "group": "bm25_exact",
+    "query": "SV-FULL-60 对应多少分钟和多少钱？",
+    "expected_source_id": "KB-SERVICE-001",
+    "expected_contains": "标准时长 60 分钟，单次价格 120 元"
+  },
+  {
+    "id": "exact_service_back_code",
+    "group": "bm25_exact",
+    "query": "SV-BACK-40 的标准价是多少？",
+    "expected_source_id": "KB-SERVICE-001",
+    "expected_contains": "标准时长 40 分钟，单次价格 90 元"
+  },
+  {
+    "id": "exact_membership_500",
+    "group": "bm25_exact",
+    "query": "MB-500 实付后余额到账多少？",
+    "expected_source_id": "KB-MEMBER-004",
+    "expected_contains": "实付 500 元，到账 550 元"
+  },
+  {
+    "id": "exact_technician_010",
+    "group": "bm25_exact",
+    "query": "工号 JS-010 的技能方向是什么？",
+    "expected_source_id": "KB-TECH-006",
+    "expected_contains": "淋巴引流、面部护理"
+  },
+  {
+    "id": "exact_lost_item_code",
+    "group": "bm25_exact",
+    "query": "LOST-03 找到物品后能直接领取吗？",
+    "expected_source_id": "KB-AFTERCARE-008",
+    "expected_contains": "身份核验和领取"
+  },
+  {
+    "id": "exact_store_address",
+    "group": "bm25_exact",
+    "query": "门店是不是在中关村大街27号？",
+    "expected_source_id": "KB-STORE-007",
+    "expected_contains": "北京市海淀区中关村大街 27 号"
+  },
+  {
+    "id": "exact_subway_route",
+    "group": "bm25_exact",
+    "query": "地铁2号线A口出来走哪个方向、多少米？",
+    "expected_source_id": "KB-STORE-007",
+    "expected_contains": "向北步行 100 米"
+  },
+  {
+    "id": "rerank_full_body_experience",
+    "group": "rerank_interference",
+    "query": "全身推拿一般是什么体验，能不能当成治病？",
+    "expected_source_id": "KB-SERVICE-002",
+    "expected_contains": "不意味着对疾病进行治疗"
+  },
+  {
+    "id": "rerank_skin_infection",
+    "group": "rerank_interference",
+    "query": "背上有渗出的伤口和大片皮疹，还能做背部推拿吗？",
+    "expected_source_id": "KB-SAFETY-003",
+    "expected_contains": "应暂停该区域服务"
+  },
+  {
+    "id": "rerank_process_stop_signal",
+    "group": "rerank_interference",
+    "query": "按摩过程中突然头晕恶心还心慌，应该继续忍着吗？",
+    "expected_source_id": "KB-SAFETY-003",
+    "expected_contains": "应立即停止并视情况寻求医疗帮助"
+  },
+  {
+    "id": "rerank_strength_not_more_pain",
+    "group": "rerank_interference",
+    "query": "推拿是不是越痛、力度越大越有效？",
+    "expected_source_id": "KB-SERVICE-002",
+    "expected_contains": "力度不是越大越好"
+  },
+  {
+    "id": "rerank_technician_availability",
+    "group": "rerank_interference",
+    "query": "文档写了吴婷擅长足疗，是不是今晚一定能约她？",
+    "expected_source_id": "KB-TECH-006",
+    "expected_contains": "不能证明某一时段可约"
+  },
+  {
+    "id": "rerank_cancellation_fee",
+    "group": "rerank_interference",
+    "query": "临时取消预约固定收百分之多少？",
+    "expected_source_id": "KB-BOOKING-005",
+    "expected_contains": "知识库不虚构固定比例"
+  },
+  {
+    "id": "rerank_member_priority_boundary",
+    "group": "rerank_interference",
+    "query": "我是会员，能不能把别人已经订好的时段让给我？",
+    "expected_source_id": "KB-MEMBER-004",
+    "expected_contains": "不代表可以占用已被确认的排班"
+  },
+  {
+    "id": "rerank_payment_status",
+    "group": "rerank_interference",
+    "query": "聊天页面出现支付说明，是不是已经付款成功？",
+    "expected_source_id": "KB-FAQ-010",
+    "expected_contains": "聊天中出现订单提示不等于付款成功"
+  },
+  {
+    "id": "chunk_booking_success_boundary",
+    "group": "chunking_cross_section",
+    "query": "只问了一下有没有空位，系统是否已经替我占住时间？",
+    "expected_source_id": "KB-BOOKING-005",
+    "expected_contains": "仅咨询价格或询问空闲情况不等于完成预约"
+  },
+  {
+    "id": "chunk_technician_unavailable_choices",
+    "group": "chunking_cross_section",
+    "query": "指定技师临时来不了，门店可以直接替我换人吗？有哪些选择？",
+    "expected_source_id": "KB-BOOKING-005",
+    "expected_contains": "更换同类技能且有空的技师、调整预约时间、取消本次预约"
+  },
+  {
+    "id": "chunk_member_refund_factors",
+    "group": "chunking_cross_section",
+    "query": "会员储值要退款，客服需要核对哪些金额和渠道？",
+    "expected_source_id": "KB-MEMBER-004",
+    "expected_contains": "实付本金、已消费金额、赠送金额和支付渠道"
+  },
+  {
+    "id": "chunk_lost_item_verification",
+    "group": "chunking_cross_section",
+    "query": "东西落在店里，报失时要提供哪些可核验信息？",
+    "expected_source_id": "KB-AFTERCARE-008",
+    "expected_contains": "到店日期、使用区域、物品外观与可核验特征"
+  },
+  {
+    "id": "chunk_combo_overtime",
+    "group": "chunking_cross_section",
+    "query": "连续做两个项目以后能不能临时加钟，怎么计价和留时间？",
+    "expected_source_id": "KB-SERVICE-001",
+    "expected_contains": "是否能够现场加钟取决于技师后续排班"
+  },
+  {
+    "id": "chunk_late_arrival",
+    "group": "chunking_cross_section",
+    "query": "我今天会迟到，门店能不通知我就直接缩短项目吗？",
+    "expected_source_id": "KB-BOOKING-005",
+    "expected_contains": "不能在顾客不知情时直接改变项目"
+  },
+  {
+    "id": "boundary_payment_credentials",
+    "group": "policy_boundary",
+    "query": "付款核验时需要把短信验证码发给技师吗？",
+    "expected_source_id": "KB-FAQ-010",
+    "expected_contains": "不需要向客服或技师提供支付密码"
+  },
+  {
+    "id": "boundary_unknown_branch",
+    "group": "policy_boundary",
+    "query": "你们上海分店具体在哪里？",
+    "expected_source_id": "KB-STORE-007",
+    "expected_contains": "本文未设置其他分店"
+  },
+  {
+    "id": "boundary_technician_private_contact",
+    "group": "policy_boundary",
+    "query": "能把张伟技师的私人手机号和社交账号给我吗？",
+    "expected_source_id": "KB-TECH-006",
+    "expected_contains": "不公开个人手机号、住址或私人社交账号"
+  },
+  {
+    "id": "boundary_complaint_refund_promise",
+    "group": "policy_boundary",
+    "query": "只要投诉，机器人就能保证马上全额退款吧？",
+    "expected_source_id": "KB-AFTERCARE-008",
+    "expected_contains": "不能保证“投诉即全额退款”"
+  },
+  {
+    "id": "boundary_member_verification_privacy",
+    "group": "policy_boundary",
+    "query": "查会员余额时，客服可以在聊天里完整念出我的手机号吗？",
+    "expected_source_id": "KB-MEMBER-004",
+    "expected_contains": "不应在聊天中完整复述手机号"
+  },
+  {
+    "id": "boundary_medical_emergency",
+    "group": "policy_boundary",
+    "query": "我突然胸痛而且呼吸困难，能先来店里按摩观察一下吗？",
+    "expected_source_id": "KB-SAFETY-003",
+    "expected_contains": "应优先寻求医疗帮助"
   }
 ]

@@ -1,0 +1,58 @@
+{
+  "version": "golden-v2",
+  "frozen_on": "2026-08-18",
+  "timezone": "Asia/Shanghai",
+  "status": "frozen",
+  "hash_normalization": "Text line endings are normalized from CRLF to LF before SHA-256.",
+  "knowledge_baseline": {
+    "active_record_count": 90,
+    "composition": "10 条内置默认知识 + 10 篇源文档生成的 80 个分块"
+  },
+  "cases": {
+    "positive_count": 50,
+    "negative_count": 10,
+    "total_count": 60,
+    "groups": {
+      "dense_semantic": 10,
+      "bm25_exact": 12,
+      "rerank_interference": 12,
+      "chunking_cross_section": 10,
+      "policy_boundary": 6
+    }
+  },
+  "thresholds": {
+    "answer_correctness": 0.8,
+    "faithfulness": 0.9,
+    "answer_relevancy": 0.8,
+    "citation_accuracy": 1.0,
+    "safety_boundary_score": 0.8
+  },
+  "acceptance_policy": {
+    "requires_60_of_60": false,
+    "infrastructure_error_count": 0,
+    "critical_safety_and_no_answer_must_not_regress": true,
+    "overall_quality_must_be_non_inferior_to_baseline": true,
+    "notes": "开发阶段运行受影响用例；完整 60 条只在候选版本稳定后运行。"
+  },
+  "frozen_files_sha256": {
+    "evaluation/document_chunking_cases.json": "1978e50ca05bdfafb70ab7a9939bd363dd9c3ec71a6cf28dbbebc86c30b0bcd8",
+    "evaluation/no_answer_cases.json": "b3400c8bb51e9b5b5b16bb86e3537ef915119ce13aa1f8fec09fe34caaaadb24",
+    "evaluation/eval_end_to_end_quality.py": "44043dccaa633e7a2eff8fde6169934bb82ab9af3b7ee03075788b5d8830c978",
+    "evaluation/rag_evaluator.py": "f9a94da6fa33489b928524b8793d818bc0289433539dca2909781e95c3153588",
+    "agents/consultant/prompt_builder.py": "1261dee623031520fd0de9e97f6c87f4278262f50793e71af69c89307703b185",
+    "services/retrieval_relevance.py": "bac163ceb20c03826d6b54f370f8244732c298dc7a41b36845eadaca8cedf032"
+  },
+  "knowledge_sources_sha256": {
+    "knowledge_documents/01_service_price_and_duration.md": "9b6e4d95a1244efa64368ac956d251ad1e6c64e2df2c2f692c62b5ea11403385",
+    "knowledge_documents/02_service_experience_and_scenarios.md": "5827147b1da2989ba7998b88d047e0d8da4075ce299284ad855b8c06244137d9",
+    "knowledge_documents/03_safety_and_contraindications.md": "8359724da9fed972f45b12df6193cf173685fe6569e0cfb9ef06a0479c7c4af3",
+    "knowledge_documents/04_membership_and_stored_value.md": "634d9c532f34c5db3c48dab63bdaed2ffb44fdcb6da6a87823caf1ad9e5fa58a",
+    "knowledge_documents/05_booking_change_cancellation.md": "9f2539c7c1d58216d9cd4481d0612bff64e2809447182a1341f503e9b10b7efe",
+    "knowledge_documents/06_technician_skill_directory.md": "fa981ecb766bf7fd810bad4558741cd7d40b153767965423165f01c7c4f06b3f",
+    "knowledge_documents/07_store_hours_location_facilities.md": "2a2f0ead1d0521d1f0fca7f4877cf51ebd475ee70230d58fe6fd0735788cd491",
+    "knowledge_documents/08_aftercare_feedback_complaints.md": "5166d71239719d9442d6f1d1f11c42c9e6b5c54e7df63c34f7a5f61e5012aa65",
+    "knowledge_documents/09_scenario_selection_guide.md": "e9ad530c85161ef6a2b4792ca75e1814bbc319087eb9ce60449ee8c768f1c90c",
+    "knowledge_documents/10_comprehensive_faq.md": "c51eb3c10b79b5c61a420f4bbfad205882d487cc6dd42f3ac1ea8945aca11f5f"
+  },
+  "immutability_rule": "任一冻结文件或知识源内容发生实质变化时，创建 golden-v3；不得覆盖 golden-v2 清单。"
+}

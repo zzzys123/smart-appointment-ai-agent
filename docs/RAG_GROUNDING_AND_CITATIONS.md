@@ -13,7 +13,7 @@ RRF 排序（只负责融合名次）
         ↓
 检查每个候选的原始通道分数
         ↓
-dense_score >= 0.60 或 bm25_score >= 8.0 ?
+dense_score >= 0.66 或 bm25_score >= 8.0 ?
         ├─ 是：保留候选 → LLM 严格依据证据回答 → 附加引用
         └─ 否：固定无答案提示，不调用 LLM，不附引用
 ```
@@ -24,7 +24,7 @@ dense_score >= 0.60 或 bm25_score >= 8.0 ?
 
 ```dotenv
 RAG_NO_ANSWER_ENABLED=true
-RAG_DENSE_MIN_SCORE=0.60
+RAG_DENSE_MIN_SCORE=0.66
 RAG_BM25_MIN_SCORE=8.0
 ```
 
@@ -36,7 +36,9 @@ RAG_BM25_MIN_SCORE=8.0
 .\.venv\Scripts\python.exe evaluation\eval_no_answer_gate.py
 ```
 
-当前结果：17/17 条已知问题保留至少一个候选；2/2 条未覆盖问题（游泳池、免费 WiFi）被拒答。样本量很小，只能作为回归冒烟，不代表完整的线上拒答准确率。
+当前结果：50/50 条已知问题保留至少一个候选；10/10 条未覆盖问题被拒答。
+0.60 阈值会误放行针灸、拔罐/刮痧两个相邻领域问题，因而在同一 Embedding
+模型和当前语料上校准为 0.66。该结果仍是离线回归，不代表完整线上分布。
 
 ## 固定兜底
 

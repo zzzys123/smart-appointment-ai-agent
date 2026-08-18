@@ -27,6 +27,16 @@ logger = logging.getLogger(__name__)
 # RRF 融合常数，经验值 60（参考 TREC RRF 论文）
 RRF_K = 60
 
+# Small, auditable domain synonym set for wording gaps that jieba/BM25 cannot
+# bridge by itself.  Expansions only add terms; the original query is retained.
+_SPARSE_QUERY_EXPANSIONS = (
+    (re.compile(r"空位|有空"), ("空闲", "可预约")),
+    (re.compile(r"占住|占着|保留.{0,4}时段"), ("占用", "完成预约", "预约成功")),
+    (re.compile(r"脚部|脚"), ("足部",)),
+    (re.compile(r"(?:不想|不要).{0,8}(?:碰|按|按摩|操作)|避开"), ("避开", "不操作")),
+    (re.compile(r"(?:别人|他人).{0,10}(?:订|预约)|已经订好|已订"), ("已确认", "排班", "占用")),
+)
+
 
 def _tokenize_zh(text: str) -> List[str]:
     """中文分词：jieba 切词 + 去除空白/纯符号 token，用于 BM25 稀疏检索。"""
@@ -39,6 +49,16 @@ def _tokenize_zh(text: str) -> List[str]:
         if tok and not re.fullmatch(r"[\s\W_]+", tok):
             cleaned.append(tok.lower())
     return cleaned
+
+
+def _expand_sparse_query(query: str) -> Tuple[str, List[str]]:
+    additions: List[str] = []
+    for pattern, terms in _SPARSE_QUERY_EXPANSIONS:
+        if pattern.search(query):
+            additions.extend(term for term in terms if term not in query)
+    additions = list(dict.fromkeys(additions))
+    expanded = " ".join([query, *additions]) if additions else query
+    return expanded, additions
 
 
 class HybridRetriever(BaseRetriever):
@@ -70,7 +90,16 @@ class HybridRetriever(BaseRetriever):
             else:
                 logger.warning(f"文档 {doc.get('id')} 缺少 embedding，已跳过向量索引")
 
-            text_for_bm25 = f"{doc['content']} {' '.join(doc.get('keywords', []))}"
+            text_for_bm25 = " ".join(
+                str(value)
+                for value in (
+                    doc.get("source_id") or "",
+                    doc.get("title") or "",
+                    doc["content"],
+                    " ".join(doc.get("keywords", [])),
+                )
+                if value
+            )
             bm25_corpus.append(_tokenize_zh(text_for_bm25))
             self.bm25_doc_ids.append(doc["id"])
 
@@ -116,8 +145,9 @@ class HybridRetriever(BaseRetriever):
         t1 = time.perf_counter()
         sparse_ranking: List[int] = []
         sparse_score_map: Dict[int, float] = {}
+        sparse_query, query_expansions = _expand_sparse_query(query)
         if self.bm25 is not None:
-            bm25_scores = self.bm25.get_scores(_tokenize_zh(query))
+            bm25_scores = self.bm25.get_scores(_tokenize_zh(sparse_query))
             order = np.argsort(bm25_scores)[::-1][:candidate_n]
             for index in order:
                 if bm25_scores[index] > 0:
@@ -125,7 +155,12 @@ class HybridRetriever(BaseRetriever):
                     sparse_ranking.append(doc_id)
                     sparse_score_map[doc_id] = float(bm25_scores[index])
         if trace is not None:
-            trace.add_stage("sparse_recall", sparse_ranking, (time.perf_counter() - t1) * 1000)
+            trace.add_stage(
+                "sparse_recall",
+                sparse_ranking,
+                (time.perf_counter() - t1) * 1000,
+                query_expansions=query_expansions,
+            )
 
         # 3. RRF 融合：score = Σ 1 / (RRF_K + rank)，rank 从 1 开始
         t2 = time.perf_counter()

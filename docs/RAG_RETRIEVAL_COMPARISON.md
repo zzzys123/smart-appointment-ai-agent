@@ -1,5 +1,9 @@
 # RAG 新旧检索方式对比报告
 
+> 本文保留 2026-08-14 的 17 条初始实验记录。当前 50 条严格证据、10 条
+> 无答案及 Cross-Encoder 对比结果以
+> [`evaluation/GOLDEN_SET.md`](../evaluation/GOLDEN_SET.md) 为准。
+
 测试日期：2026-08-14
 
 ## 1. 结论

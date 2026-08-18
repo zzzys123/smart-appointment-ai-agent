@@ -40,6 +40,7 @@ logs/
 
 # --- Tests / coverage ---
 .pytest_cache/
+.pytest_tmp_codex*/
 .coverage
 .coverage.*
 htmlcov/

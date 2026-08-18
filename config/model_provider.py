@@ -34,7 +34,11 @@ def get_model_provider() -> str:
     return (_env("MODEL_PROVIDER", "azure") or "azure").strip().lower()
 
 
-def create_chat_model(temperature: float = 0):
+def create_chat_model(
+    temperature: float = 0,
+    max_tokens: int | None = None,
+    extra_body: dict | None = None,
+):
     """Create a chat model from environment configuration.
 
     Azure-compatible env vars:
@@ -55,6 +59,10 @@ def create_chat_model(temperature: float = 0):
             temperature=temperature,
             azure_endpoint=_env("AZURE_OPENAI_ENDPOINT"),
             api_key=SecretStr(_env("AZURE_OPENAI_API_KEY", "") or ""),
+            timeout=float(_env("LLM_TIMEOUT_SECONDS", "60") or "60"),
+            max_retries=int(_env("LLM_MAX_RETRIES", "2") or "2"),
+            max_tokens=max_tokens,
+            extra_body=extra_body,
         )
 
     if provider in CHAT_PROVIDERS:
@@ -63,6 +71,10 @@ def create_chat_model(temperature: float = 0):
             api_key=SecretStr(_env("LLM_API_KEY", "") or ""),
             base_url=_env("LLM_BASE_URL"),
             temperature=temperature,
+            timeout=float(_env("LLM_TIMEOUT_SECONDS", "60") or "60"),
+            max_retries=int(_env("LLM_MAX_RETRIES", "2") or "2"),
+            max_tokens=max_tokens,
+            extra_body=extra_body,
         )
 
     raise ValueError(
@@ -81,6 +93,10 @@ def create_embedding_model():
             api_key=SecretStr(_env("AZURE_OPENAI_API_KEY", "") or ""),
             api_version=_env("AZURE_OPENAI_EMBEDDING_VERSION", "2023-05-15"),
             azure_endpoint=_env("AZURE_OPENAI_ENDPOINT_EMBEDDING"),
+            request_timeout=float(
+                _env("EMBEDDING_TIMEOUT_SECONDS", "30") or "30"
+            ),
+            max_retries=int(_env("EMBEDDING_MAX_RETRIES", "2") or "2"),
         )
 
     if provider in EMBEDDING_PROVIDERS:
@@ -91,6 +107,10 @@ def create_embedding_model():
             # OpenAI-compatible providers like DashScope (Qwen) only accept raw
             # strings; disable token-id batching to send plain text.
             check_embedding_ctx_length=False,
+            request_timeout=float(
+                _env("EMBEDDING_TIMEOUT_SECONDS", "30") or "30"
+            ),
+            max_retries=int(_env("EMBEDDING_MAX_RETRIES", "2") or "2"),
         )
 
     raise ValueError(

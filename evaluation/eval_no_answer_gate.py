@@ -23,7 +23,7 @@ from services.retrieval_relevance import RetrievalRelevancePolicy
 
 
 DEFAULT_CASES = ROOT / "evaluation" / "document_chunking_cases.json"
-UNKNOWN_QUERIES = ["店里有游泳池吗", "店里提供免费 WiFi 吗"]
+DEFAULT_UNKNOWN_CASES = ROOT / "evaluation" / "no_answer_cases.json"
 
 
 def _scores(document):
@@ -34,8 +34,9 @@ def _scores(document):
     }
 
 
-async def main(cases_path: Path) -> int:
+async def main(cases_path: Path, unknown_cases_path: Path) -> int:
     cases = json.loads(cases_path.read_text(encoding="utf-8"))
+    unknown_cases = json.loads(unknown_cases_path.read_text(encoding="utf-8"))
     service = KnowledgeService()
     await service.initialize()
     policy = RetrievalRelevancePolicy()
@@ -52,19 +53,21 @@ async def main(cases_path: Path) -> int:
             })
 
     accepted_unknown = []
-    for query in UNKNOWN_QUERIES:
+    for case in unknown_cases:
+        query = case["query"]
         documents = await service.search(query, top_k=3)
         kept = policy.filter(documents)
         if kept:
             accepted_unknown.append({
+                "id": case["id"],
                 "query": query,
                 "scores": [_scores(document) for document in kept],
             })
 
     print(
         f"Known queries kept: {len(cases) - len(rejected_valid)}/{len(cases)}; "
-        f"unknown queries rejected: {len(UNKNOWN_QUERIES) - len(accepted_unknown)}/"
-        f"{len(UNKNOWN_QUERIES)}"
+        f"unknown queries rejected: {len(unknown_cases) - len(accepted_unknown)}/"
+        f"{len(unknown_cases)}"
     )
     if rejected_valid:
         print("Rejected known queries:")
@@ -78,5 +81,8 @@ async def main(cases_path: Path) -> int:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
+    parser.add_argument(
+        "--unknown-cases", type=Path, default=DEFAULT_UNKNOWN_CASES
+    )
     args = parser.parse_args()
-    raise SystemExit(asyncio.run(main(args.cases)))
+    raise SystemExit(asyncio.run(main(args.cases, args.unknown_cases)))

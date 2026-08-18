@@ -48,10 +48,13 @@ jobs:
       - name: Run deterministic backend tests
         run: >-
           python -m pytest
+          tests/test_adaptive_rerank.py
           tests/test_app_health.py
+          tests/test_cross_encoder_reranker.py
           tests/test_document_ingestion.py
           tests/test_redis_integration.py
           tests/test_rag_grounding.py
+          tests/test_retrieval_observability.py
           tests/test_retriever_category_filter.py
           tests/test_shared_knowledge_service.py
           -q
