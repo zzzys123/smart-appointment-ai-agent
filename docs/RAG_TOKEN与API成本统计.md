@@ -40,6 +40,19 @@ EMBEDDING_CNY_PER_1M_TOKENS=
 系统不会把未知价格当成 0。若只能从控制台获得整次运行账单，可以继续通过 Golden 命令的
 `--estimated-cost-cny` 写入人工核对后的总费用；结果会同时保留自动统计摘要。
 
+### 当前本地价格档案（2026-08-19）
+
+根据阿里云百炼官方价格页，当前国内 `qwen3.7-plus` 在单请求输入不超过 256K Token 时显示
+限时 8 折：输入 1.6 元/百万 Token、输出 6.4 元/百万 Token；固定快照原价为输入 2 元、输出
+8 元。`text-embedding-v3` 同步调用为 0.0005 元/千输入 Token，即 0.5 元/百万 Token。
+
+本机 `.env` 已按当前限时价配置，并记录价格档案、生效日期、来源 URL 和 256K 上限。超过该输入
+上限时统计器返回 `pricing_tier_exceeded`，拒绝错误套用低档单价。估算不扣除免费额度和缓存优惠，
+所以通常比实际账单保守；活动结束后必须更新配置。
+
+- 文本模型价格：https://help.aliyun.com/zh/model-studio/model-pricing
+- Embedding 价格：https://help.aliyun.com/zh/model-studio/text-embedding-synchronous-api
+
 线上咨询默认输出一条 `rag_model_usage` 结构化日志。可选持久化配置：
 
 ```env
@@ -50,6 +63,28 @@ MODEL_USAGE_PATH=data/observability/model_usage.jsonl
 
 事件只包含 Trace ID、Session SHA-256、分阶段聚合用量和费用状态，不包含原始问题、Prompt、答案
 或原始 Session ID。开启 JSONL 后可离线汇总单次咨询费用、失败调用率及 Token 分布。
+
+汇总命令：
+
+```powershell
+.venv\Scripts\python.exe evaluation\summarize_online_metrics.py `
+  --usage-path data\observability\model_usage.jsonl `
+  --retrieval-path data\observability\retrieval_traces.jsonl `
+  --output data\observability\online_metrics_report.json
+```
+
+报告包含检索 P50/P95/P99、无答案率、错误率、重排触发/回退率、各阶段 Token、失败调用率、费用
+覆盖率、单次费用分布和累计费用。路径位于被 Git 忽略的 `data/`，不会意外提交真实运行数据。
+
+上线或重启后可用一次非 Golden 咨询检查两个事件能否通过 Trace ID 关联：
+
+```powershell
+.venv\Scripts\python.exe evaluation\smoke_online_observability.py
+```
+
+2026-08-19 首次冒烟成功关联两个事件，同时发现“门店目前提供哪些主要服务项目？”被现有 0.66
+证据门拒答。该现象已写入 `evaluation/GOLDEN_V3_CANDIDATES.jsonl`，只作为新版本候选收集，不修改
+Golden v2，也不围绕这一条立即调整阈值。
 
 ## Golden 输出
 

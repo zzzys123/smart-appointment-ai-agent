@@ -33,6 +33,16 @@ def _env_float(name: str) -> Optional[float]:
     return value
 
 
+def _env_int(name: str) -> Optional[int]:
+    raw = os.getenv(name)
+    if raw in (None, ""):
+        return None
+    value = int(raw)
+    if value <= 0:
+        raise ValueError(f"{name} 必须大于 0")
+    return value
+
+
 class UsageCollector:
     """Thread-safe aggregate of token counts, logical calls and failures."""
 
@@ -47,6 +57,7 @@ class UsageCollector:
                 "total_tokens": 0,
                 "estimated_input_tokens": 0,
                 "input_characters": 0,
+                "max_input_tokens_per_call": 0,
             }
         )
 
@@ -73,6 +84,9 @@ class UsageCollector:
                     else input_tokens + output_tokens
                 ),
             )
+            item["max_input_tokens_per_call"] = max(
+                item["max_input_tokens_per_call"], max(0, int(input_tokens))
+            )
 
     def record_embedding(self, texts: Iterable[str], *, failed: bool = False) -> None:
         values = [str(text) for text in texts]
@@ -98,7 +112,11 @@ class UsageCollector:
             for name, previous in report.get("stages", {}).items():
                 item = self._stages[name]
                 for key in item:
-                    item[key] += int(previous.get(key, 0) or 0)
+                    previous_value = int(previous.get(key, 0) or 0)
+                    if key == "max_input_tokens_per_call":
+                        item[key] = max(item[key], previous_value)
+                    else:
+                        item[key] += previous_value
 
     def snapshot(self, *, case_count: Optional[int] = None) -> Dict[str, Any]:
         with self._lock:
@@ -121,6 +139,13 @@ class UsageCollector:
                 "input_characters",
             )
         }
+        totals["max_input_tokens_per_call"] = max(
+            (
+                int(stage["max_input_tokens_per_call"])
+                for stage in stages.values()
+            ),
+            default=0,
+        )
         return {
             "stages": stages,
             "totals": totals,
@@ -134,6 +159,7 @@ class UsageCollector:
         chat_input_rate = _env_float("LLM_INPUT_CNY_PER_1M_TOKENS")
         chat_output_rate = _env_float("LLM_OUTPUT_CNY_PER_1M_TOKENS")
         embedding_rate = _env_float("EMBEDDING_CNY_PER_1M_TOKENS")
+        pricing_max_input = _env_int("MODEL_PRICING_MAX_INPUT_TOKENS")
         chat_tokens = sum(
             int(values["input_tokens"]) + int(values["output_tokens"])
             for name, values in stages.items()
@@ -153,6 +179,22 @@ class UsageCollector:
                 "total_cny": None,
                 "cny_per_case": None,
                 "reason": "The chat provider returned no token usage metadata.",
+            }
+        max_input_tokens = max(
+            (
+                int(values.get("max_input_tokens_per_call", 0))
+                for name, values in stages.items()
+                if name != "embedding"
+            ),
+            default=0,
+        )
+        if pricing_max_input and max_input_tokens > pricing_max_input:
+            return {
+                "status": "pricing_tier_exceeded",
+                "total_cny": None,
+                "cny_per_case": None,
+                "max_input_tokens_per_call": max_input_tokens,
+                "configured_tier_max_input_tokens": pricing_max_input,
             }
         missing = []
         if chat_tokens and chat_input_rate is None:
@@ -191,6 +233,13 @@ class UsageCollector:
                 round(total / case_count, 8) if case_count and case_count > 0 else None
             ),
             "embedding_token_source": "estimated_from_characters",
+            "pricing_profile": os.getenv("MODEL_PRICING_PROFILE"),
+            "pricing_effective_date": os.getenv("MODEL_PRICING_EFFECTIVE_DATE"),
+            "pricing_source_url": os.getenv("MODEL_PRICING_SOURCE_URL"),
+            "pricing_assumption": (
+                "All input tokens use the standard input rate; cache discounts "
+                "and free quota are not deducted."
+            ),
             "pricing_cny_per_1m_tokens": {
                 "llm_input": chat_input_rate,
                 "llm_output": chat_output_rate,

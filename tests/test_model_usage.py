@@ -166,6 +166,21 @@ def test_success_without_provider_usage_is_unknown_not_free(monkeypatch):
     assert cost["total_cny"] is None
 
 
+def test_pricing_tier_guard_rejects_calls_above_configured_input_limit(monkeypatch):
+    monkeypatch.setenv("LLM_INPUT_CNY_PER_1M_TOKENS", "1.6")
+    monkeypatch.setenv("LLM_OUTPUT_CNY_PER_1M_TOKENS", "6.4")
+    monkeypatch.setenv("MODEL_PRICING_MAX_INPUT_TOKENS", "100")
+    collector = UsageCollector()
+    collector.record_chat("answer", input_tokens=101, output_tokens=1)
+
+    cost = collector.snapshot()["cost"]
+
+    assert cost["status"] == "pricing_tier_exceeded"
+    assert cost["total_cny"] is None
+    assert cost["max_input_tokens_per_call"] == 101
+    assert cost["configured_tier_max_input_tokens"] == 100
+
+
 def test_usage_observer_hashes_session_and_never_persists_raw_values(
     monkeypatch, tmp_path
 ):

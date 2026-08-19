@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import threading
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
@@ -45,6 +46,7 @@ class ModelUsageObserver:
     ) -> Dict[str, Any]:
         return {
             "event": "rag_model_usage",
+            "recorded_at": datetime.now(timezone.utc).isoformat(),
             "trace_id": trace_id,
             "session_sha256": self._session_hash(session_id),
             "usage": dict(report.get("totals", {})),
