@@ -116,6 +116,13 @@ button, textarea, input { font: inherit; }
 .reminder-icon { width: 64px; height: 64px; margin: 0 auto 16px; display: grid; place-items: center; border-radius: 18px; color: #ff7892; font-size: 28px; background: rgba(255,255,255,.12); }
 .reminder-copy { padding: 18px; border-radius: 12px; white-space: pre-wrap; background: #f7f6ff; line-height: 1.8; }
 
+.observability-page .section-alert { margin-bottom: 18px; }
+.health-card { min-height: 112px; }
+.health-icon { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; color: #6f4ae8; background: #f1edff; font-size: 20px; }
+.section-title { margin-top: 28px !important; }
+.metrics-detail-row { margin-top: 16px; }
+.lifecycle-card { margin-bottom: 18px; }
+
 @media (max-width: 900px) {
   .app-content { padding: 22px 18px; }
   .page-heading { align-items: flex-start; flex-direction: column; }

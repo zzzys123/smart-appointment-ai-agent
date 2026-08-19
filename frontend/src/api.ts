@@ -1,7 +1,10 @@
 import type {
   KnowledgeDocument,
+  KnowledgeLifecycleStatus,
   KnowledgeListResponse,
+  OnlineMetricsResponse,
   ScheduleItem,
+  SystemHealthResponse,
   Technician,
   UserAnalysis
 } from "./types";
@@ -55,6 +58,16 @@ export const api = {
       method: "POST",
       body: formData
     }),
+  knowledgeLifecycle: () =>
+    request<{ status: string; data: KnowledgeLifecycleStatus }>("/api/knowledge/lifecycle/status"),
+  backupKnowledge: () =>
+    request<{ status: string; data: { path: string; sha256: string } }>("/api/knowledge/lifecycle/backup", { method: "POST" }),
+  syncManagedKnowledge: () =>
+    request<{ status: string; data: { totals: Record<string, number> }; backup?: { path: string } }>("/api/knowledge/lifecycle/sync", {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify({ confirm: true, create_backup_first: true })
+    }),
   listTechnicians: () => request<Technician[]>("/api/technicians/"),
   technicianSchedule: (id: number) =>
     request<ScheduleItem[]>(`/api/technicians/${id}/schedule`),
@@ -68,6 +81,11 @@ export const api = {
         headers: jsonHeaders,
         body: JSON.stringify({ user_id: "default_user" })
       }
+    ),
+  systemHealth: () => request<SystemHealthResponse>("/api/system/health"),
+  onlineMetrics: (since?: string) =>
+    request<OnlineMetricsResponse>(
+      `/api/system/metrics${since ? `?since=${encodeURIComponent(since)}` : ""}`
     )
 };
 
