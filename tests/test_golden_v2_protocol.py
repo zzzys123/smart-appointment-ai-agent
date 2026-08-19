@@ -10,6 +10,7 @@ from evaluation.golden_v2_protocol import (
     evaluate_acceptance,
     load_case_catalog,
     load_split_manifest,
+    normalize_trace_infrastructure_errors,
     validate_complete_result,
 )
 
@@ -102,3 +103,31 @@ def test_incomplete_or_pre_v2_result_is_rejected():
     result["details"].pop()
     with pytest.raises(ProtocolError, match="result cases mismatch"):
         validate_complete_result(result, "dev")
+
+
+def test_retrieval_trace_error_cannot_pass_as_no_answer():
+    result = {
+        "details": [{
+            "id": "unknown_wifi",
+            "kind": "no_answer",
+            "passed": True,
+            "refusal_correct": True,
+            "retrieval_trace": {"error": "Connection error."},
+        }],
+        "summary": {
+            "infrastructure_error_count": 0,
+            "case_pass_rate": 1.0,
+            "no_answer_accuracy": 1.0,
+        },
+    }
+
+    count = normalize_trace_infrastructure_errors(result)
+
+    assert count == 1
+    assert result["details"][0]["passed"] is False
+    assert result["details"][0]["infrastructure_error"].startswith(
+        "retrieval_trace_error"
+    )
+    assert result["summary"]["infrastructure_error_count"] == 1
+    assert result["summary"]["case_pass_rate"] == 0.0
+    assert result["summary"]["no_answer_accuracy"] == 0.0

@@ -15,7 +15,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from evaluation.eval_end_to_end_quality import evaluate
-from evaluation.golden_v2_protocol import case_ids_for_split, load_split_manifest
+from evaluation.golden_v2_protocol import (
+    case_ids_for_split,
+    load_split_manifest,
+    normalize_trace_infrastructure_errors,
+)
 
 
 def _default_output(split: str, partial: bool = False) -> Path:
@@ -73,6 +77,12 @@ def main() -> int:
     failures_output = args.failures_output or _default_failures(
         args.split, partial=not complete_split
     )
+    if args.resume and output.exists():
+        previous = json.loads(output.read_text(encoding="utf-8"))
+        if normalize_trace_infrastructure_errors(previous):
+            output.write_text(
+                json.dumps(previous, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
     result = asyncio.run(evaluate(
         output=output,
         failures_output=failures_output,
@@ -84,6 +94,7 @@ def main() -> int:
         case_timeout_seconds=args.case_timeout_seconds,
         resume=args.resume,
     ))
+    normalize_trace_infrastructure_errors(result)
     result["protocol"] = {
         "split_version": manifest["split_version"],
         "split": args.split,

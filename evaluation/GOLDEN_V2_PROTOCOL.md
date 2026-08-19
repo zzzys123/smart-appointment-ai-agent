@@ -17,6 +17,8 @@
 2. 候选配置冻结后才运行一次 Holdout，不根据单条 Holdout 失败继续定向调参。
 3. 完整 60 条只用于建立正式基线或发布候选的最终记录，不作为日常回归。
 4. 任何用例、期望答案、Judge、关键 Prompt 或知识源的实质变化，都应建立 Golden v3。
+5. 检索 Trace 中出现连接或服务错误时，即使系统降级后正确拒答，也必须记为基础设施失败并在
+   `--resume` 时重试，不能计入无答案通过率。
 
 默认命令只运行 40 条 Dev：
 
@@ -69,3 +71,20 @@ Safety Boundary Score ≥ 0.8。无答案用例必须拒答且不得返回引用
 冻结前的 `end_to_end_quality*.json` 没有 `golden_version=golden-v2`，只作历史参考，验收器会拒绝
 把它们当作正式基线。下一次在线评测应先冻结配置，再分别建立 Dev 和 Holdout 的正式基线；不需要
 为了完成本协议重新运行 60 条。
+
+## 2026-08-19 正式基线
+
+已按相同冻结配置分别运行 40 条 Dev 和一次 20 条 Holdout，结果由
+`GOLDEN_V2_BASELINE_MANIFEST.json` 固定。两个集合均无基础设施或 Trace 错误，关键指标和总体
+通过率均为 100%。这只是当前版本的对照点，不意味着未来版本必须继续 60/60；未来候选仍按非劣
+规则验收。
+
+本轮没有采集模型 Token 用量，也无法从结果可靠反推 API 费用，因此成本状态明确记录为
+`not_collected`。在确定绝对成本预算或建立可计量成本的新基线前，未来正式 Holdout/完整集验收的
+成本门保持阻塞，不能把未知成本写成 0。
+
+离线校验命令：
+
+```powershell
+.venv\Scripts\python.exe evaluation\verify_golden_v2_baseline.py
+```

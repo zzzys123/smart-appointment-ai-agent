@@ -106,6 +106,49 @@ def _result_ids(result: Mapping[str, Any]) -> List[str]:
     return [str(detail.get("id")) for detail in result.get("details", [])]
 
 
+def normalize_trace_infrastructure_errors(result: Dict[str, Any]) -> int:
+    """Turn swallowed retrieval failures into resumable infrastructure errors.
+
+    KnowledgeService deliberately degrades retrieval exceptions to an empty
+    result for production availability. That behavior is correct online but an
+    evaluation must not count a connection failure as a successful no-answer.
+    """
+
+    details = result.get("details", [])
+    for detail in details:
+        trace_error = detail.get("retrieval_trace", {}).get("error")
+        if trace_error and not detail.get("infrastructure_error"):
+            detail["infrastructure_error"] = f"retrieval_trace_error: {trace_error}"
+            detail["passed"] = False
+
+    infrastructure_count = sum(
+        bool(detail.get("infrastructure_error")) for detail in details
+    )
+    summary = result.get("summary")
+    if isinstance(summary, dict):
+        summary["infrastructure_error_count"] = infrastructure_count
+        summary["case_pass_rate"] = (
+            statistics.fmean(float(bool(detail.get("passed"))) for detail in details)
+            if details
+            else 0.0
+        )
+        valid_no_answers = [
+            detail
+            for detail in details
+            if detail.get("kind") == "no_answer"
+            and not detail.get("infrastructure_error")
+        ]
+        summary["no_answer_accuracy"] = (
+            statistics.fmean(
+                float(bool(detail.get("refusal_correct")))
+                for detail in valid_no_answers
+            )
+            if valid_no_answers
+            else 0.0
+        )
+    return infrastructure_count
+
+
 def validate_complete_result(result: Mapping[str, Any], split: str) -> None:
     if result.get("golden_version") != "golden-v2":
         raise ProtocolError("result is not a Golden v2 result")
