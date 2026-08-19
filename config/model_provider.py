@@ -17,6 +17,8 @@ from langchain_openai import (
 )
 from pydantic import SecretStr
 
+from services.model_usage import MeteredEmbeddings, get_usage_callback_handler
+
 load_dotenv()
 
 
@@ -51,6 +53,7 @@ def create_chat_model(
         LLM_API_KEY, LLM_BASE_URL, LLM_MODEL
     """
     provider = get_model_provider()
+    callbacks = [get_usage_callback_handler()]
 
     if provider == "azure":
         return AzureChatOpenAI(
@@ -63,6 +66,7 @@ def create_chat_model(
             max_retries=int(_env("LLM_MAX_RETRIES", "2") or "2"),
             max_tokens=max_tokens,
             extra_body=extra_body,
+            callbacks=callbacks,
         )
 
     if provider in CHAT_PROVIDERS:
@@ -75,6 +79,7 @@ def create_chat_model(
             max_retries=int(_env("LLM_MAX_RETRIES", "2") or "2"),
             max_tokens=max_tokens,
             extra_body=extra_body,
+            callbacks=callbacks,
         )
 
     raise ValueError(
@@ -88,7 +93,7 @@ def create_embedding_model():
     provider = (_env("EMBEDDING_PROVIDER") or get_model_provider()).strip().lower()
 
     if provider == "azure":
-        return AzureOpenAIEmbeddings(
+        return MeteredEmbeddings(AzureOpenAIEmbeddings(
             azure_deployment=_env("AZURE_OPENAI_DEPLOYMENT_EMBEDDING"),
             api_key=SecretStr(_env("AZURE_OPENAI_API_KEY", "") or ""),
             api_version=_env("AZURE_OPENAI_EMBEDDING_VERSION", "2023-05-15"),
@@ -97,10 +102,10 @@ def create_embedding_model():
                 _env("EMBEDDING_TIMEOUT_SECONDS", "30") or "30"
             ),
             max_retries=int(_env("EMBEDDING_MAX_RETRIES", "2") or "2"),
-        )
+        ))
 
     if provider in EMBEDDING_PROVIDERS:
-        return OpenAIEmbeddings(
+        return MeteredEmbeddings(OpenAIEmbeddings(
             model=_env("EMBEDDING_MODEL", "text-embedding-v3") or "text-embedding-v3",
             api_key=SecretStr(_env("EMBEDDING_API_KEY") or _env("LLM_API_KEY", "") or ""),
             base_url=_env("EMBEDDING_BASE_URL") or _env("LLM_BASE_URL"),
@@ -111,7 +116,7 @@ def create_embedding_model():
                 _env("EMBEDDING_TIMEOUT_SECONDS", "30") or "30"
             ),
             max_retries=int(_env("EMBEDDING_MAX_RETRIES", "2") or "2"),
-        )
+        ))
 
     raise ValueError(
         f"Unsupported EMBEDDING_PROVIDER={provider!r}. "

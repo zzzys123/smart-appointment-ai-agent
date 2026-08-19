@@ -19,6 +19,7 @@ from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 
 from config.model_provider import create_chat_model, get_model_provider
+from services.model_usage import usage_stage
 
 logger = logging.getLogger(__name__)
 
@@ -99,12 +100,13 @@ class LLMReranker(BaseReranker):
         )
 
         try:
-            result: _RerankResult = await self.structured_llm.ainvoke(
-                [
-                    ("system", _RERANK_SYSTEM_PROMPT),
-                    ("human", user_prompt),
-                ]
-            )
+            with usage_stage("llm_rerank"):
+                result: _RerankResult = await self.structured_llm.ainvoke(
+                    [
+                        ("system", _RERANK_SYSTEM_PROMPT),
+                        ("human", user_prompt),
+                    ]
+                )
             score_map = {item.index: item.score for item in result.rankings}
 
             scored = []

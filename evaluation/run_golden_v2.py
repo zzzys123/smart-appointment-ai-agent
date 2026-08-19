@@ -20,6 +20,11 @@ from evaluation.golden_v2_protocol import (
     load_split_manifest,
     normalize_trace_infrastructure_errors,
 )
+from services.model_usage import (
+    UsageCollector,
+    activate_usage_collector,
+    deactivate_usage_collector,
+)
 
 
 def _default_output(split: str, partial: bool = False) -> Path:
@@ -77,24 +82,35 @@ def main() -> int:
     failures_output = args.failures_output or _default_failures(
         args.split, partial=not complete_split
     )
+    previous_usage = None
     if args.resume and output.exists():
         previous = json.loads(output.read_text(encoding="utf-8"))
+        previous_usage = previous.get("usage")
         if normalize_trace_infrastructure_errors(previous):
             output.write_text(
                 json.dumps(previous, ensure_ascii=False, indent=2), encoding="utf-8"
             )
-    result = asyncio.run(evaluate(
-        output=output,
-        failures_output=failures_output,
-        top_k=args.top_k,
-        case_ids=case_ids,
-        rerank_mode=args.rerank_mode,
-        adaptive_llm=args.adaptive_llm,
-        concurrency=args.concurrency,
-        case_timeout_seconds=args.case_timeout_seconds,
-        resume=args.resume,
-    ))
+    usage_collector = UsageCollector()
+    usage_collector.merge(previous_usage)
+    usage_token = activate_usage_collector(usage_collector)
+    try:
+        result = asyncio.run(evaluate(
+            output=output,
+            failures_output=failures_output,
+            top_k=args.top_k,
+            case_ids=case_ids,
+            rerank_mode=args.rerank_mode,
+            adaptive_llm=args.adaptive_llm,
+            concurrency=args.concurrency,
+            case_timeout_seconds=args.case_timeout_seconds,
+            resume=args.resume,
+        ))
+    finally:
+        deactivate_usage_collector(usage_token)
     normalize_trace_infrastructure_errors(result)
+    usage = usage_collector.snapshot(case_count=len(case_ids))
+    result["usage"] = {"stages": usage["stages"], "totals": usage["totals"]}
+    result["cost"] = usage["cost"]
     result["protocol"] = {
         "split_version": manifest["split_version"],
         "split": args.split,
@@ -107,6 +123,7 @@ def main() -> int:
             "total_cny": args.estimated_cost_cny,
             "cny_per_case": args.estimated_cost_cny / len(case_ids),
             "source": "operator_supplied",
+            "calculated_usage_cost": usage["cost"],
         }
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")

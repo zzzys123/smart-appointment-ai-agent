@@ -7,6 +7,7 @@
 import json
 from typing import Dict, Any, AsyncGenerator, List
 from langchain_core.language_models.chat_models import BaseChatModel
+from services.model_usage import usage_stage
 from .prompt_builder import PromptBuilder
 
 
@@ -28,7 +29,8 @@ class ResponseGenerator:
             return self.NO_ANSWER_MESSAGE
         try:
             prompt = self.prompt_builder.build_consultation_prompt(user_input, knowledge_docs)
-            response = await self.llm.ainvoke([{"role": "user", "content": prompt}])
+            with usage_stage("answer"):
+                response = await self.llm.ainvoke([{"role": "user", "content": prompt}])
             return response.content
         except Exception as e:
             return f"抱歉，处理您的问题时出现了错误。请稍后再试。"
@@ -43,7 +45,8 @@ class ResponseGenerator:
 
         try:
             prompt = self.prompt_builder.build_consultation_prompt(user_input, knowledge_docs)
-            response = await self.llm.ainvoke([{"role": "user", "content": prompt}])
+            with usage_stage("answer"):
+                response = await self.llm.ainvoke([{"role": "user", "content": prompt}])
             content = response.content
             
             # 只在开头添加一次REPLY标签，然后逐字符输出

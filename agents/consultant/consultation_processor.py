@@ -4,10 +4,20 @@
 负责协调整个咨询流程
 """
 
+import logging
 from typing import AsyncGenerator, Dict, Any
 from .knowledge_retriever import KnowledgeRetriever
 from .consultation_classifier import ConsultationClassifier
 from .response_generator import ResponseGenerator
+from services.model_usage import (
+    UsageCollector,
+    activate_usage_collector,
+    deactivate_usage_collector,
+)
+from services.model_usage_observability import emit_model_usage
+
+
+logger = logging.getLogger(__name__)
 
 
 class ConsultationProcessor:
@@ -19,19 +29,39 @@ class ConsultationProcessor:
         self.knowledge_retriever = knowledge_retriever
         self.consultation_classifier = consultation_classifier
         self.response_generator = response_generator
+        self.last_usage = None
+
+    def _finish_usage(self, collector: UsageCollector, session_id: str | None = None):
+        try:
+            report = collector.snapshot(case_count=1)
+            self.last_usage = report
+            service = getattr(self.knowledge_retriever, "knowledge_service", None)
+            trace = service.get_last_trace() if service is not None else None
+            emit_model_usage(
+                report,
+                trace_id=trace.trace_id if trace is not None else None,
+                session_id=session_id,
+            )
+        except Exception:
+            logger.exception("记录模型用量失败")
     
     async def process_consultation(self, user_input: str) -> str:
         """处理标准咨询"""
-        # 1. 检索知识
-        knowledge_docs = await self.knowledge_retriever.search_knowledge(user_input, top_k=3)
-        
-        # 2. 生成响应
-        response = await self.response_generator.generate_response(user_input, knowledge_docs)
-        
-        return response
+        collector = UsageCollector()
+        usage_token = activate_usage_collector(collector)
+        try:
+            # 1. 检索知识
+            knowledge_docs = await self.knowledge_retriever.search_knowledge(user_input, top_k=3)
+            # 2. 生成响应
+            return await self.response_generator.generate_response(user_input, knowledge_docs)
+        finally:
+            deactivate_usage_collector(usage_token)
+            self._finish_usage(collector)
     
     async def process_consultation_stream(self, user_input: str, session_id: str) -> AsyncGenerator[str, None]:
         """处理流式咨询"""
+        collector = UsageCollector()
+        usage_token = activate_usage_collector(collector)
         try:
             # 1. 检索知识
             knowledge_docs = await self.knowledge_retriever.search_knowledge(user_input, top_k=3)
@@ -45,6 +75,9 @@ class ConsultationProcessor:
             
         except Exception as e:
             yield f"[REPLY][咨询机器人]抱歉，处理您的问题时出现了错误：{str(e)}"
+        finally:
+            deactivate_usage_collector(usage_token)
+            self._finish_usage(collector, session_id=session_id)
     
     async def handle_unrelated_request(self, user_input: str, unrelated_callback, shared_state) -> AsyncGenerator[str, None]:
         """处理与咨询无关的请求"""
