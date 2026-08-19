@@ -21,6 +21,7 @@ from services.knowledge_lifecycle import (  # noqa: E402
     lifecycle_status,
     restore_backup,
     sync_directory,
+    verify_manifest,
     write_manifest,
 )
 
@@ -33,6 +34,12 @@ async def _async_main(args) -> None:
     if args.command == "manifest":
         result = write_manifest(args.manifest_path, document_dir=args.document_dir) if args.write else build_manifest(args.document_dir)
         _print(result)
+        return
+    if args.command == "verify-manifest":
+        result = verify_manifest(args.manifest_path, document_dir=args.document_dir)
+        _print(result)
+        if not result["matches"]:
+            raise SystemExit(1)
         return
     if args.command == "backup":
         _print(create_backup(args.db_url, args.backup_dir))
@@ -72,6 +79,7 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
     manifest = sub.add_parser("manifest")
     manifest.add_argument("--write", action="store_true")
+    sub.add_parser("verify-manifest")
     sub.add_parser("status")
     sync = sub.add_parser("sync")
     sync.add_argument("--apply", action="store_true", help="实际同步；默认只预览")

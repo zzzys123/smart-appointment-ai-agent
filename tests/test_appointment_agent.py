@@ -13,9 +13,13 @@ import asyncio
 from agents.appointment_agent import AppointmentAgent
 
 
+pytestmark = pytest.mark.integration
+
+
 class TestAppointmentAgentCoreFeatures:
     """测试预约代理核心功能"""
     
+    @pytest.mark.online
     def test_should_extract_user_info_from_natural_language(self):
         """
         测试：预约代理应该能从自然语言中提取预约信息
@@ -90,6 +94,7 @@ class TestAppointmentAgentCoreFeatures:
         assert agent.appointment_history["project"] == "按摩"  # 应该保持
         assert agent.appointment_history["start_time"] == "明天下午2点"
     
+    @pytest.mark.online
     def test_should_identify_unrelated_requests(self):
         """
         测试：预约代理应该能识别与预约无关的请求
@@ -167,7 +172,9 @@ class TestAppointmentAgentCoreFeatures:
         # 应该能处理不完整信息（不抛出异常）
         try:
             response_tokens = []
-            async for token in agent.appointment_processor.handle_incomplete_info(incomplete_data):
+            async for token in agent.appointment_processor.handle_incomplete_info(
+                incomplete_data, agent.appointment_history
+            ):
                 response_tokens.append(token)
             
             response = "".join(response_tokens)

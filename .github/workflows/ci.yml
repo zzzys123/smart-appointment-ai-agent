@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - "feat/**"
       - "agent/**"
   pull_request:
     branches:
@@ -19,9 +20,9 @@ concurrency:
 
 jobs:
   backend:
-    name: Backend tests (Python 3.11)
+    name: Offline unit + integration tests (Python 3.11)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       PYTHON_DOTENV_DISABLED: "1"
       PYTHONUNBUFFERED: "1"
@@ -43,21 +44,36 @@ jobs:
         run: python -m pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Compile Python modules
-        run: python -m compileall -q agents api config db services app.py
+        run: python -m compileall -q agents api config db evaluation scripts services tests app.py
 
-      - name: Run deterministic backend tests
-        run: >-
-          python -m pytest
-          tests/test_adaptive_rerank.py
-          tests/test_app_health.py
-          tests/test_cross_encoder_reranker.py
-          tests/test_document_ingestion.py
-          tests/test_redis_integration.py
-          tests/test_rag_grounding.py
-          tests/test_retrieval_observability.py
-          tests/test_retriever_category_filter.py
-          tests/test_shared_knowledge_service.py
-          -q
+      - name: Run the complete deterministic suite
+        run: python -m pytest -q
+
+      - name: Show tests reserved for explicit online runs
+        run: python -m pytest --collect-only -q -m online
+
+  quality-gates:
+    name: Golden v2 + knowledge baseline integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify frozen Golden v2 files
+        run: python evaluation/verify_golden_v2.py
+
+      - name: Verify frozen Golden v2 baseline results
+        run: python evaluation/verify_golden_v2_baseline.py
+
+      - name: Verify versioned knowledge sources and 80 chunks
+        run: python scripts/manage_knowledge.py verify-manifest
 
   frontend:
     name: Frontend production build (Node 20)
@@ -85,13 +101,31 @@ jobs:
       - name: Build React frontend
         run: npm run build
 
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout complete history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan repository history with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   container:
     name: Docker image and Compose
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs:
       - backend
+      - quality-gates
       - frontend
+      - secret-scan
 
     steps:
       - name: Checkout repository

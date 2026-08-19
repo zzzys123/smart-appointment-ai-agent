@@ -23,6 +23,21 @@
 
 ---
 
+## 当前工程基线（2026-08-19）
+
+| 项目 | 当前状态 |
+|------|---------|
+| 知识基线 | 90 条活动知识：10 条内置知识 + 10 篇受管文档生成的 80 个分块 |
+| Golden 版本 | Golden v2 已冻结；40 条 Dev + 20 条 Holdout，正式基线均为 100%，不以日常反复跑 60/60 为目标 |
+| 默认检索 | Hybrid（Dense + BM25 + RRF）；Cross-Encoder 与 LLM 精排可按策略启用 |
+| 自动化测试 | 90 条确定性测试通过；15 条真实模型测试默认跳过，需显式授权运行 |
+| CI 门禁 | Python 离线回归、Golden/知识完整性、前端构建、Gitleaks、Compose 与 Docker 镜像构建 |
+| 可选基础设施 | Redis 与 Docker 不是本地单机开发的前置条件；多进程协调或容器演示时再启用 |
+
+Golden v2 当前成本状态为 `not_collected`。后续正式候选需要在预先确定预算或建立可计量成本基线后，才能通过成本门禁；未知成本不会被记为 0。
+
+---
+
 ## 技术栈
 
 | 类别 | 技术 |
@@ -35,7 +50,7 @@
 | 缓存与协调 | Redis（可选启用）、会话 TTL、限流、分布式锁、预约幂等 |
 | 外部工具 | OpenWeatherMap（天气）、MCP |
 | 前端 | React 19、TypeScript、Ant Design、TanStack Query、React Router、Vite；Jinja2 作为 Legacy 回退页 |
-| 测试与 CI | Pytest、GitHub Actions、TypeScript/Vite 生产构建 |
+| 测试与 CI | Pytest 分层（unit / integration / online）、GitHub Actions、Golden/知识完整性、Gitleaks、TypeScript/Vite 与 Docker 构建 |
 
 ---
 
@@ -131,6 +146,7 @@ START → classify_node（LLM 意图分类）
 详细说明见 [`docs/RAG_DOCUMENT_INGESTION.md`](docs/RAG_DOCUMENT_INGESTION.md)。
 无答案阈值和流式引用协议见 [`docs/RAG_GROUNDING_AND_CITATIONS.md`](docs/RAG_GROUNDING_AND_CITATIONS.md)。
 端到端评测、动态路由与 Trace 运维见 [`docs/RAG_QUALITY_ROUTING_OBSERVABILITY.md`](docs/RAG_QUALITY_ROUTING_OBSERVABILITY.md)。
+测试分层、在线费用保护和 CI 门禁见 [`docs/测试分层与CI.md`](docs/测试分层与CI.md)。
 
 ---
 
@@ -367,11 +383,19 @@ AI：📋 订单号：ORD4082031 | 技师：张伟 | 项目：全身推拿 | 金
 # Dense / Hybrid / 本地 Cross-Encoder 同口径对比
 .\.venv\Scripts\python.exe evaluation\eval_reranker_strategies.py
 
-# 不访问外部 API 的确定性回归
-.\.venv\Scripts\python.exe -m pytest tests\test_document_ingestion.py tests\test_redis_integration.py tests\test_retriever_category_filter.py tests\test_shared_knowledge_service.py -q
+# 完整确定性回归：自动跳过真实模型测试
+.\.venv\Scripts\python.exe -m pytest -q
+
+# 真实模型测试：需要有效 API Key，可能产生费用
+.\.venv\Scripts\python.exe -m pytest -q -m online --run-online
+
+# 冻结基线与知识清单离线校验
+.\.venv\Scripts\python.exe evaluation\verify_golden_v2.py
+.\.venv\Scripts\python.exe evaluation\verify_golden_v2_baseline.py
+.\.venv\Scripts\python.exe scripts\manage_knowledge.py verify-manifest
 ```
 
-当前确定性回归结果为 **31 passed**；GitHub Actions 会在 Push 和 Pull Request 中重复执行后端测试、React 生产构建、Compose 配置校验与 Docker 镜像构建，不使用真实 API Key。
+当前确定性回归结果为 **90 passed、15 skipped**；跳过项均属于显式标记的在线模型测试。GitHub Actions 不使用真实 API Key，并会在 Push 和 Pull Request 中执行完整离线回归、Golden v2 与 90 条知识基线校验、React 构建、密钥扫描、Compose 校验和 Docker 镜像构建。
 
 ---
 
@@ -409,6 +433,8 @@ AI：📋 订单号：ORD4082031 | 技师：张伟 | 项目：全身推拿 | 金
 │   ├── document_chunking_cases.json# 50 条严格证据用例
 │   ├── no_answer_cases.json        # 10 条未知问题用例
 │   ├── GOLDEN_SET.md               # 评测口径、结果与局限
+│   ├── GOLDEN_V2_PROTOCOL.md       # Dev/Holdout 划分与非劣验收规则
+│   ├── GOLDEN_V2_*MANIFEST.json    # 冻结文件与正式基线哈希
 │   ├── eval_document_chunking.py   # Whole vs Chunked 离线对比
 │   ├── eval_retrieval_strategies.py# 真实 Dense vs Hybrid 对比
 │   ├── eval_no_answer_gate.py      # 已知/未知问题门控冒烟评估
@@ -419,11 +445,13 @@ AI：📋 订单号：ORD4082031 | 技师：张伟 | 项目：全身推拿 | 金
 │   ├── RAG_DOCUMENT_INGESTION.md    # 文档导入与版本同步
 │   ├── RAG_RETRIEVAL_COMPARISON.md # 严格证据评估报告
 │   ├── RAG_GROUNDING_AND_CITATIONS.md# 无答案门控与引用协议
+│   ├── 测试分层与CI.md              # 离线/在线测试边界与 CI 门禁
 │   └── REDIS_INTEGRATION.md         # Redis 能力与一致性边界
 ├── web/                            # FastAPI 页面路由与 Legacy Jinja
 ├── data/                           # SQLite 数据库 + checkpointer
-├── tests/                          # 单元与确定性集成测试
-├── .github/workflows/ci.yml        # 后端测试 + 前端生产构建
+├── tests/                          # unit / integration / online 分层测试
+├── pytest.ini                      # 测试标记定义与严格校验
+├── .github/workflows/ci.yml        # 离线回归 + 基线 + 安全 + 构建门禁
 ├── Dockerfile                      # React 构建 + Python 运行时多阶段镜像
 ├── .dockerignore                   # 镜像构建上下文排除规则
 ├── compose.yaml                    # App + Redis 编排与持久化 Volume
@@ -461,3 +489,4 @@ USE_LANGGRAPH=false  # 切换到旧版 TaskClassificationAgent
 | 长文知识库 | 手工短条目 → Markdown/TXT 分块、来源同步、哈希去重和索引代数 |
 | 前端工作台 | Jinja 页面 → React/TypeScript 主界面，Legacy 页面保留回退 |
 | 并发协调 | 单进程锁 → 可选 Redis 限流、聊天锁、预约锁与幂等 |
+| 工程质量门禁 | 手工选择少量测试 → 默认完整离线回归、在线费用保护、Golden/知识完整性与密钥扫描 |

@@ -14,6 +14,9 @@ from agents.appointment_agent import AppointmentAgent
 from agents.consultant_agent import ConsultantAgent
 
 
+pytestmark = pytest.mark.online
+
+
 class TestTaskClassificationAgentRealWorkflow:
     """测试任务分类代理真实工作流程"""
     

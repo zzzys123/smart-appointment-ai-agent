@@ -15,6 +15,21 @@ from services.knowledge_lifecycle import (
 )
 
 
+def test_default_knowledge_baseline_contains_ten_seed_entries(monkeypatch):
+    import services.knowledge_service as knowledge_module
+
+    class StubRouter:
+        knowledge = object()
+
+    monkeypatch.setattr(knowledge_module, "DatabaseRouter", lambda _db_path: StubRouter())
+    monkeypatch.setattr(knowledge_module, "create_retriever", lambda: object())
+
+    service = knowledge_module.KnowledgeService("sqlite:///:memory:")
+
+    assert len(service.default_knowledge) == 10
+    assert all(item["content"] and item["category"] and item["keywords"] for item in service.default_knowledge)
+
+
 def _write_document(path, source_id="KB-TEST-001", body="# 规则\n\n至少提前两小时取消。"):
     path.write_text(
         f"---\nsource_id: {source_id}\ncategory: 测试\nversion: 1\n---\n{body}\n",
