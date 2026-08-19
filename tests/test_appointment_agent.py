@@ -10,10 +10,35 @@ AppointmentAgent 功能测试
 
 import pytest
 import asyncio
+import agents.appointment_agent as appointment_module
 from agents.appointment_agent import AppointmentAgent
 
 
 pytestmark = pytest.mark.integration
+
+
+class _OfflineChatModel:
+    """Constructor-only stub that fails if an offline test invokes the model."""
+
+    def __bool__(self):
+        return False
+
+    def with_structured_output(self, _schema):
+        return self
+
+    def invoke(self, _input):
+        raise AssertionError("offline appointment test attempted a real model call")
+
+
+@pytest.fixture(autouse=True)
+def _isolate_offline_tests_from_model_credentials(request, monkeypatch):
+    if request.node.get_closest_marker("online"):
+        return
+    monkeypatch.setattr(
+        appointment_module,
+        "create_chat_model",
+        lambda **_kwargs: _OfflineChatModel(),
+    )
 
 
 class TestAppointmentAgentCoreFeatures:
