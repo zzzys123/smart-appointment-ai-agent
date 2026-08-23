@@ -12,6 +12,9 @@ services:
       REDIS_ENABLED: "true"
       REDIS_URL: redis://redis:6379/0
       CHECKPOINT_DB_PATH: /app/data/langgraph_checkpoints.db
+      APPOINTMENT_BACKEND: ${APPOINTMENT_BACKEND:-java}
+      JAVA_APPOINTMENT_BASE_URL: http://appointment-service:8080
+      JAVA_APPOINTMENT_TIMEOUT_SECONDS: ${JAVA_APPOINTMENT_TIMEOUT_SECONDS:-3}
     ports:
       - "8000:8000"
     volumes:
@@ -19,6 +22,54 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      appointment-service:
+        condition: service_healthy
+    restart: unless-stopped
+
+  appointment-service:
+    build:
+      context: ./backend-java
+      dockerfile: Dockerfile
+    image: smart-appointment-service:local
+    container_name: smart-appointment-service
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smart_appointment}
+      MYSQL_USER: ${MYSQL_USER:-appointment}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-appointment_dev}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8080/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.4
+    container_name: smart-appointment-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smart_appointment}
+      MYSQL_USER: ${MYSQL_USER:-appointment}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-appointment_dev}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-appointment_root_dev}
+      TZ: Asia/Shanghai
+    ports:
+      - "127.0.0.1:${MYSQL_HOST_PORT:-3307}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
     restart: unless-stopped
 
   redis:
@@ -39,3 +90,4 @@ services:
 volumes:
   app-data:
   redis-data:
+  mysql-data:

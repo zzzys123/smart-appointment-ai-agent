@@ -23,7 +23,12 @@ class AppointmentAgent:
     3. 协调整个预约流程
     """
     
-    def __init__(self, session_id=None, unrelated_callback=None):
+    def __init__(
+        self,
+        session_id=None,
+        unrelated_callback=None,
+        appointment_gateway=None,
+    ):
         # 基础设置
         self.session_id = session_id or str(uuid.uuid4())
         self.unrelated_callback = unrelated_callback
@@ -34,9 +39,14 @@ class AppointmentAgent:
         
         # 初始化组件
         self.input_parser = InputParser(self.llm)
-        self.technician_finder = TechnicianFinder()
+        if appointment_gateway is None:
+            from services.appointment_gateway import create_appointment_gateway
+
+            appointment_gateway = create_appointment_gateway()
+        self.appointment_gateway = appointment_gateway
+        self.technician_finder = TechnicianFinder(appointment_gateway)
         self.message_builder = MessageBuilder()
-        self.appointment_database = AppointmentDatabase()
+        self.appointment_database = AppointmentDatabase(appointment_gateway)
         self.appointment_processor = AppointmentProcessor(
             self.input_parser, 
             self.technician_finder,
@@ -165,7 +175,11 @@ class AppointmentAgent:
                     yield token
                 
                 # 只有在真正完成预约时才重置状态
-                if not recommendation_pending and not self.appointment_history.get('awaiting_confirmation'):
+                if (
+                    not recommendation_pending
+                    and not self.appointment_history.get('awaiting_confirmation')
+                    and self.appointment_processor.last_appointment_completed
+                ):
                     self._reset_state_after_appointment()
                     self.last_run_completed = True
                 return

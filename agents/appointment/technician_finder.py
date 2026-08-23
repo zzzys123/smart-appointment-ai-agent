@@ -6,14 +6,21 @@
 
 from typing import Optional, Dict, Any, Callable
 from datetime import datetime, timedelta
+from services.appointment_gateway import (
+    AppointmentGateway,
+    create_appointment_gateway,
+)
 from services.text_embedding import find_best_match_indices
 
 
 class TechnicianFinder:
     """技师查找器"""
     
-    def __init__(self):
-        pass
+    def __init__(self, appointment_gateway: Optional[AppointmentGateway] = None):
+        self.appointment_gateway = (
+            appointment_gateway or create_appointment_gateway()
+        )
+        self.last_failure_reason = None
     
     def parse_time_and_duration(self, start_time_str: str, duration_str: str) -> tuple:
         """解析预约时间和时长"""
@@ -39,47 +46,50 @@ class TechnicianFinder:
         except Exception:
             return None, None, None
     
-    def find_specific_technician(self, technician_name: str, start_time: datetime, 
-                               end_time: datetime, yield_func: Optional[Callable] = None) -> Optional[Dict]:
+    async def find_specific_technician(self, technician_name: str, start_time: datetime,
+                                     end_time: datetime, yield_func: Optional[Callable] = None) -> Optional[Dict]:
         """查找指定技师的可用性"""
-        # 通过Services层访问数据库
-        from services.appointment_service import AppointmentService
-        appointment_service = AppointmentService()
-        
         if yield_func:
             yield_func(f"[THOUGHT][预约机器人] 用户指定了技师：{technician_name}，正在查询该技师信息...\n")
-        
-        specific_tech = appointment_service.get_technician_by_name(technician_name)
+
+        technicians = await self.appointment_gateway.list_technicians()
+        specific_tech = next(
+            (tech for tech in technicians if tech.get("name") == technician_name),
+            None,
+        )
         if specific_tech:
             if yield_func:
                 yield_func(f"[THOUGHT][预约机器人] 找到技师：{specific_tech['name']}，正在检查档期...\n")
-            
-            if appointment_service.is_technician_available(specific_tech["id"], start_time, end_time):
+
+            available = await self.appointment_gateway.find_available_technicians(
+                start_time,
+                self._duration_minutes(start_time, end_time),
+            )
+            available_ids = {tech["id"] for tech in available}
+            if specific_tech["id"] in available_ids:
                 if yield_func:
                     yield_func(f"[THOUGHT][预约机器人] {technician_name}技师在指定时间有空\n")
                 return specific_tech
             else:
+                self.last_failure_reason = "technician_unavailable"
                 if yield_func:
                     yield_func(f"[THOUGHT][预约机器人] {technician_name}技师在指定时间不空闲\n")
                 return None
         else:
+            self.last_failure_reason = "technician_not_found"
             if yield_func:
                 yield_func(f"[THOUGHT][预约机器人] 未找到名为'{technician_name}'的技师\n")
             return None
 
-    def find_similar_available_technician(self, target_technician: Dict[str, Any], 
-                                        start_time: datetime, end_time: datetime, 
-                                        yield_func: Optional[Callable] = None) -> Optional[Dict]:
+    async def find_similar_available_technician(self, target_technician: Dict[str, Any],
+                                              start_time: datetime, end_time: datetime,
+                                              yield_func: Optional[Callable] = None) -> Optional[Dict]:
         """根据目标技师的专长查找相似且可用的技师"""
-        # 通过Services层访问数据库
-        from services.appointment_service import AppointmentService
-        appointment_service = AppointmentService()
-        
         if yield_func:
             yield_func(f"[THOUGHT][预约机器人] 正在根据{target_technician['name']}的专长查找相似技师...\n")
-        
+
         # 获取所有技师
-        all_techs = appointment_service.get_all_technicians()
+        all_techs = await self.appointment_gateway.list_technicians()
         if not all_techs:
             return None
             
@@ -100,10 +110,16 @@ class TechnicianFinder:
         if yield_func:
             yield_func(f"[THOUGHT][预约机器人] 根据专长相似度排序，准备检查可用性...\n")
         
+        available = await self.appointment_gateway.find_available_technicians(
+            start_time,
+            self._duration_minutes(start_time, end_time),
+        )
+        available_ids = {tech["id"] for tech in available}
+
         # 按相似度顺序检查技师可用性
         for index in indices:
             similar_tech = other_techs[index]
-            if appointment_service.is_technician_available(similar_tech["id"], start_time, end_time):
+            if similar_tech["id"] in available_ids:
                 if yield_func:
                     yield_func(f"[THOUGHT][预约机器人] 找到相似且可用的技师：{similar_tech['name']}\n")
                 return similar_tech
@@ -144,20 +160,22 @@ class TechnicianFinder:
         
         return filtered_techs if filtered_techs else all_techs  # 如果没有匹配的，返回所有技师
     
-    def find_available_technician(self, filtered_techs: list, all_techs: list, 
-                                start_time: datetime, end_time: datetime, 
-                                preference: str, gender: str = None, yield_func: Optional[Callable] = None) -> Optional[Dict]:
+    async def find_available_technician(self, filtered_techs: list, all_techs: list,
+                                      start_time: datetime, end_time: datetime,
+                                      preference: str, gender: str = None, yield_func: Optional[Callable] = None) -> Optional[Dict]:
         """在技师列表中查找可用技师"""
-        # 通过Services层访问数据库
-        from services.appointment_service import AppointmentService
-        appointment_service = AppointmentService()
-        
         if yield_func:
             yield_func("[THOUGHT][预约机器人] 正在查找空闲技师...\n")
-        
+
+        available = await self.appointment_gateway.find_available_technicians(
+            start_time,
+            self._duration_minutes(start_time, end_time),
+        )
+        available_ids = {tech["id"] for tech in available}
+
         # 先在筛选后的技师中查找
         for tech in filtered_techs:
-            if appointment_service.is_technician_available(tech["id"], start_time, end_time):
+            if tech["id"] in available_ids:
                 if yield_func:
                     yield_func(f"[THOUGHT][预约机器人] 找到空闲技师：{tech['name']}\n")
                 return tech
@@ -167,22 +185,20 @@ class TechnicianFinder:
             if yield_func:
                 yield_func("[THOUGHT][预约机器人] 偏好技师无空闲，尝试查找所有技师...\n")
             for tech in all_techs:
-                if appointment_service.is_technician_available(tech["id"], start_time, end_time):
+                if tech["id"] in available_ids:
                     if yield_func:
                         yield_func(f"[THOUGHT][预约机器人] 找到空闲技师：{tech['name']}\n")
                     return tech
-        
+
+        self.last_failure_reason = "no_available_technician"
         if yield_func:
             yield_func("[THOUGHT][预约机器人] 没有找到空闲技师\n")
         return None
-    
-    def find_technician_with_thought(self, appointment_history: Dict[str, Any], 
-                                   yield_func: Optional[Callable] = None) -> Optional[Dict]:
+
+    async def find_technician_with_thought(self, appointment_history: Dict[str, Any],
+                                         yield_func: Optional[Callable] = None) -> Optional[Dict]:
         """带思考提示的技师检索流程"""
-        # 通过Services层访问数据库
-        from services.appointment_service import AppointmentService
-        appointment_service = AppointmentService()
-        
+        self.last_failure_reason = None
         preference = appointment_history.get("preference")
         gender = appointment_history.get("gender")
         start_time_str = appointment_history.get("start_time")
@@ -201,16 +217,24 @@ class TechnicianFinder:
 
         # 优先处理指定技师
         if technician_name and technician_name != "未知":
-            specific_tech = self.find_specific_technician(technician_name, start_time, end_time, yield_func)
+            specific_tech = await self.find_specific_technician(
+                technician_name, start_time, end_time, yield_func
+            )
             
             # 如果指定技师可用，直接返回
             if specific_tech:
                 return specific_tech
             
             # 如果指定技师不可用，查找相似技师并返回推荐信息
-            target_tech = appointment_service.get_technician_by_name(technician_name)
+            all_techs = await self.appointment_gateway.list_technicians()
+            target_tech = next(
+                (tech for tech in all_techs if tech.get("name") == technician_name),
+                None,
+            )
             if target_tech:
-                similar_tech = self.find_similar_available_technician(target_tech, start_time, end_time, yield_func)
+                similar_tech = await self.find_similar_available_technician(
+                    target_tech, start_time, end_time, yield_func
+                )
                 if similar_tech:
                     # 返回包含推荐信息的结果，但标记为需要用户确认
                     return {
@@ -227,7 +251,7 @@ class TechnicianFinder:
         if yield_func:
             yield_func("[THOUGHT][预约机器人] 正在检索所有技师数据...\n")
         
-        all_techs = appointment_service.get_all_technicians()
+        all_techs = await self.appointment_gateway.list_technicians()
         if not all_techs:
             if yield_func:
                 yield_func("[THOUGHT][预约机器人] 没有找到任何技师数据\n")
@@ -244,4 +268,16 @@ class TechnicianFinder:
             yield_func(f"[THOUGHT][预约机器人] 根据偏好'{preference}'进一步筛选，找到{len(filtered_techs)}位技师\n")
         
         # 查找可用技师
-        return self.find_available_technician(filtered_techs, gender_filtered_techs, start_time, end_time, preference, gender, yield_func)
+        return await self.find_available_technician(
+            filtered_techs,
+            gender_filtered_techs,
+            start_time,
+            end_time,
+            preference,
+            gender,
+            yield_func,
+        )
+
+    @staticmethod
+    def _duration_minutes(start_time: datetime, end_time: datetime) -> int:
+        return int((end_time - start_time).total_seconds() / 60)

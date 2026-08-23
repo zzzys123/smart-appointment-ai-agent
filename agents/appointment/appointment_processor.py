@@ -8,11 +8,17 @@ import os
 import json
 import asyncio
 import aiohttp
-from typing import Dict, Any, AsyncGenerator
+from typing import Dict, Any, AsyncGenerator, Tuple
 from .input_parser import InputParser
 from .technician_finder import TechnicianFinder
 from .message_builder import MessageBuilder
 from .appointment_database import AppointmentDatabase
+from services.appointment_gateway import (
+    AppointmentBackendUnavailableError,
+    AppointmentConflictError,
+    AppointmentGatewayError,
+    AppointmentRequestError,
+)
 from langchain_classic.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.tools import BaseTool
 from langchain_core.prompts import ChatPromptTemplate
@@ -79,6 +85,7 @@ class AppointmentProcessor:
         self.message_builder = message_builder
         self.appointment_database = appointment_database
         self.llm = llm
+        self.last_appointment_completed = False
         
         # 初始化天气工具和 agent
         if self.llm:
@@ -185,6 +192,7 @@ class AppointmentProcessor:
     async def handle_complete_appointment(self, appointment_history: Dict[str, Any], 
                                         session_id: str) -> AsyncGenerator[str, None]:
         """处理预约信息完整的情况"""
+        self.last_appointment_completed = False
         # 检查是否用户拒绝了推荐
         if appointment_history.get('recommendation_declined'):
             reply = self.message_builder.create_recommendation_declined_message(self.llm)
@@ -201,7 +209,10 @@ class AppointmentProcessor:
             # 标记为推荐技师用于成功消息显示
             tech['is_recommendation'] = True
             tech['original_technician'] = appointment_history.get('original_technician')
-            reply = await self._process_successful_appointment(tech, appointment_history, session_id)
+            reply, completed = await self._process_successful_appointment(
+                tech, appointment_history, session_id
+            )
+            self.last_appointment_completed = completed
             yield f"[REPLY][预约机器人]{reply}"
             # 清理状态
             appointment_history.pop('confirmed_technician', None)
@@ -220,7 +231,22 @@ class AppointmentProcessor:
         def collect_thoughts(msg):
             thought_msgs.append(msg)
         
-        tech = self.technician_finder.find_technician_with_thought(appointment_history, collect_thoughts)
+        try:
+            tech = await self.technician_finder.find_technician_with_thought(
+                appointment_history, collect_thoughts
+            )
+        except AppointmentBackendUnavailableError:
+            yield (
+                "[REPLY][预约机器人]"
+                + self.message_builder.create_backend_unavailable_message()
+            )
+            return
+        except AppointmentRequestError:
+            yield (
+                "[REPLY][预约机器人]"
+                + self.message_builder.create_invalid_appointment_message()
+            )
+            return
         
         # 输出所有思考过程
         for msg in thought_msgs:
@@ -250,40 +276,66 @@ class AppointmentProcessor:
                 return
             else:
                 # 正常预约流程
-                reply = await self._process_successful_appointment(tech, appointment_history, session_id)
+                reply, completed = await self._process_successful_appointment(
+                    tech, appointment_history, session_id
+                )
+                self.last_appointment_completed = completed
                 yield f"[REPLY][预约机器人]{reply}"
         else:
-            reply = self.message_builder.create_appointment_failure_message(technician_name)
+            reply = self.message_builder.create_appointment_failure_message(
+                technician_name,
+                self.technician_finder.last_failure_reason,
+            )
             yield f"[REPLY][预约机器人]{reply}"
     
     async def _process_successful_appointment(self, tech: Dict[str, Any], 
-                                           appointment_history: Dict[str, Any], session_id: str) -> str:
+                                           appointment_history: Dict[str, Any], session_id: str) -> Tuple[str, bool]:
         """处理预约成功的情况，并结合北京天气生成温馨提示"""
         start_time, end_time, duration_min = self.technician_finder.parse_time_and_duration(
             appointment_history["start_time"], 
             appointment_history["duration"]
         )
         # 保存预约到数据库
-        success = self.appointment_database.save_appointment(
-            tech["id"], start_time, end_time, appointment_history, session_id
-        )
-        if success:
+        try:
+            result = await self.appointment_database.save_appointment(
+                tech["id"], start_time, end_time, appointment_history, session_id
+            )
+        except AppointmentConflictError:
+            return (
+                self.message_builder.create_appointment_conflict_message(
+                    tech.get("name", "")
+                ),
+                False,
+            )
+        except AppointmentBackendUnavailableError:
+            return self.message_builder.create_backend_unavailable_message(), False
+        except AppointmentRequestError:
+            return self.message_builder.create_invalid_appointment_message(), False
+        except AppointmentGatewayError:
+            return self.message_builder.create_save_failure_message(), False
+
+        if result:
             # 更新内存中的忙碌时段
-            self.appointment_database.update_memory_schedule(tech["id"], start_time, end_time)
+            if result.created:
+                self.appointment_database.update_memory_schedule(
+                    tech["id"], start_time, end_time
+                )
             # 使用 LLM agent 生成结合北京天气的温馨提示
             if self.llm and hasattr(self, 'agent_executor'):
                 prompt = f"请获取北京今天的天气信息，然后结合天气情况为用户生成一段温馨的预约成功提示。技师姓名：{tech['name']}，性别：{tech['gender']}。请根据天气给出合适的建议和关怀。"
                 try:
                     result = await self.agent_executor.ainvoke({"input": prompt})
                     agent_output = result.get("output", "")
-                    return f"\n机器人：已为您预约技师：{tech['name']}，性别：{tech['gender']}。预约成功！\n{agent_output}\n"
+                    return (
+                        f"\n机器人：已为您预约技师：{tech['name']}，性别：{tech['gender']}。预约成功！\n{agent_output}\n",
+                        True,
+                    )
                 except Exception as e:
                     print(f"Agent调用失败: {e}")
-                    return self.message_builder.create_appointment_success_message(tech)
+                    return self.message_builder.create_appointment_success_message(tech), True
             else:
-                return self.message_builder.create_appointment_success_message(tech)
-        else:
-            return self.message_builder.create_save_failure_message()
+                return self.message_builder.create_appointment_success_message(tech), True
+        return self.message_builder.create_save_failure_message(), False
     
     async def handle_incomplete_info(self, data: Dict[str, Any], appointment_history: Dict[str, Any]) -> AsyncGenerator[str, None]:
         """处理信息不完整的情况"""
