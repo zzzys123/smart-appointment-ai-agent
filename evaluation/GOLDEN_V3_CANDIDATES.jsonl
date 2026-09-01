@@ -1,0 +1,1 @@
+{"id":"candidate_service_catalog_paraphrase","captured_on":"2026-08-19","query":"门店目前提供哪些主要服务项目？","expected_behavior":"应依据知识库概括主要服务项目，不应因证据门过严直接拒答。","observed_behavior":"Hybrid Top-1 dense=0.6335，低于 Golden v2 的 0.66 门槛，BM25 未达到阈值，系统正确执行现有门控但产生业务上的疑似误拒答。","source":"online_observability_smoke","status":"unreviewed","usage_policy":"仅作为 Golden v3 候选；不得修改 Golden v2 或围绕单条样本立即调参。"}

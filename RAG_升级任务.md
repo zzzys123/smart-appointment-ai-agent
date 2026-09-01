@@ -175,7 +175,7 @@
 - 新增 `services/reranker.py`:
   - `BaseReranker` 抽象接口(为第三步可插拔铺垫)
   - `LLMReranker`:复用 `create_chat_model`(Qwen),用 `with_structured_output` 让 LLM 对候选逐一打 0-10 分后重排;异常时回退粗排原始顺序(容错)
-  - `CrossEncoderReranker`:本地重排占位(第三步后落地)
+  - `CrossEncoderReranker`:本地重排（sentence-transformers 批量推理、延迟加载、异常回退）
   - `create_reranker()` 工厂,`RERANKER_PROVIDER=llm|cross-encoder`
 - `services/knowledge_service.py`:
   - `search()` 改为两段式:粗排召回(候选池 top_k*4)→ 可选精排 rerank → 取 top_k
@@ -351,7 +351,7 @@ ranked = sorted(fused.items(), key=lambda kv: kv[1], reverse=True)
 一句话:**Bi-Encoder 快但粗,Cross-Encoder 准但慢** → 所以用 Bi-Encoder 召回、Cross-Encoder 精排。
 
 ### 两种主流实现
-1. **Cross-Encoder 专用重排模型**(工业界主流):如 `bge-reranker`、`cross-encoder/ms-marco-MiniLM`,输入 (query, doc) 输出相关性分数;本地跑、不花 API 钱,但需下载模型。项目中 `CrossEncoderReranker` 为此预留占位。
+1. **Cross-Encoder 专用重排模型**(工业界主流):如 `bge-reranker`、`cross-encoder/ms-marco-MiniLM`,输入 (query, doc) 输出相关性分数;本地跑、不花 API 钱,但需下载模型。项目已实现 `CrossEncoderReranker`，默认模型可配置且失败时回退粗排。
 2. **LLM Rerank**(第二步已实现):让 LLM(Qwen)当裁判给候选打分;复用现有 LLM、理解力强,但每次查询多一次 LLM 调用,慢且耗 token。
 
 ### 项目实现(`services/reranker.py` 的 LLMReranker)

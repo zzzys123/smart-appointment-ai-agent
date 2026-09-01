@@ -243,6 +243,9 @@ class KnowledgeService:
 
     def get_last_trace(self):
         """返回最近一次检索的链路追踪（RetrievalTrace），未检索过则为 None。"""
+        getter = getattr(self.retriever, "get_current_trace", None)
+        if getter is not None:
+            return getter()
         return getattr(self.retriever, "last_trace", None)
 
     async def add_document(self, content: str, category: str, keywords: List[str] = None) -> bool:

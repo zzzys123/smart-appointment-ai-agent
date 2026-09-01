@@ -20,6 +20,7 @@ class PromptBuilder:
             "你是一个推拿房的前台接待员，负责为客户解答关于推拿服务、预约、价格、营业时间、地址、交通等相关问题。"
             "我会为你提供经过相关度过滤的知识库信息，请严格依据这些信息回答，不要使用模型记忆补充门店事实。"
             "如果资料没有明确支持某个结论，就说明当前知识库信息不足，并建议用户联系门店确认。"
+            "涉及业务规则、项目名称、金额、时间和适用条件时，尽量沿用证据原文，不要把宽泛表述擅自具体化或扩大。"
             "请用专业、礼貌、简洁的语言回复用户。"
             "如果用户的问题与推拿房服务完全无关（如天气、股票、新闻等），请礼貌地告知用户你只能回答推拿相关问题。"
             "回答正文中不要自行编造来源编号，系统会在回答后自动附加引用。"
@@ -52,18 +53,25 @@ class PromptBuilder:
         
         context = "\n以下是相关的知识库信息：\n"
         for i, doc in enumerate(knowledge_docs, 1):
-            metadata = []
-            if doc.get('source_name'):
-                metadata.append(f"来源: {doc['source_name']}")
-            if doc.get('title'):
-                metadata.append(f"章节: {doc['title']}")
-            chunk_index = doc.get('chunk_index')
-            chunk_count = doc.get('chunk_count')
-            if chunk_index is not None and chunk_count:
-                metadata.append(f"分块: {int(chunk_index) + 1}/{chunk_count}")
-
-            metadata_prefix = f"[{' | '.join(metadata)}]\n" if metadata else ""
-            context += f"{i}. {metadata_prefix}{doc['content']}\n"
+            context += f"{i}. {self.format_knowledge_document(doc)}\n"
         context += "\n请只基于以上信息回答；资料未明确支持的内容不要推测。\n"
         
         return context
+
+    @staticmethod
+    def format_knowledge_document(document: Dict[str, Any]) -> str:
+        """Format one evidence item identically for generation and evaluation."""
+        metadata = []
+        if document.get("source_id"):
+            metadata.append(f"来源编号: {document['source_id']}")
+        if document.get("source_name"):
+            metadata.append(f"来源: {document['source_name']}")
+        if document.get("title"):
+            metadata.append(f"章节: {document['title']}")
+        chunk_index = document.get("chunk_index")
+        chunk_count = document.get("chunk_count")
+        if chunk_index is not None and chunk_count:
+            metadata.append(f"分块: {int(chunk_index) + 1}/{chunk_count}")
+
+        metadata_prefix = f"[{' | '.join(metadata)}]\n" if metadata else ""
+        return f"{metadata_prefix}{document.get('content', '')}"

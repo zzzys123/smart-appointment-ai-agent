@@ -12,6 +12,9 @@ import pytest
 from agents.consultant_agent import ConsultantAgent
 
 
+pytestmark = pytest.mark.online
+
+
 class TestConsultantAgentCoreFeatures:
     """测试咨询代理核心功能"""
     

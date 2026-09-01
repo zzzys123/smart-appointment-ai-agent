@@ -7,6 +7,7 @@
 from typing import List, Dict, Any, Optional
 from services.knowledge_service import KnowledgeService, get_shared_knowledge_service
 from services.retrieval_relevance import RetrievalRelevancePolicy
+from services.retriever.observability import emit_retrieval_trace
 
 
 class KnowledgeRetriever:
@@ -34,7 +35,18 @@ class KnowledgeRetriever:
         
         # 搜索相关知识
         recalled_docs = await self.knowledge_service.search(query, top_k=top_k)
-        relevant_docs = self.relevance_policy.filter(recalled_docs or [])
+        relevant_docs, gate_diagnostics = self.relevance_policy.filter_with_diagnostics(
+            recalled_docs or []
+        )
+        trace = self.knowledge_service.get_last_trace()
+        if trace is not None:
+            trace.record_evidence_gate(
+                recalled_docs or [],
+                relevant_docs,
+                diagnostics=gate_diagnostics,
+                thresholds=self.relevance_policy.thresholds,
+            )
+            emit_retrieval_trace(trace)
         
         # 记录检索日志（含结构化链路追踪）
         self._log_search_results(query, relevant_docs)

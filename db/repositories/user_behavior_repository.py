@@ -97,7 +97,13 @@ class UserBehaviorRepository(BaseUserBehaviorRepository):
             
             return [self._behavior_to_dict(behavior) for behavior in behaviors]
 
-    def update_user_preference(self, user_id: str, preference_type: str, preference_value: str) -> bool:
+    def update_user_preference(
+        self,
+        user_id: str,
+        preference_type: str,
+        preference_value: str,
+        confidence_score: int = 1,
+    ) -> bool:
         """
         更新用户偏好
         
@@ -119,7 +125,7 @@ class UserBehaviorRepository(BaseUserBehaviorRepository):
             
             if existing:
                 # 增加置信度
-                existing.confidence_score += 1
+                existing.confidence_score += max(1, int(confidence_score))
                 existing.last_updated = datetime.utcnow()
             else:
                 # 创建新偏好
@@ -127,7 +133,7 @@ class UserBehaviorRepository(BaseUserBehaviorRepository):
                     user_id=user_id,
                     preference_type=preference_type,
                     preference_value=preference_value,
-                    confidence_score=1
+                    confidence_score=max(1, int(confidence_score))
                 )
                 session.add(preference)
             

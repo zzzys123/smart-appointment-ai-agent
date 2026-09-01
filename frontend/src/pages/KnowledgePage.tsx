@@ -6,6 +6,8 @@ import {
   FileTextOutlined,
   PlusOutlined,
   ReloadOutlined,
+  SafetyCertificateOutlined,
+  SyncOutlined,
   SearchOutlined
 } from "@ant-design/icons";
 import {
@@ -71,6 +73,42 @@ export default function KnowledgePage() {
     queryKey: ["knowledge"],
     queryFn: api.listKnowledge
   });
+  const lifecycleQuery = useQuery({
+    queryKey: ["knowledge-lifecycle"],
+    queryFn: api.knowledgeLifecycle
+  });
+
+  const backup = async () => {
+    try {
+      const result = await api.backupKnowledge();
+      message.success(`备份完成：${result.data.path}`);
+    } catch (error) {
+      message.error(getErrorMessage(error));
+    }
+  };
+
+  const syncBaseline = () => {
+    Modal.confirm({
+      title: "同步受管知识文档？",
+      content: "系统会先备份 SQLite，再增量同步 knowledge_documents 并仅在有变化时重建索引。",
+      okText: "备份并同步",
+      cancelText: "取消",
+      onOk: async () => {
+        try {
+          const result = await api.syncManagedKnowledge();
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ["knowledge"] }),
+            queryClient.invalidateQueries({ queryKey: ["knowledge-lifecycle"] })
+          ]);
+          message.success(`同步完成：变更 ${result.data.totals.changed || 0} 个分块`);
+          await load();
+        } catch (error) {
+          message.error(getErrorMessage(error));
+          throw error;
+        }
+      }
+    });
+  };
 
   const load = async () => {
     const result = await knowledgeQuery.refetch();
@@ -228,6 +266,23 @@ export default function KnowledgePage() {
         <Col xs={24} sm={8}><Card><Statistic title="知识分类" value={categories.length} /></Card></Col>
         <Col xs={24} sm={8}><Card><Statistic title="检索模式" value="Hybrid RAG" valueStyle={{ fontSize: 22 }} /></Card></Col>
       </Row>
+
+      <Card className="data-card lifecycle-card">
+        <div className="table-toolbar">
+          <Space direction="vertical" size={2}>
+            <Typography.Text strong><SafetyCertificateOutlined /> 知识库基线</Typography.Text>
+            <Typography.Text type="secondary">
+              源文档 {lifecycleQuery.data?.data.source.document_count ?? "--"} 篇 / {lifecycleQuery.data?.data.source.chunk_count ?? "--"} 个受管分块 · 数据库活跃 {lifecycleQuery.data?.data.database.active_chunk_count ?? "--"} 条 · 清单
+              <Tag color={lifecycleQuery.data?.data.manifest.matches ? "success" : "warning"}>{lifecycleQuery.data?.data.manifest.status || "loading"}</Tag>
+              数据库<Tag color={lifecycleQuery.data?.data.database.matches ? "success" : "warning"}>{lifecycleQuery.data?.data.database.status || "loading"}</Tag>
+            </Typography.Text>
+          </Space>
+          <Space>
+            <Button onClick={() => void backup()}>创建快照</Button>
+            <Button type="primary" icon={<SyncOutlined />} disabled={!lifecycleQuery.data?.data.manifest.matches} onClick={syncBaseline}>备份并同步</Button>
+          </Space>
+        </div>
+      </Card>
 
       <Card className="data-card">
         <div className="table-toolbar">

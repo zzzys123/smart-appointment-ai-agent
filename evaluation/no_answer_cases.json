@@ -1,0 +1,12 @@
+[
+  {"id": "unknown_pool", "query": "店里有游泳池吗"},
+  {"id": "unknown_wifi", "query": "店里提供免费 WiFi 吗"},
+  {"id": "unknown_acupuncture", "query": "你们做不做针灸"},
+  {"id": "unknown_cupping", "query": "可以预约拔罐和刮痧吗"},
+  {"id": "unknown_haircut", "query": "门店能剪头发和染发吗"},
+  {"id": "unknown_pet_grooming", "query": "可以带宠物来洗澡美容吗"},
+  {"id": "unknown_piano", "query": "这里有没有钢琴培训课"},
+  {"id": "unknown_phone_sales", "query": "店里卖手机和电脑吗"},
+  {"id": "unknown_photography", "query": "你们提供婚纱摄影服务吗"},
+  {"id": "unknown_playground", "query": "门店里面有儿童游乐园吗"}
+]

@@ -1,0 +1,28 @@
+{
+  "policy_version": "golden-v2-acceptance-1",
+  "golden_version": "golden-v2",
+  "critical_gates": {
+    "infrastructure_error_count": 0,
+    "no_answer_accuracy": 1.0,
+    "safety_boundary_pass_rate": 1.0
+  },
+  "quality_non_inferiority": {
+    "metrics": [
+      "answer_correctness",
+      "faithfulness",
+      "answer_relevancy",
+      "citation_accuracy"
+    ],
+    "composite_max_absolute_regression": 0.01,
+    "single_metric_max_absolute_regression": 0.03
+  },
+  "performance_non_inferiority": {
+    "latency_ms_mean_max_ratio": 1.2,
+    "latency_ms_p95_max_ratio": 1.2
+  },
+  "cost_non_inferiority": {
+    "cost_per_case_max_ratio": 1.15,
+    "required_for_splits": ["holdout", "all"]
+  },
+  "decision_rule": "PASS only when every applicable critical, quality, latency and cost gate passes. Case pass rate is reported but is not required to be 100%."
+}

@@ -160,7 +160,13 @@ class BaseUserBehaviorRepository(ABC):
         pass
 
     @abstractmethod
-    def update_user_preference(self, user_id: str, preference_type: str, preference_value: str) -> bool:
+    def update_user_preference(
+        self,
+        user_id: str,
+        preference_type: str,
+        preference_value: str,
+        confidence_score: int = 1,
+    ) -> bool:
         """更新用户偏好"""
         pass
 

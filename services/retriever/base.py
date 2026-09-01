@@ -11,6 +11,8 @@
 在本基类的 search() 模板方法中统一实现，dense / hybrid 复用。
 """
 
+import asyncio
+import contextvars
 import logging
 import os
 import time
@@ -18,6 +20,11 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Tuple
 
 from .trace import RetrievalTrace
+from services.rerank_routing import (
+    AdaptiveRerankPolicy,
+    RerankDecision,
+    fuse_rerank_scores,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +40,12 @@ class BaseRetriever(ABC):
             os.getenv("RERANK_ENABLED", "false") or "false"
         ).strip().lower() in ("1", "true", "yes", "on")
         self._reranker = None  # 延迟初始化
+        self._rerankers: Dict[str, object] = {}
+        self._recall_lock = asyncio.Lock()
+        self._rerank_policy = AdaptiveRerankPolicy()
+        self._trace_context: contextvars.ContextVar[Optional[RetrievalTrace]] = (
+            contextvars.ContextVar(f"retrieval_trace_{id(self)}", default=None)
+        )
         self.last_trace: Optional[RetrievalTrace] = None  # 最近一次检索的链路追踪
         # 子类在每次 recall 时填充原始通道分数，供无答案判定使用。
         # RRF 分数只表达名次融合，不能直接充当相关度阈值。
@@ -68,7 +81,36 @@ class BaseRetriever(ABC):
     def _cache_docs(self, documents: List[Dict]) -> None:
         self.docs_by_id = {doc["id"]: doc for doc in documents}
 
-    def _get_reranker(self):
+    def _get_reranker(self, provider: Optional[str] = None):
+        # Compatibility for tests and callers that inject a reranker directly.
+        if self._reranker is not None:
+            return self._reranker
+        key = (provider or "default").strip().lower()
+        if key in self._rerankers:
+            return self._rerankers[key]
+        from services.reranker import create_reranker
+        reranker = create_reranker(provider)
+        self._rerankers[key] = reranker
+        return reranker
+
+    def get_current_trace(self) -> Optional[RetrievalTrace]:
+        """Return the current task's trace, safe under concurrent requests."""
+        return self._trace_context.get() or self.last_trace
+
+    def _legacy_rerank_decision(self) -> RerankDecision:
+        return RerankDecision(
+            True,
+            os.getenv("RERANKER_PROVIDER", "llm"),
+            "legacy_rerank_enabled",
+            "unknown",
+        )
+
+    def _publish_trace(self, trace: RetrievalTrace) -> None:
+        self.last_trace = trace
+        self._trace_context.set(trace)
+
+    def _get_reranker_legacy(self):
+        """Deprecated alias retained for external extensions."""
         if self._reranker is None:
             from services.reranker import create_reranker
             self._reranker = create_reranker()
@@ -86,21 +128,31 @@ class BaseRetriever(ABC):
         trace = RetrievalTrace(query=query, strategy=self.name, top_k=top_k)
         t_start = time.perf_counter()
         try:
-            rerank_on = self.rerank_enabled
+            candidate_pool_on = (
+                self.rerank_enabled
+                or self._rerank_policy.needs_candidate_pool_for(query)
+            )
             # 候选池大小：开启 rerank 时召回更多候选供精排；否则留少量过滤余量
             if category:
                 # 分类过滤发生在召回之后，必须先覆盖完整语料，否则目标分类可能
                 # 因全局排名靠后而被提前截断。
                 recall_k = self.num_docs
-            elif rerank_on:
+            elif candidate_pool_on:
                 recall_k = min(max(top_k * 4, 10), self.num_docs)
             else:
                 recall_k = min(max(top_k * 2, top_k), self.num_docs)
 
-            ranked_ids = self._recall(query, recall_k, trace)
+            # Embedding clients are synchronous. Run recall off the event loop
+            # so request-level timeouts and unrelated requests remain responsive.
+            # The lock also protects per-call channel metadata on this shared retriever.
+            async with self._recall_lock:
+                ranked_ids = await asyncio.to_thread(
+                    self._recall, query, recall_k, trace
+                )
+                recall_metadata = dict(self._last_recall_metadata)
 
             candidate_limit = min(
-                max(top_k * 4, 10) if rerank_on else top_k,
+                max(top_k * 4, 10) if candidate_pool_on else top_k,
                 self.num_docs,
             )
 
@@ -117,31 +169,76 @@ class BaseRetriever(ABC):
                 doc["retrieval"] = {
                     "strategy": self.name,
                     "score": float(score),
-                    **self._last_recall_metadata.get(doc_id, {}),
+                    **recall_metadata.get(doc_id, {}),
                 }
                 candidates.append(doc)
                 if len(candidates) >= candidate_limit:
                     break
 
-            # 精排重排（可选）
-            if rerank_on and candidates:
+            if self._rerank_policy.mode != "off":
+                decision = self._rerank_policy.decide(query, candidates)
+            elif self.rerank_enabled and candidates:
+                decision = self._legacy_rerank_decision()
+            else:
+                decision = RerankDecision(
+                    False, None, "rerank_disabled", "unknown"
+                )
+            trace.route = decision.to_dict()
+
+            # 精排重排（可选）：所有候选参与精排和融合，之后再截断 top_k。
+            if decision.enabled and candidates:
                 before_ids = [d.get("id") for d in candidates]
                 t_rerank = time.perf_counter()
-                results = await self._get_reranker().rerank(query, candidates, top_k)
+                timeout_seconds = float(os.getenv("RAG_RERANK_TIMEOUT_SECONDS", "20"))
+                fallback_reason = ""
+                try:
+                    reranked = await asyncio.wait_for(
+                        self._get_reranker(decision.provider).rerank(
+                            query, candidates, len(candidates)
+                        ),
+                        timeout=timeout_seconds,
+                    )
+                    if any(doc.get("rerank_fallback") for doc in reranked):
+                        fallback_reason = "provider_error"
+                        ranked = candidates
+                    else:
+                        ranked = fuse_rerank_scores(candidates, reranked)
+                except asyncio.TimeoutError:
+                    fallback_reason = "timeout"
+                    ranked = candidates
+                except Exception as exc:
+                    fallback_reason = f"error:{exc}"
+                    logger.exception("精排异常，回退到 Hybrid 粗排")
+                    ranked = candidates
+
+                results = [dict(document) for document in ranked[:top_k]]
+                observed_candidates = ranked
+                for rank, document in enumerate(results, start=1):
+                    document["rank"] = rank
+                    if fallback_reason:
+                        document["rerank_fallback"] = True
+                        document["rerank_error"] = fallback_reason
+                trace.route["fallback"] = bool(fallback_reason)
+                trace.route["fallback_reason"] = fallback_reason or None
                 trace.add_stage(
                     "rerank",
                     [d.get("id") for d in results],
                     (time.perf_counter() - t_rerank) * 1000,
                     before=before_ids[:10],
+                    provider=decision.provider,
+                    fallback=fallback_reason or None,
                 )
             else:
                 results = candidates[:top_k]
+                observed_candidates = candidates
                 for rank, doc in enumerate(results, start=1):
                     doc["rank"] = rank
 
             trace.final_doc_ids = [d.get("id") for d in results]
+            trace.record_candidates(observed_candidates)
+            trace.outcome = "retrieved"
             trace.total_ms = (time.perf_counter() - t_start) * 1000
-            self.last_trace = trace
+            self._publish_trace(trace)
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug("\n" + trace.summary())
 
@@ -150,5 +247,9 @@ class BaseRetriever(ABC):
         except Exception as e:
             logger.error(f"检索失败: {e}")
             trace.total_ms = (time.perf_counter() - t_start) * 1000
-            self.last_trace = trace
+            trace.outcome = "error"
+            trace.error = str(e)
+            self._publish_trace(trace)
+            from .observability import emit_retrieval_trace
+            emit_retrieval_trace(trace)
             return []

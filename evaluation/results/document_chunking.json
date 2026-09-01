@@ -1,23 +1,23 @@
 {
   "config": {
-    "corpus_dir": "D:\\桌面\\简历项目\\smart-appointment-ai-agent\\knowledge_documents",
-    "cases_file": "D:\\桌面\\简历项目\\smart-appointment-ai-agent\\evaluation\\document_chunking_cases.json",
+    "corpus_dir": "C:\\Users\\LingoAce\\Desktop\\项目对比\\smart-appointment-ai-agent-master\\knowledge_documents",
+    "cases_file": "C:\\Users\\LingoAce\\Desktop\\项目对比\\smart-appointment-ai-agent-master\\evaluation\\document_chunking_cases.json",
     "chunk_size": 500,
     "chunk_overlap": 100,
     "document_count": 10,
     "chunk_count": 80
   },
   "whole_document": {
-    "recall_at_1": 0.8823529411764706,
-    "recall_at_3": 1.0,
+    "recall_at_1": 0.9,
+    "recall_at_3": 0.98,
     "recall_at_10": 1.0,
-    "mrr": 0.9411764705882353,
-    "source_recall_at_1": 0.8823529411764706,
-    "source_recall_at_3": 1.0,
+    "mrr": 0.945,
+    "source_recall_at_1": 0.9,
+    "source_recall_at_3": 0.98,
     "source_recall_at_10": 1.0,
-    "source_mrr": 0.9411764705882353,
+    "source_mrr": 0.945,
     "average_candidate_chars": 976.5,
-    "average_top3_context_chars": 2985.470588235294,
+    "average_top3_context_chars": 2986.4,
     "details": [
       {
         "id": "semantic_neck_metaphor",
@@ -715,20 +715,1373 @@
             "is_evidence": false
           }
         ]
+      },
+      {
+        "id": "semantic_quiet_rest_strength",
+        "group": "dense_semantic",
+        "query": "我想安静躺一会儿，但完全不知道该选多大力度",
+        "expected_source_id": "KB-GUIDE-009",
+        "expected_contains": "力度从较轻开始",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 17.905835,
+            "char_count": 975,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "技师技能与演示工号目录",
+            "chunk_index": 0,
+            "score": 8.369888,
+            "char_count": 1017,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 8.057289,
+            "char_count": 867,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_full_body_avoid_area",
+        "group": "dense_semantic",
+        "query": "想全身放松，但脚不想让技师碰，可以吗？",
+        "expected_source_id": "KB-GUIDE-009",
+        "expected_contains": "仍可要求避开头部、腹部、足部或其他区域",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 10.051733,
+            "char_count": 975,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 9.956844,
+            "char_count": 1001,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 9.835195,
+            "char_count": 948,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_back_or_whole_body",
+        "group": "dense_semantic",
+        "query": "背和腿都很累，只做背部项目够不够？",
+        "expected_source_id": "KB-GUIDE-009",
+        "expected_contains": "全身推拿的覆盖更广",
+        "rank": 2,
+        "source_rank": 2,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 12.523154,
+            "char_count": 1001,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 12.462069,
+            "char_count": 975,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 10.408974,
+            "char_count": 948,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_one_leg_sudden_swelling",
+        "group": "dense_semantic",
+        "query": "逛街后只有一条腿突然又肿又热，还适合按脚吗？",
+        "expected_source_id": "KB-GUIDE-009",
+        "expected_contains": "单侧突然肿痛、发热或受伤",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 20.244275,
+            "char_count": 975,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 15.337465,
+            "char_count": 948,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "按摩服务安全边界与不适用情形",
+            "chunk_index": 0,
+            "score": 8.190566,
+            "char_count": 1005,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_aftercare_persistent_discomfort",
+        "group": "dense_semantic",
+        "query": "服务结束回家以后越来越不舒服，我该找谁处理身体问题？",
+        "expected_source_id": "KB-AFTERCARE-008",
+        "expected_contains": "及时咨询医疗专业人员",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 15.919691,
+            "char_count": 906,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 11.016141,
+            "char_count": 948,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 9.719,
+            "char_count": 975,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_first_visit_arrival",
+        "group": "dense_semantic",
+        "query": "第一次来店里，要不要比预约时间早一点到？",
+        "expected_source_id": "KB-SERVICE-001",
+        "expected_contains": "提前 10 分钟",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 10.268461,
+            "char_count": 1001,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 9.367103,
+            "char_count": 1014,
+            "contains_expected": true,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "门店营业时间、地址、交通与设施",
+            "chunk_index": 0,
+            "score": 8.972974,
+            "char_count": 852,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_service_full_code",
+        "group": "bm25_exact",
+        "query": "SV-FULL-60 对应多少分钟和多少钱？",
+        "expected_source_id": "KB-SERVICE-001",
+        "expected_contains": "标准时长 60 分钟，单次价格 120 元",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 14.749509,
+            "char_count": 1001,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 11.051809,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 8.977143,
+            "char_count": 867,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_service_back_code",
+        "group": "bm25_exact",
+        "query": "SV-BACK-40 的标准价是多少？",
+        "expected_source_id": "KB-SERVICE-001",
+        "expected_contains": "标准时长 40 分钟，单次价格 90 元",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 11.544475,
+            "char_count": 1001,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 7.983363,
+            "char_count": 867,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 5.19804,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_membership_500",
+        "group": "bm25_exact",
+        "query": "MB-500 实付后余额到账多少？",
+        "expected_source_id": "KB-MEMBER-004",
+        "expected_contains": "实付 500 元，到账 550 元",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 27.393441,
+            "char_count": 867,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 9.457906,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 4.241687,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_technician_010",
+        "group": "bm25_exact",
+        "query": "工号 JS-010 的技能方向是什么？",
+        "expected_source_id": "KB-TECH-006",
+        "expected_contains": "淋巴引流、面部护理",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "技师技能与演示工号目录",
+            "chunk_index": 0,
+            "score": 17.424951,
+            "char_count": 1017,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 9.204787,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 6.81488,
+            "char_count": 1014,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_lost_item_code",
+        "group": "bm25_exact",
+        "query": "LOST-03 找到物品后能直接领取吗？",
+        "expected_source_id": "KB-AFTERCARE-008",
+        "expected_contains": "身份核验和领取",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 20.581339,
+            "char_count": 906,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "门店营业时间、地址、交通与设施",
+            "chunk_index": 0,
+            "score": 9.595761,
+            "char_count": 852,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 9.42617,
+            "char_count": 1014,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_store_address",
+        "group": "bm25_exact",
+        "query": "门店是不是在中关村大街27号？",
+        "expected_source_id": "KB-STORE-007",
+        "expected_contains": "北京市海淀区中关村大街 27 号",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "门店营业时间、地址、交通与设施",
+            "chunk_index": 0,
+            "score": 15.328396,
+            "char_count": 852,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 12.484808,
+            "char_count": 1180,
+            "contains_expected": true,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 3.968941,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_subway_route",
+        "group": "bm25_exact",
+        "query": "地铁2号线A口出来走哪个方向、多少米？",
+        "expected_source_id": "KB-STORE-007",
+        "expected_contains": "向北步行 100 米",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "门店营业时间、地址、交通与设施",
+            "chunk_index": 0,
+            "score": 28.592425,
+            "char_count": 852,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 20.548031,
+            "char_count": 1180,
+            "contains_expected": true,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "按摩服务安全边界与不适用情形",
+            "chunk_index": 0,
+            "score": 7.758474,
+            "char_count": 1005,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_full_body_experience",
+        "group": "rerank_interference",
+        "query": "全身推拿一般是什么体验，能不能当成治病？",
+        "expected_source_id": "KB-SERVICE-002",
+        "expected_contains": "不意味着对疾病进行治疗",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 18.429076,
+            "char_count": 948,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 12.365871,
+            "char_count": 1001,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 11.675403,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_skin_infection",
+        "group": "rerank_interference",
+        "query": "背上有渗出的伤口和大片皮疹，还能做背部推拿吗？",
+        "expected_source_id": "KB-SAFETY-003",
+        "expected_contains": "应暂停该区域服务",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "按摩服务安全边界与不适用情形",
+            "chunk_index": 0,
+            "score": 23.663874,
+            "char_count": 1005,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 15.097537,
+            "char_count": 975,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 14.432937,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_process_stop_signal",
+        "group": "rerank_interference",
+        "query": "按摩过程中突然头晕恶心还心慌，应该继续忍着吗？",
+        "expected_source_id": "KB-SAFETY-003",
+        "expected_contains": "应立即停止并视情况寻求医疗帮助",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "按摩服务安全边界与不适用情形",
+            "chunk_index": 0,
+            "score": 26.747411,
+            "char_count": 1005,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 14.092425,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 14.010952,
+            "char_count": 948,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_strength_not_more_pain",
+        "group": "rerank_interference",
+        "query": "推拿是不是越痛、力度越大越有效？",
+        "expected_source_id": "KB-SERVICE-002",
+        "expected_contains": "力度不是越大越好",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 20.058152,
+            "char_count": 948,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 18.486146,
+            "char_count": 975,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 6.671962,
+            "char_count": 867,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_technician_availability",
+        "group": "rerank_interference",
+        "query": "文档写了吴婷擅长足疗，是不是今晚一定能约她？",
+        "expected_source_id": "KB-TECH-006",
+        "expected_contains": "不能证明某一时段可约",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "技师技能与演示工号目录",
+            "chunk_index": 0,
+            "score": 23.840939,
+            "char_count": 1017,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 11.215782,
+            "char_count": 1014,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 7.157848,
+            "char_count": 1001,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_cancellation_fee",
+        "group": "rerank_interference",
+        "query": "临时取消预约固定收百分之多少？",
+        "expected_source_id": "KB-BOOKING-005",
+        "expected_contains": "知识库不虚构固定比例",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 17.14711,
+            "char_count": 1014,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 14.354289,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 8.118234,
+            "char_count": 867,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_member_priority_boundary",
+        "group": "rerank_interference",
+        "query": "我是会员，能不能把别人已经订好的时段让给我？",
+        "expected_source_id": "KB-MEMBER-004",
+        "expected_contains": "不代表可以占用已被确认的排班",
+        "rank": 4,
+        "source_rank": 4,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 13.570041,
+            "char_count": 1014,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 11.779098,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 9.891848,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_payment_status",
+        "group": "rerank_interference",
+        "query": "聊天页面出现支付说明，是不是已经付款成功？",
+        "expected_source_id": "KB-FAQ-010",
+        "expected_contains": "聊天中出现订单提示不等于付款成功",
+        "rank": 2,
+        "source_rank": 2,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 21.450332,
+            "char_count": 1014,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 21.297395,
+            "char_count": 1180,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 16.387371,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_booking_success_boundary",
+        "group": "chunking_cross_section",
+        "query": "只问了一下有没有空位，系统是否已经替我占住时间？",
+        "expected_source_id": "KB-BOOKING-005",
+        "expected_contains": "仅咨询价格或询问空闲情况不等于完成预约",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 17.399847,
+            "char_count": 1014,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 12.744182,
+            "char_count": 1001,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 10.636044,
+            "char_count": 948,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_technician_unavailable_choices",
+        "group": "chunking_cross_section",
+        "query": "指定技师临时来不了，门店可以直接替我换人吗？有哪些选择？",
+        "expected_source_id": "KB-BOOKING-005",
+        "expected_contains": "更换同类技能且有空的技师、调整预约时间、取消本次预约",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 22.963207,
+            "char_count": 1014,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 16.981425,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 14.806992,
+            "char_count": 975,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_member_refund_factors",
+        "group": "chunking_cross_section",
+        "query": "会员储值要退款，客服需要核对哪些金额和渠道？",
+        "expected_source_id": "KB-MEMBER-004",
+        "expected_contains": "实付本金、已消费金额、赠送金额和支付渠道",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 39.651926,
+            "char_count": 867,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 23.602479,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 19.967633,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_lost_item_verification",
+        "group": "chunking_cross_section",
+        "query": "东西落在店里，报失时要提供哪些可核验信息？",
+        "expected_source_id": "KB-AFTERCARE-008",
+        "expected_contains": "到店日期、使用区域、物品外观与可核验特征",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 13.34674,
+            "char_count": 906,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 11.116881,
+            "char_count": 975,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 11.026053,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_combo_overtime",
+        "group": "chunking_cross_section",
+        "query": "连续做两个项目以后能不能临时加钟，怎么计价和留时间？",
+        "expected_source_id": "KB-SERVICE-001",
+        "expected_contains": "是否能够现场加钟取决于技师后续排班",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 25.301546,
+            "char_count": 1001,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 17.449034,
+            "char_count": 1014,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 13.700329,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_late_arrival",
+        "group": "chunking_cross_section",
+        "query": "我今天会迟到，门店能不通知我就直接缩短项目吗？",
+        "expected_source_id": "KB-BOOKING-005",
+        "expected_contains": "不能在顾客不知情时直接改变项目",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 18.545165,
+            "char_count": 1014,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 10.390942,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "从口语化需求选择合适服务的指南",
+            "chunk_index": 0,
+            "score": 9.658993,
+            "char_count": 975,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_payment_credentials",
+        "group": "policy_boundary",
+        "query": "付款核验时需要把短信验证码发给技师吗？",
+        "expected_source_id": "KB-FAQ-010",
+        "expected_contains": "不需要向客服或技师提供支付密码",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 22.813542,
+            "char_count": 1180,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 18.96674,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 14.406919,
+            "char_count": 867,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_unknown_branch",
+        "group": "policy_boundary",
+        "query": "你们上海分店具体在哪里？",
+        "expected_source_id": "KB-STORE-007",
+        "expected_contains": "本文未设置其他分店",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "门店营业时间、地址、交通与设施",
+            "chunk_index": 0,
+            "score": 9.499442,
+            "char_count": 852,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 6.116883,
+            "char_count": 948,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 5.697175,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_technician_private_contact",
+        "group": "policy_boundary",
+        "query": "能把张伟技师的私人手机号和社交账号给我吗？",
+        "expected_source_id": "KB-TECH-006",
+        "expected_contains": "不公开个人手机号、住址或私人社交账号",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "技师技能与演示工号目录",
+            "chunk_index": 0,
+            "score": 32.649523,
+            "char_count": 1017,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 16.428396,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 12.52363,
+            "char_count": 867,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_complaint_refund_promise",
+        "group": "policy_boundary",
+        "query": "只要投诉，机器人就能保证马上全额退款吧？",
+        "expected_source_id": "KB-AFTERCARE-008",
+        "expected_contains": "不能保证“投诉即全额退款”",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 32.282227,
+            "char_count": 906,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 16.582108,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 16.072348,
+            "char_count": 867,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_member_verification_privacy",
+        "group": "policy_boundary",
+        "query": "查会员余额时，客服可以在聊天里完整念出我的手机号吗？",
+        "expected_source_id": "KB-MEMBER-004",
+        "expected_contains": "不应在聊天中完整复述手机号",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "会员储值档位、权益与核销规则",
+            "chunk_index": 0,
+            "score": 31.567191,
+            "char_count": 867,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 22.403447,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "到店服务综合问答与信息边界",
+            "chunk_index": 0,
+            "score": 18.005001,
+            "char_count": 1180,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_medical_emergency",
+        "group": "policy_boundary",
+        "query": "我突然胸痛而且呼吸困难，能先来店里按摩观察一下吗？",
+        "expected_source_id": "KB-SAFETY-003",
+        "expected_contains": "应优先寻求医疗帮助",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "按摩服务安全边界与不适用情形",
+            "chunk_index": 0,
+            "score": 22.935269,
+            "char_count": 1005,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "服务体验、作用边界与适用场景",
+            "chunk_index": 0,
+            "score": 11.61158,
+            "char_count": 948,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 10.982296,
+            "char_count": 906,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
       }
     ]
   },
   "chunked_passage": {
-    "recall_at_1": 0.7647058823529411,
-    "recall_at_3": 1.0,
-    "recall_at_10": 1.0,
-    "mrr": 0.8627450980392156,
-    "source_recall_at_1": 0.8235294117647058,
-    "source_recall_at_3": 1.0,
+    "recall_at_1": 0.7,
+    "recall_at_3": 0.92,
+    "recall_at_10": 0.98,
+    "mrr": 0.8159444444444445,
+    "source_recall_at_1": 0.82,
+    "source_recall_at_3": 0.98,
     "source_recall_at_10": 1.0,
-    "source_mrr": 0.9019607843137255,
+    "source_mrr": 0.9006666666666666,
     "average_candidate_chars": 114.55,
-    "average_top3_context_chars": 389.52941176470586,
+    "average_top3_context_chars": 371.84,
     "details": [
       {
         "id": "semantic_neck_metaphor",
@@ -1422,6 +2775,1359 @@
             "chunk_index": 6,
             "score": 18.013182,
             "char_count": 125,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_quiet_rest_strength",
+        "group": "dense_semantic",
+        "query": "我想安静躺一会儿，但完全不知道该选多大力度",
+        "expected_source_id": "KB-GUIDE-009",
+        "expected_contains": "力度从较轻开始",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“我只想安静休息，不确定力度”",
+            "chunk_index": 5,
+            "score": 33.078571,
+            "char_count": 91,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "力度与沟通",
+            "chunk_index": 5,
+            "score": 19.898965,
+            "char_count": 95,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "如何选择与推荐",
+            "chunk_index": 7,
+            "score": 15.816221,
+            "char_count": 105,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_full_body_avoid_area",
+        "group": "dense_semantic",
+        "query": "想全身放松，但脚不想让技师碰，可以吗？",
+        "expected_source_id": "KB-GUIDE-009",
+        "expected_contains": "仍可要求避开头部、腹部、足部或其他区域",
+        "rank": 2,
+        "source_rank": 2,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "示例核对",
+            "chunk_index": 5,
+            "score": 22.81492,
+            "char_count": 148,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“哪儿都紧，想从头到脚松一松”",
+            "chunk_index": 4,
+            "score": 21.858391,
+            "char_count": 104,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“背上像背着东西”“坐一天腰背发紧”",
+            "chunk_index": 2,
+            "score": 18.72462,
+            "char_count": 104,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_back_or_whole_body",
+        "group": "dense_semantic",
+        "query": "背和腿都很累，只做背部项目够不够？",
+        "expected_source_id": "KB-GUIDE-009",
+        "expected_contains": "全身推拿的覆盖更广",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“背上像背着东西”“坐一天腰背发紧”",
+            "chunk_index": 2,
+            "score": 24.976185,
+            "char_count": 104,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "背部推拿的体验重点",
+            "chunk_index": 4,
+            "score": 22.117809,
+            "char_count": 98,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "标准价目表",
+            "chunk_index": 1,
+            "score": 21.52906,
+            "char_count": 318,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_one_leg_sudden_swelling",
+        "group": "dense_semantic",
+        "query": "逛街后只有一条腿突然又肿又热，还适合按脚吗？",
+        "expected_source_id": "KB-GUIDE-009",
+        "expected_contains": "单侧突然肿痛、发热或受伤",
+        "rank": 2,
+        "source_rank": 2,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "足底按摩的体验重点",
+            "chunk_index": 3,
+            "score": 28.072613,
+            "char_count": 103,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“逛了一天脚底累”“小腿像灌了铅”",
+            "chunk_index": 3,
+            "score": 27.148724,
+            "char_count": 119,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "示例核对",
+            "chunk_index": 5,
+            "score": 16.875222,
+            "char_count": 148,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_aftercare_persistent_discomfort",
+        "group": "dense_semantic",
+        "query": "服务结束回家以后越来越不舒服，我该找谁处理身体问题？",
+        "expected_source_id": "KB-AFTERCARE-008",
+        "expected_contains": "及时咨询医疗专业人员",
+        "rank": 18,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "跨章节场景",
+            "chunk_index": 6,
+            "score": 29.829146,
+            "char_count": 121,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "服务后反馈、遗失物与客诉处理流程",
+            "chunk_index": 0,
+            "score": 17.762401,
+            "char_count": 75,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "检索问题示例",
+            "chunk_index": 6,
+            "score": 17.001149,
+            "char_count": 115,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "semantic_first_visit_arrival",
+        "group": "dense_semantic",
+        "query": "第一次来店里，要不要比预约时间早一点到？",
+        "expected_source_id": "KB-SERVICE-001",
+        "expected_contains": "提前 10 分钟",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "如何理解时长",
+            "chunk_index": 2,
+            "score": 25.392359,
+            "char_count": 120,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "检索问题示例",
+            "chunk_index": 6,
+            "score": 23.416816,
+            "char_count": 115,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "取消或改期的时间规则",
+            "chunk_index": 3,
+            "score": 19.812759,
+            "char_count": 216,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_service_full_code",
+        "group": "bm25_exact",
+        "query": "SV-FULL-60 对应多少分钟和多少钱？",
+        "expected_source_id": "KB-SERVICE-001",
+        "expected_contains": "标准时长 60 分钟，单次价格 120 元",
+        "rank": 8,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "价格相近但问题不同",
+            "chunk_index": 3,
+            "score": 27.413494,
+            "char_count": 154,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "精确查询示例",
+            "chunk_index": 4,
+            "score": 25.61467,
+            "char_count": 124,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "与项目效果页面的检索边界",
+            "chunk_index": 6,
+            "score": 22.355466,
+            "char_count": 142,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_service_back_code",
+        "group": "bm25_exact",
+        "query": "SV-BACK-40 的标准价是多少？",
+        "expected_source_id": "KB-SERVICE-001",
+        "expected_contains": "标准时长 40 分钟，单次价格 90 元",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "标准价目表",
+            "chunk_index": 1,
+            "score": 15.361157,
+            "char_count": 318,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "服务项目、标准价格与时长说明",
+            "chunk_index": 0,
+            "score": 13.222543,
+            "char_count": 97,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "精确查询示例",
+            "chunk_index": 4,
+            "score": 13.131833,
+            "char_count": 124,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_membership_500",
+        "group": "bm25_exact",
+        "query": "MB-500 实付后余额到账多少？",
+        "expected_source_id": "KB-MEMBER-004",
+        "expected_contains": "实付 500 元，到账 550 元",
+        "rank": 2,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "精确查询示例",
+            "chunk_index": 4,
+            "score": 39.854307,
+            "char_count": 124,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "两个标准储值档位",
+            "chunk_index": 1,
+            "score": 29.986945,
+            "char_count": 193,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "退款与异常处理",
+            "chunk_index": 5,
+            "score": 16.675721,
+            "char_count": 109,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_technician_010",
+        "group": "bm25_exact",
+        "query": "工号 JS-010 的技能方向是什么？",
+        "expected_source_id": "KB-TECH-006",
+        "expected_contains": "淋巴引流、面部护理",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "工号 JS-010：何静",
+            "chunk_index": 6,
+            "score": 29.338092,
+            "char_count": 74,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "工号 JS-008：吴婷",
+            "chunk_index": 4,
+            "score": 20.842862,
+            "char_count": 100,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "可以指定技师吗",
+            "chunk_index": 6,
+            "score": 17.98967,
+            "char_count": 84,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_lost_item_code",
+        "group": "bm25_exact",
+        "query": "LOST-03 找到物品后能直接领取吗？",
+        "expected_source_id": "KB-AFTERCARE-008",
+        "expected_contains": "身份核验和领取",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "遗失物处理",
+            "chunk_index": 4,
+            "score": 44.585862,
+            "char_count": 108,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约确认、迟到、改期与取消政策",
+            "chunk_index": 0,
+            "score": 19.40223,
+            "char_count": 82,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "停车与设施",
+            "chunk_index": 4,
+            "score": 15.431265,
+            "char_count": 173,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_store_address",
+        "group": "bm25_exact",
+        "query": "门店是不是在中关村大街27号？",
+        "expected_source_id": "KB-STORE-007",
+        "expected_contains": "北京市海淀区中关村大街 27 号",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "详细地址",
+            "chunk_index": 2,
+            "score": 40.73664,
+            "char_count": 98,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "营业到几点",
+            "chunk_index": 1,
+            "score": 37.841396,
+            "char_count": 133,
+            "contains_expected": true,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“脖子像落枕”“低头一天肩膀沉”",
+            "chunk_index": 1,
+            "score": 12.68998,
+            "char_count": 137,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "exact_subway_route",
+        "group": "bm25_exact",
+        "query": "地铁2号线A口出来走哪个方向、多少米？",
+        "expected_source_id": "KB-STORE-007",
+        "expected_contains": "向北步行 100 米",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "地铁步行路线",
+            "chunk_index": 3,
+            "score": 54.882447,
+            "char_count": 95,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "营业到几点",
+            "chunk_index": 1,
+            "score": 40.672208,
+            "char_count": 133,
+            "contains_expected": true,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "检索问题示例",
+            "chunk_index": 6,
+            "score": 28.612489,
+            "char_count": 115,
+            "contains_expected": true,
+            "is_evidence": true
+          }
+        ]
+      },
+      {
+        "id": "rerank_full_body_experience",
+        "group": "rerank_interference",
+        "query": "全身推拿一般是什么体验，能不能当成治病？",
+        "expected_source_id": "KB-SERVICE-002",
+        "expected_contains": "不意味着对疾病进行治疗",
+        "rank": 2,
+        "source_rank": 2,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "示例核对",
+            "chunk_index": 5,
+            "score": 29.810289,
+            "char_count": 148,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "全身推拿的体验重点",
+            "chunk_index": 1,
+            "score": 29.195109,
+            "char_count": 125,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "与价格、禁忌页面的区别",
+            "chunk_index": 6,
+            "score": 25.482367,
+            "char_count": 151,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_skin_infection",
+        "group": "rerank_interference",
+        "query": "背上有渗出的伤口和大片皮疹，还能做背部推拿吗？",
+        "expected_source_id": "KB-SAFETY-003",
+        "expected_contains": "应暂停该区域服务",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "皮肤与感染风险",
+            "chunk_index": 3,
+            "score": 44.430332,
+            "char_count": 106,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "背部推拿的体验重点",
+            "chunk_index": 4,
+            "score": 38.435296,
+            "char_count": 98,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“背上像背着东西”“坐一天腰背发紧”",
+            "chunk_index": 2,
+            "score": 31.490034,
+            "char_count": 104,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_process_stop_signal",
+        "group": "rerank_interference",
+        "query": "按摩过程中突然头晕恶心还心慌，应该继续忍着吗？",
+        "expected_source_id": "KB-SAFETY-003",
+        "expected_contains": "应立即停止并视情况寻求医疗帮助",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "服务过程中的停止信号",
+            "chunk_index": 5,
+            "score": 62.189544,
+            "char_count": 96,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "身体出现异常感受",
+            "chunk_index": 2,
+            "score": 27.511625,
+            "char_count": 110,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "示例核对",
+            "chunk_index": 5,
+            "score": 15.649755,
+            "char_count": 148,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_strength_not_more_pain",
+        "group": "rerank_interference",
+        "query": "推拿是不是越痛、力度越大越有效？",
+        "expected_source_id": "KB-SERVICE-002",
+        "expected_contains": "力度不是越大越好",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-002",
+            "source_name": "02_service_experience_and_scenarios.md",
+            "title": "力度与沟通",
+            "chunk_index": 5,
+            "score": 47.773025,
+            "char_count": 95,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“我只想安静休息，不确定力度”",
+            "chunk_index": 5,
+            "score": 47.021726,
+            "char_count": 91,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "示例核对",
+            "chunk_index": 5,
+            "score": 13.926794,
+            "char_count": 148,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_technician_availability",
+        "group": "rerank_interference",
+        "query": "文档写了吴婷擅长足疗，是不是今晚一定能约她？",
+        "expected_source_id": "KB-TECH-006",
+        "expected_contains": "不能证明某一时段可约",
+        "rank": 2,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "工号 JS-008：吴婷",
+            "chunk_index": 4,
+            "score": 38.621164,
+            "char_count": 100,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "技师技能与演示工号目录",
+            "chunk_index": 0,
+            "score": 22.54816,
+            "char_count": 108,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "取消或改期的时间规则",
+            "chunk_index": 3,
+            "score": 15.821688,
+            "char_count": 216,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_cancellation_fee",
+        "group": "rerank_interference",
+        "query": "临时取消预约固定收百分之多少？",
+        "expected_source_id": "KB-BOOKING-005",
+        "expected_contains": "知识库不虚构固定比例",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "取消或改期的时间规则",
+            "chunk_index": 3,
+            "score": 35.27624,
+            "char_count": 216,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "能取消或改期吗",
+            "chunk_index": 4,
+            "score": 26.289395,
+            "char_count": 88,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "技师变更",
+            "chunk_index": 4,
+            "score": 19.89236,
+            "char_count": 116,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_member_priority_boundary",
+        "group": "rerank_interference",
+        "query": "我是会员，能不能把别人已经订好的时段让给我？",
+        "expected_source_id": "KB-MEMBER-004",
+        "expected_contains": "不代表可以占用已被确认的排班",
+        "rank": 5,
+        "source_rank": 5,
+        "top3": [
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“我只想安静休息，不确定力度”",
+            "chunk_index": 5,
+            "score": 18.622318,
+            "char_count": 91,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "会员怎么充值",
+            "chunk_index": 3,
+            "score": 17.407962,
+            "char_count": 106,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "退款与补偿边界",
+            "chunk_index": 5,
+            "score": 17.053784,
+            "char_count": 121,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "rerank_payment_status",
+        "group": "rerank_interference",
+        "query": "聊天页面出现支付说明，是不是已经付款成功？",
+        "expected_source_id": "KB-FAQ-010",
+        "expected_contains": "聊天中出现订单提示不等于付款成功",
+        "rank": 2,
+        "source_rank": 2,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "没有完成支付怎么办",
+            "chunk_index": 7,
+            "score": 53.818141,
+            "char_count": 81,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "支付时需要提供验证码吗",
+            "chunk_index": 7,
+            "score": 45.273835,
+            "char_count": 91,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "退款与异常处理",
+            "chunk_index": 5,
+            "score": 25.006809,
+            "char_count": 109,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_booking_success_boundary",
+        "group": "chunking_cross_section",
+        "query": "只问了一下有没有空位，系统是否已经替我占住时间？",
+        "expected_source_id": "KB-BOOKING-005",
+        "expected_contains": "仅咨询价格或询问空闲情况不等于完成预约",
+        "rank": 4,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "没有完成支付怎么办",
+            "chunk_index": 7,
+            "score": 26.150541,
+            "char_count": 81,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "技师变更",
+            "chunk_index": 4,
+            "score": 25.016118,
+            "char_count": 116,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "示例核对",
+            "chunk_index": 5,
+            "score": 20.621639,
+            "char_count": 148,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_technician_unavailable_choices",
+        "group": "chunking_cross_section",
+        "query": "指定技师临时来不了，门店可以直接替我换人吗？有哪些选择？",
+        "expected_source_id": "KB-BOOKING-005",
+        "expected_contains": "更换同类技能且有空的技师、调整预约时间、取消本次预约",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "技师变更",
+            "chunk_index": 4,
+            "score": 54.991513,
+            "char_count": 116,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "可以指定技师吗",
+            "chunk_index": 6,
+            "score": 26.984035,
+            "char_count": 84,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "如何选择与推荐",
+            "chunk_index": 7,
+            "score": 25.783642,
+            "char_count": 105,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_member_refund_factors",
+        "group": "chunking_cross_section",
+        "query": "会员储值要退款，客服需要核对哪些金额和渠道？",
+        "expected_source_id": "KB-MEMBER-004",
+        "expected_contains": "实付本金、已消费金额、赠送金额和支付渠道",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "退款与异常处理",
+            "chunk_index": 5,
+            "score": 58.046169,
+            "char_count": 109,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "退款与补偿边界",
+            "chunk_index": 5,
+            "score": 50.169791,
+            "char_count": 121,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "两个标准储值档位",
+            "chunk_index": 1,
+            "score": 33.686689,
+            "char_count": 193,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_lost_item_verification",
+        "group": "chunking_cross_section",
+        "query": "东西落在店里，报失时要提供哪些可核验信息？",
+        "expected_source_id": "KB-AFTERCARE-008",
+        "expected_contains": "到店日期、使用区域、物品外观与可核验特征",
+        "rank": 2,
+        "source_rank": 2,
+        "top3": [
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "支付时需要提供验证码吗",
+            "chunk_index": 7,
+            "score": 24.217269,
+            "char_count": 91,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "遗失物处理",
+            "chunk_index": 4,
+            "score": 22.151755,
+            "char_count": 108,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "一般体验反馈",
+            "chunk_index": 1,
+            "score": 15.974383,
+            "char_count": 116,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_combo_overtime",
+        "group": "chunking_cross_section",
+        "query": "连续做两个项目以后能不能临时加钟，怎么计价和留时间？",
+        "expected_source_id": "KB-SERVICE-001",
+        "expected_contains": "是否能够现场加钟取决于技师后续排班",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "组合与加钟说明",
+            "chunk_index": 4,
+            "score": 53.079066,
+            "char_count": 116,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "与项目效果页面的检索边界",
+            "chunk_index": 6,
+            "score": 19.841243,
+            "char_count": 142,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "预约变更后的确认",
+            "chunk_index": 5,
+            "score": 19.704287,
+            "char_count": 97,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "chunk_late_arrival",
+        "group": "chunking_cross_section",
+        "query": "我今天会迟到，门店能不通知我就直接缩短项目吗？",
+        "expected_source_id": "KB-BOOKING-005",
+        "expected_contains": "不能在顾客不知情时直接改变项目",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-BOOKING-005",
+            "source_name": "05_booking_change_cancellation.md",
+            "title": "到店与迟到",
+            "chunk_index": 2,
+            "score": 41.039616,
+            "char_count": 106,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "能取消或改期吗",
+            "chunk_index": 4,
+            "score": 22.885201,
+            "char_count": 88,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "如何理解时长",
+            "chunk_index": 2,
+            "score": 18.134743,
+            "char_count": 120,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_payment_credentials",
+        "group": "policy_boundary",
+        "query": "付款核验时需要把短信验证码发给技师吗？",
+        "expected_source_id": "KB-FAQ-010",
+        "expected_contains": "不需要向客服或技师提供支付密码",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "支付时需要提供验证码吗",
+            "chunk_index": 7,
+            "score": 55.084297,
+            "char_count": 91,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "退款与异常处理",
+            "chunk_index": 5,
+            "score": 34.786886,
+            "char_count": 109,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "一般体验反馈",
+            "chunk_index": 1,
+            "score": 32.228963,
+            "char_count": 116,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_unknown_branch",
+        "group": "policy_boundary",
+        "query": "你们上海分店具体在哪里？",
+        "expected_source_id": "KB-STORE-007",
+        "expected_contains": "本文未设置其他分店",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-STORE-007",
+            "source_name": "07_store_hours_location_facilities.md",
+            "title": "详细地址",
+            "chunk_index": 2,
+            "score": 19.036635,
+            "char_count": 98,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "能取消或改期吗",
+            "chunk_index": 4,
+            "score": 9.648641,
+            "char_count": 88,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "标准价目表",
+            "chunk_index": 1,
+            "score": 9.367985,
+            "char_count": 318,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_technician_private_contact",
+        "group": "policy_boundary",
+        "query": "能把张伟技师的私人手机号和社交账号给我吗？",
+        "expected_source_id": "KB-TECH-006",
+        "expected_contains": "不公开个人手机号、住址或私人社交账号",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "安全与隐私",
+            "chunk_index": 9,
+            "score": 59.980346,
+            "char_count": 72,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "隐私提醒",
+            "chunk_index": 6,
+            "score": 30.866665,
+            "char_count": 70,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-TECH-006",
+            "source_name": "06_technician_skill_directory.md",
+            "title": "工号 JS-001：张伟",
+            "chunk_index": 1,
+            "score": 24.388363,
+            "char_count": 92,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_complaint_refund_promise",
+        "group": "policy_boundary",
+        "query": "只要投诉，机器人就能保证马上全额退款吧？",
+        "expected_source_id": "KB-AFTERCARE-008",
+        "expected_contains": "不能保证“投诉即全额退款”",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-AFTERCARE-008",
+            "source_name": "08_aftercare_feedback_complaints.md",
+            "title": "退款与补偿边界",
+            "chunk_index": 5,
+            "score": 59.732152,
+            "char_count": 121,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "退款与异常处理",
+            "chunk_index": 5,
+            "score": 32.901743,
+            "char_count": 109,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "投诉多久能处理完",
+            "chunk_index": 8,
+            "score": 31.726668,
+            "char_count": 102,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_member_verification_privacy",
+        "group": "policy_boundary",
+        "query": "查会员余额时，客服可以在聊天里完整念出我的手机号吗？",
+        "expected_source_id": "KB-MEMBER-004",
+        "expected_contains": "不应在聊天中完整复述手机号",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "隐私提醒",
+            "chunk_index": 6,
+            "score": 66.008468,
+            "char_count": 70,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-FAQ-010",
+            "source_name": "10_comprehensive_faq.md",
+            "title": "支付时需要提供验证码吗",
+            "chunk_index": 7,
+            "score": 38.995777,
+            "char_count": 91,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-MEMBER-004",
+            "source_name": "04_membership_and_stored_value.md",
+            "title": "退款与异常处理",
+            "chunk_index": 5,
+            "score": 23.401771,
+            "char_count": 109,
+            "contains_expected": false,
+            "is_evidence": false
+          }
+        ]
+      },
+      {
+        "id": "boundary_medical_emergency",
+        "group": "policy_boundary",
+        "query": "我突然胸痛而且呼吸困难，能先来店里按摩观察一下吗？",
+        "expected_source_id": "KB-SAFETY-003",
+        "expected_contains": "应优先寻求医疗帮助",
+        "rank": 1,
+        "source_rank": 1,
+        "top3": [
+          {
+            "source_id": "KB-SAFETY-003",
+            "source_name": "03_safety_and_contraindications.md",
+            "title": "建议暂缓并优先就医的情况",
+            "chunk_index": 1,
+            "score": 43.635445,
+            "char_count": 111,
+            "contains_expected": true,
+            "is_evidence": true
+          },
+          {
+            "source_id": "KB-GUIDE-009",
+            "source_name": "09_scenario_selection_guide.md",
+            "title": "“逛了一天脚底累”“小腿像灌了铅”",
+            "chunk_index": 3,
+            "score": 20.287574,
+            "char_count": 119,
+            "contains_expected": false,
+            "is_evidence": false
+          },
+          {
+            "source_id": "KB-SERVICE-001",
+            "source_name": "01_service_price_and_duration.md",
+            "title": "示例核对",
+            "chunk_index": 5,
+            "score": 19.357207,
+            "char_count": 148,
             "contains_expected": false,
             "is_evidence": false
           }

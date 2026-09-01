@@ -4,6 +4,7 @@ import {
   BarChartOutlined,
   BookOutlined,
   CalendarOutlined,
+  DashboardOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   MessageOutlined,
@@ -17,6 +18,7 @@ const KnowledgePage = lazy(() => import("./pages/KnowledgePage"));
 const SchedulePage = lazy(() => import("./pages/SchedulePage"));
 const TechniciansPage = lazy(() => import("./pages/TechniciansPage"));
 const UserBehaviorPage = lazy(() => import("./pages/UserBehaviorPage"));
+const ObservabilityPage = lazy(() => import("./pages/ObservabilityPage"));
 
 const { Header, Sider, Content } = Layout;
 
@@ -25,7 +27,8 @@ const navItems = [
   { key: "/knowledge", icon: <BookOutlined />, label: <Link to="/knowledge">知识库管理</Link> },
   { key: "/technicians", icon: <TeamOutlined />, label: <Link to="/technicians">技师管理</Link> },
   { key: "/schedule", icon: <CalendarOutlined />, label: <Link to="/schedule">今日排班</Link> },
-  { key: "/behavior", icon: <BarChartOutlined />, label: <Link to="/behavior">用户洞察</Link> }
+  { key: "/behavior", icon: <BarChartOutlined />, label: <Link to="/behavior">用户洞察</Link> },
+  { key: "/observability", icon: <DashboardOutlined />, label: <Link to="/observability">系统观测</Link> }
 ];
 
 export default function App() {
@@ -88,6 +91,7 @@ export default function App() {
               <Route path="/technicians" element={<TechniciansPage />} />
               <Route path="/schedule" element={<SchedulePage />} />
               <Route path="/behavior" element={<UserBehaviorPage />} />
+              <Route path="/observability" element={<ObservabilityPage />} />
               <Route path="*" element={<Navigate to="/chat" replace />} />
             </Routes>
           </Suspense>

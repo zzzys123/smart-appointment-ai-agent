@@ -1,0 +1,103 @@
+{
+  "golden_version": "golden-v2",
+  "split_version": "golden-v2-split-1",
+  "frozen_on": "2026-08-19",
+  "status": "frozen",
+  "selection_policy": "Stratified 40/20 split. Cases used in the 2026-08-18 focused regression loop remain in dev where possible; holdout preserves every positive group plus no-answer coverage.",
+  "historical_exposure_notice": "All 60 cases were evaluated before this split existed. The holdout is protected from future tuning, but it is retrospective rather than a pristine unseen set. Golden v3 should add newly authored unseen holdout cases.",
+  "usage_policy": {
+    "dev": "May be run repeatedly while developing. Prefer only impacted case IDs.",
+    "holdout": "Run once after the candidate configuration is frozen. Do not tune from individual holdout failures.",
+    "all": "Run only for a release candidate or a deliberately recorded formal baseline. Never use 60/60 as the acceptance target."
+  },
+  "expected_counts": {
+    "dev": {
+      "total": 40,
+      "answer": 34,
+      "no_answer": 6,
+      "groups": {
+        "dense_semantic": 7,
+        "bm25_exact": 8,
+        "rerank_interference": 8,
+        "chunking_cross_section": 7,
+        "policy_boundary": 4
+      }
+    },
+    "holdout": {
+      "total": 20,
+      "answer": 16,
+      "no_answer": 4,
+      "groups": {
+        "dense_semantic": 3,
+        "bm25_exact": 4,
+        "rerank_interference": 4,
+        "chunking_cross_section": 3,
+        "policy_boundary": 2
+      }
+    }
+  },
+  "holdout_case_ids": [
+    "semantic_whole_body",
+    "semantic_back_or_whole_body",
+    "semantic_first_visit_arrival",
+    "exact_membership_code",
+    "exact_service_full_code",
+    "exact_store_address",
+    "exact_subway_route",
+    "rerank_neck_injury",
+    "rerank_skin_infection",
+    "rerank_technician_availability",
+    "rerank_payment_status",
+    "chunk_complaint_cross_section",
+    "chunk_member_refund_factors",
+    "chunk_late_arrival",
+    "boundary_technician_private_contact",
+    "boundary_medical_emergency",
+    "unknown_pool",
+    "unknown_acupuncture",
+    "unknown_phone_sales",
+    "unknown_playground"
+  ],
+  "dev_case_ids": [
+    "semantic_neck_metaphor",
+    "semantic_foot_fatigue",
+    "semantic_back_sitting",
+    "semantic_quiet_rest_strength",
+    "semantic_full_body_avoid_area",
+    "semantic_one_leg_sudden_swelling",
+    "semantic_aftercare_persistent_discomfort",
+    "exact_technician_008",
+    "exact_technician_009",
+    "exact_cancel_code",
+    "exact_parking_code",
+    "exact_service_back_code",
+    "exact_membership_500",
+    "exact_technician_010",
+    "exact_lost_item_code",
+    "rerank_neck_price",
+    "rerank_neck_experience",
+    "rerank_medical_promise",
+    "rerank_full_body_experience",
+    "rerank_process_stop_signal",
+    "rerank_strength_not_more_pain",
+    "rerank_cancellation_fee",
+    "rerank_member_priority_boundary",
+    "chunk_booking_cross_section",
+    "chunk_store_last_start",
+    "chunk_pregnancy_heat",
+    "chunk_booking_success_boundary",
+    "chunk_technician_unavailable_choices",
+    "chunk_lost_item_verification",
+    "chunk_combo_overtime",
+    "boundary_payment_credentials",
+    "boundary_unknown_branch",
+    "boundary_complaint_refund_promise",
+    "boundary_member_verification_privacy",
+    "unknown_wifi",
+    "unknown_cupping",
+    "unknown_haircut",
+    "unknown_pet_grooming",
+    "unknown_piano",
+    "unknown_photography"
+  ]
+}

@@ -40,6 +40,7 @@ logs/
 
 # --- Tests / coverage ---
 .pytest_cache/
+.pytest_tmp_codex*/
 .coverage
 .coverage.*
 htmlcov/
@@ -63,6 +64,11 @@ Thumbs.db
 frontend/node_modules/
 frontend/dist/
 frontend/*.tsbuildinfo
+
+# --- Java / Maven ---
+backend-java/target/
+*.class
+*.iml
 
 # --- Local interview notes ---
 面试问答_智能预约多Agent系统.md

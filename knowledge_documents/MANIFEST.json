@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "chunking": {
+    "chunk_size": 500,
+    "chunk_overlap": 100
+  },
+  "document_count": 10,
+  "chunk_count": 80,
+  "files": [
+    {
+      "path": "01_service_price_and_duration.md",
+      "source_id": "KB-SERVICE-001",
+      "version": "1.0",
+      "category": "服务项目",
+      "file_sha256": "9b6e4d95a1244efa64368ac956d251ad1e6c64e2df2c2f692c62b5ea11403385",
+      "chunk_count": 6,
+      "chunk_sha256": [
+        "20f322d1bef72bd5431a697ae28af52eeb1177299e79b48fb8501ba3e3097777",
+        "71651033819c21dbd39fa40fbef2a50d5ad81528fb9ba19bb7f4f078d81a4c81",
+        "46a388c7c24b9379953d4af3ccbf9bf0445b2687b3070ff7936a257ce9e26f59",
+        "764f2b1c2a983de75d31edc188b8690c8f564b2659637e466a4a0dda169663ea",
+        "99302a7a0262cc0a2400f5114c3f037b9c3b17d542615faf612238308c50be04",
+        "c32a89986d7fe1dc7f504f23d3efeb62333d2a2849549998ceef2403c95173f0"
+      ]
+    },
+    {
+      "path": "02_service_experience_and_scenarios.md",
+      "source_id": "KB-SERVICE-002",
+      "version": "1.0",
+      "category": "服务介绍",
+      "file_sha256": "5827147b1da2989ba7998b88d047e0d8da4075ce299284ad855b8c06244137d9",
+      "chunk_count": 8,
+      "chunk_sha256": [
+        "706cd79941c5d99bb580f80c27cf8e3202ade19ae2cb647b4d939bb7fd751bc7",
+        "ad4389fdaddcbe53867cfb0c897ba823a19793d46a0025a3ae68c329c18d8c07",
+        "7003181edcbc7cd4bd4520c23c1f6b9b2caf392dad0120a340573e7d66b7a74b",
+        "d1723e03f411e1bbfe33bce171f17b7f841f2c113b36fd14acc5b89472866fe1",
+        "f654be6ae77682d395b6ec697b70d41139d26bd0e441bc1974277c91d6ad28db",
+        "5800cbb08b3bf291ccce5d9ffb579a0a203b7d4d55fcb25d26326d4e0b9dde27",
+        "07e32996019363bce15f4f44e7a9afda1649f4965c0035aedca36b0bee1fab76",
+        "044aa05f796ba7f20874a55f4be191e05a9e81790ebd3f86adaaae50bb5b49ec"
+      ]
+    },
+    {
+      "path": "03_safety_and_contraindications.md",
+      "source_id": "KB-SAFETY-003",
+      "version": "1.0",
+      "category": "安全须知",
+      "file_sha256": "8359724da9fed972f45b12df6193cf173685fe6569e0cfb9ef06a0479c7c4af3",
+      "chunk_count": 8,
+      "chunk_sha256": [
+        "1a09628809576ba84094d635b3903245007aac3413f28c2789d029ec486e2deb",
+        "541bb5734c62c46f82a92a01ecda895ae3103ed36a88a107c7c1a5c6951f7ed5",
+        "bc308bf3e36805eb708e32b2799ded4f7f6929681c99e725083feec08f4b3017",
+        "6db138478706e3f225cdefd7d5c6b664744600b04174ba37c1e0f254dfa692f7",
+        "a88b21430d0299ff332a2e4b13d0707899a981c213dffeedb9e893c20c233126",
+        "15c4f672eae5f0408626ef862d825e233aeeec246dcea5995c0b85fea09d2687",
+        "361909a76fe870c1e58a5c5e11f19d37318184dac034104dd3e7f566cf3047a2",
+        "db4e61dddb3e3584ee00a61b4dd3b9db723f5ba6904866c754cab0104241ebc4"
+      ]
+    },
+    {
+      "path": "04_membership_and_stored_value.md",
+      "source_id": "KB-MEMBER-004",
+      "version": "1.0",
+      "category": "会员服务",
+      "file_sha256": "634d9c532f34c5db3c48dab63bdaed2ffb44fdcb6da6a87823caf1ad9e5fa58a",
+      "chunk_count": 7,
+      "chunk_sha256": [
+        "d328ff26a3e200aa4d9c3ce98036fe7108c3a102b1510ab2502d3abd761adaf9",
+        "406464820873f99e240c65c9d80568385ec4ed5027382b17d5c4c96134687450",
+        "8f774b92dd514471c36e6cb14244da5a3253070d139f5e29d2daf829bdf1ea43",
+        "70b886835935945fbb6d98430c04444f80587be11ea0b068831ce0f6c6d07130",
+        "299c48e7b2df432faf31534bdf320891e55175d786969f5435cd40c981df9446",
+        "db73f7020924a1803f7d1e3a87304836f15fc292b927e788be2b70914a1105bf",
+        "a99aca82d200d6ac40b6ee0b2875c67bba6546cc0504bbc440397e0415a70e4c"
+      ]
+    },
+    {
+      "path": "05_booking_change_cancellation.md",
+      "source_id": "KB-BOOKING-005",
+      "version": "1.0",
+      "category": "预约政策",
+      "file_sha256": "9f2539c7c1d58216d9cd4481d0612bff64e2809447182a1341f503e9b10b7efe",
+      "chunk_count": 8,
+      "chunk_sha256": [
+        "21b0fe59cf8cca0a50286a9135fd0e01505c734beccbe328d22136686acc29d0",
+        "402f8e69b8dafc9650e49a955d4ef2df99d7e75effe52a905305f2d6b36c787c",
+        "ec0df4aa21acd101c171c05ae9064abe8f49a45f29162e37ce5afdf0aba3ad54",
+        "777fb72abf47468f2b2b06f38efb47c0b980d8932c40a258ce124ed8dc163350",
+        "51c50753a5e3752c73619df661d2d7201b33f42277eaa6c47832b6ead75adc25",
+        "6daa354127d28e9bc4d0b3e5c9d075ccdf934faa31fee1e97f59eee2b3f4bbd4",
+        "0fc17007d9578ac99cc75191998d4da45db80935c938de313c4e1f669d99b8e2",
+        "b8aa8d58dcbe80419df9f7c1ac90b3c7958339e77e86c317d438f583ffe87a1b"
+      ]
+    },
+    {
+      "path": "06_technician_skill_directory.md",
+      "source_id": "KB-TECH-006",
+      "version": "1.0",
+      "category": "技师信息",
+      "file_sha256": "fa981ecb766bf7fd810bad4558741cd7d40b153767965423165f01c7c4f06b3f",
+      "chunk_count": 10,
+      "chunk_sha256": [
+        "11566fc7a281a634cacfa13ad682771d94b1c97d8fb58e1fa1555e20c1e6137c",
+        "14d239a078406b4182d7213dac468f8889322f078f58a15d35d8b23698df1a39",
+        "c81a655212754cc004043fd9d70f43739d02a9d7f27882633c34d8e8a919c982",
+        "f61c493ecef3c2a3a8911d0b3623fc9eb359b5177dd56eb7c74a7db790538689",
+        "1be5c363df06df471097033bba648f27a17ffeebbdc08451eb9ce3d7710d4b82",
+        "e14eb69ff3dee7cebba5bd418047ddb8ceaf20dd751c48243238657e00f622ce",
+        "46adb1f11063c14bfcca59022df7c7e2d29949e7a1ff07cb37d5142cd99317a0",
+        "bf002dfa944125c0e3f01a542de9d5ba8506a390842bead4e4255cd8b2bb109b",
+        "c525708ca59da4c6f57bcd6a6858222f273cc58a3c7ad847ecd7679564b675ce",
+        "10f4345091e0550c8d211b731e7a1e4c1f133cbe1d4ef8b43770a329b7d0e730"
+      ]
+    },
+    {
+      "path": "07_store_hours_location_facilities.md",
+      "source_id": "KB-STORE-007",
+      "version": "1.0",
+      "category": "门店信息",
+      "file_sha256": "2a2f0ead1d0521d1f0fca7f4877cf51ebd475ee70230d58fe6fd0735788cd491",
+      "chunk_count": 7,
+      "chunk_sha256": [
+        "f861904b169083018902299fbfb762259b75c4c4003b10ce7206817506e2d97d",
+        "bf8967db59d60ec1ccb6a979b3cbc268f1c8223149121846a7ffb1d1f2e79d76",
+        "12e255e5d4957e5597cd8c8c474506d7ac73275b528fec232ea38f46ec235481",
+        "7f8ff708fb002751feaa37fcc392a06709d40390789cbb5d4fd900e35edb88fa",
+        "40532ab124ba3215a9382f3daa5e0facb0547acf323b09369d3d187c655fd558",
+        "ae16a321a841e0f190b7c1e404f33ed35db4e921c04d07fccbc1264b6e4c1a02",
+        "ff69d9a89dd1027e8bab8e8aa376b5c7f94ae24d684409f50eaa8dd0f15873c3"
+      ]
+    },
+    {
+      "path": "08_aftercare_feedback_complaints.md",
+      "source_id": "KB-AFTERCARE-008",
+      "version": "1.0",
+      "category": "售后服务",
+      "file_sha256": "5166d71239719d9442d6f1d1f11c42c9e6b5c54e7df63c34f7a5f61e5012aa65",
+      "chunk_count": 8,
+      "chunk_sha256": [
+        "1988b13188f06787b5b9b93998c6ad95ecbfe580e3ce4c8006cf9da09c701dbf",
+        "7591f3896d2500eac45e873b48a6fd13818fe6ce2cf4af50d0dd21741f342814",
+        "8a340b5c0110a6854a6048562b80d9f7de0209eeb6364b850358266e8e988331",
+        "9ccaf7822f9f7771e7174fca33868dc2a4d94b15fc157c397427d8faa64da566",
+        "00a58d5f5d1bf227e8382ff7d6fcd92cb14a81fd3fcd6895472075a66a7f2a2a",
+        "70e988d7c1a5d68529abb690c8800cee905146e2c8fc6aadf83f0d7083da5fd6",
+        "2cd9aa76e3e318aaf35f0c7059639a5e7d3dbe414bb049d1bd04f0a499099888",
+        "7c1e7d1266c2b1bdbf4252482ee7999c242899e55dc0749a01cc61c2a18199b3"
+      ]
+    },
+    {
+      "path": "09_scenario_selection_guide.md",
+      "source_id": "KB-GUIDE-009",
+      "version": "1.0",
+      "category": "项目推荐",
+      "file_sha256": "e9ad530c85161ef6a2b4792ca75e1814bbc319087eb9ce60449ee8c768f1c90c",
+      "chunk_count": 8,
+      "chunk_sha256": [
+        "a9e60d48adcde2566b93c759085df7a620b847d9231f285e25831fb9cc9e8d12",
+        "07471f7d58d7f0e3b8567aa18e981c85b88da65089277c5a6b9f730ed2736045",
+        "b820592eb7e4f0f4c952eeb73e33cc4bd146ea81452c0045812143cf9df0a77b",
+        "dfea602a95dd177a5250f1feba167854ed924185a7ca4fb066538f6b3eaf6987",
+        "caa52bec29a8289b027e886454fd76935906daf7f2f9a8872e2551f6b052cae8",
+        "8107e8e1eb637622340c84dcf648b233a565abcf37adf2b3db1450b4d1f6a304",
+        "c0825835db0cd502c02aa4a2b9b85f22a6ae785fa714a92aa10370d7af9f3930",
+        "62daae699d369947d785d09ef5bfbf644d755669715af65c108493573979e735"
+      ]
+    },
+    {
+      "path": "10_comprehensive_faq.md",
+      "source_id": "KB-FAQ-010",
+      "version": "1.0",
+      "category": "常见问题",
+      "file_sha256": "c51eb3c10b79b5c61a420f4bbfad205882d487cc6dd42f3ac1ea8945aca11f5f",
+      "chunk_count": 10,
+      "chunk_sha256": [
+        "f7f21d1915fdae0a01caa30a612f05f33f33aab4a0f052e72e1b8f6859a01b6c",
+        "01f33fc2f6aefe91ba59b1a282cc7bef3c1a0ae54f245c688d4c4acf57726314",
+        "deb4607b6009f9d16ebed013866c4801f72c1a52d157edcfacae8703a58a3560",
+        "e3e8d8fc82a29127ca8f5cc0fea2cb6ac730a0c0ddaf74c95a300ed2f4dab09e",
+        "994725ab760ccc8030ce4bd351abb03608a81a719d20737406fefc47fa015dfc",
+        "283789d8aefff3ed8e84b1f24d2e31bd56aeccc83f73090d6b7937ae6c76db87",
+        "7f4836e74e4deff52c4e7046f9d38a0555c5bb14c2a0f3fd58b98063339c6313",
+        "350fc80f683af1ec316f26878454c477b7f0c938986ab8f188cd80ed7674ef89",
+        "f18bc3622479659f21d86b488e5a4aadcc429a7379af6cbd62e29b8ba9bdbf84",
+        "408f91a7db047c51c18cec3657596a18f7227be1e2a58f22f3fb7222d236f09c"
+      ]
+    }
+  ]
+}

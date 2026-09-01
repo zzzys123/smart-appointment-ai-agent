@@ -10,12 +10,41 @@ AppointmentAgent 功能测试
 
 import pytest
 import asyncio
+import agents.appointment_agent as appointment_module
 from agents.appointment_agent import AppointmentAgent
+
+
+pytestmark = pytest.mark.integration
+
+
+class _OfflineChatModel:
+    """Constructor-only stub that fails if an offline test invokes the model."""
+
+    def __bool__(self):
+        return False
+
+    def with_structured_output(self, _schema):
+        return self
+
+    def invoke(self, _input):
+        raise AssertionError("offline appointment test attempted a real model call")
+
+
+@pytest.fixture(autouse=True)
+def _isolate_offline_tests_from_model_credentials(request, monkeypatch):
+    if request.node.get_closest_marker("online"):
+        return
+    monkeypatch.setattr(
+        appointment_module,
+        "create_chat_model",
+        lambda **_kwargs: _OfflineChatModel(),
+    )
 
 
 class TestAppointmentAgentCoreFeatures:
     """测试预约代理核心功能"""
     
+    @pytest.mark.online
     def test_should_extract_user_info_from_natural_language(self):
         """
         测试：预约代理应该能从自然语言中提取预约信息
@@ -90,6 +119,7 @@ class TestAppointmentAgentCoreFeatures:
         assert agent.appointment_history["project"] == "按摩"  # 应该保持
         assert agent.appointment_history["start_time"] == "明天下午2点"
     
+    @pytest.mark.online
     def test_should_identify_unrelated_requests(self):
         """
         测试：预约代理应该能识别与预约无关的请求
@@ -167,7 +197,9 @@ class TestAppointmentAgentCoreFeatures:
         # 应该能处理不完整信息（不抛出异常）
         try:
             response_tokens = []
-            async for token in agent.appointment_processor.handle_incomplete_info(incomplete_data):
+            async for token in agent.appointment_processor.handle_incomplete_info(
+                incomplete_data, agent.appointment_history
+            ):
                 response_tokens.append(token)
             
             response = "".join(response_tokens)

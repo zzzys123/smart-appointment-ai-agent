@@ -13,7 +13,9 @@ FROM python:3.11-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+ARG PYTORCH_VERSION=2.6.0
 
 WORKDIR /app
 
@@ -23,7 +25,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
-RUN python -m pip install --upgrade pip \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python -m pip install --upgrade pip \
+    && python -m pip install "torch==${PYTORCH_VERSION}" \
+        --index-url https://download.pytorch.org/whl/cpu \
     && python -m pip install -r requirements.txt
 
 COPY . .

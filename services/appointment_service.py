@@ -23,21 +23,22 @@ class AppointmentService:
         self.db_router = DatabaseRouter(db_path)
         self.technician_repo = self.db_router.technicians
     
-    def save_appointment(self, technician_id: str, start_time: datetime, 
-                        end_time: datetime, appointment_history: Dict[str, Any], 
-                        session_id: str) -> bool:
+    def save_appointment(self, technician_id: str, start_time: datetime,
+                        end_time: datetime, appointment_history: Dict[str, Any],
+                        session_id: str, idempotency_key: Optional[str] = None) -> bool:
         """保存预约信息到数据库"""
         try:
             from services.redis_service import get_redis_service
 
             technician_id_int = int(technician_id)
-            idempotency_source = (
-                f"{session_id}|{technician_id_int}|"
-                f"{start_time.isoformat()}|{end_time.isoformat()}"
-            )
-            idempotency_key = hashlib.sha256(
-                idempotency_source.encode("utf-8")
-            ).hexdigest()
+            if not idempotency_key:
+                idempotency_source = (
+                    f"{session_id}|{technician_id_int}|"
+                    f"{start_time.isoformat()}|{end_time.isoformat()}"
+                )
+                idempotency_key = hashlib.sha256(
+                    idempotency_source.encode("utf-8")
+                ).hexdigest()
             redis_service = get_redis_service()
 
             # Serialize all writes for one technician. Availability is checked

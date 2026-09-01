@@ -1,11 +1,18 @@
 """知识库管理与文档导入 API。"""
 
+import asyncio
+
 from typing import List, Optional
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
 from services.document_ingestion_service import DocumentIngestionService
+from services.knowledge_lifecycle import (
+    create_backup,
+    lifecycle_status,
+    sync_directory,
+)
 from services.knowledge_service import KnowledgeService, get_shared_knowledge_service
 
 
@@ -35,6 +42,11 @@ class SearchRequest(BaseModel):
     query: str
     top_k: int = Field(default=5, ge=1, le=50)
     category: Optional[str] = None
+
+
+class LifecycleSyncRequest(BaseModel):
+    confirm: bool = False
+    create_backup_first: bool = True
 
 
 async def _get_knowledge_service() -> KnowledgeService:
@@ -133,6 +145,48 @@ async def search_knowledge(request: SearchRequest):
         }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"搜索知识库失败: {exc}") from exc
+
+
+@router.get("/lifecycle/status")
+async def get_lifecycle_status():
+    """Compare source files, the committed manifest and active database chunks."""
+    try:
+        knowledge_service = await _get_knowledge_service()
+        return {"status": "success", "data": await lifecycle_status(knowledge_service)}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"知识库基线校验失败: {exc}") from exc
+
+
+@router.post("/lifecycle/backup")
+async def backup_knowledge_database():
+    """Create a consistent SQLite snapshot before a managed change."""
+    try:
+        knowledge_service = await _get_knowledge_service()
+        db_url = str(knowledge_service.db.session_manager.engine.url)
+        return {"status": "success", "data": await asyncio.to_thread(create_backup, db_url)}
+    except (ValueError, FileNotFoundError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"知识库备份失败: {exc}") from exc
+
+
+@router.post("/lifecycle/sync")
+async def sync_managed_knowledge(request: LifecycleSyncRequest):
+    """Synchronize managed files only after explicit confirmation and backup."""
+    if not request.confirm:
+        raise HTTPException(status_code=400, detail="同步前必须显式设置 confirm=true")
+    try:
+        knowledge_service = await _get_knowledge_service()
+        backup = None
+        if request.create_backup_first:
+            db_url = str(knowledge_service.db.session_manager.engine.url)
+            backup = await asyncio.to_thread(create_backup, db_url)
+        result = await sync_directory(knowledge_service)
+        return {"status": "success", "backup": backup, "data": result}
+    except (ValueError, FileNotFoundError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"知识库同步失败: {exc}") from exc
 
 
 @router.get("/{knowledge_id}")

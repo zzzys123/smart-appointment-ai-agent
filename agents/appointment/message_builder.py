@@ -99,17 +99,14 @@ class MessageBuilder:
         # 默认消息
         return "\n机器人：好的，我理解您的选择。您可以选择其他时间段，或者我可以为您重新推荐其他技师。请问您还有其他需要吗？\n"
     
-    def create_appointment_failure_message(self, technician_name: str) -> str:
+    def create_appointment_failure_message(
+        self, technician_name: str, reason: str = None
+    ) -> str:
         """创建预约失败消息"""
         if technician_name and technician_name != "未知":
-            # 通过Services层访问数据库
-            from services.appointment_service import AppointmentService
-            appointment_service = AppointmentService()
-            specific_tech = appointment_service.get_technician_by_name(technician_name)
-            if specific_tech:
-                return f"\n机器人：抱歉，{technician_name}技师在您选择的时间段不空闲。请选择其他时间，或者我可以为您推荐其他技师。\n"
-            else:
+            if reason == "technician_not_found":
                 return f"\n机器人：抱歉，没有找到名为'{technician_name}'的技师。请确认技师姓名，或者我可以为您推荐其他技师。\n"
+            return f"\n机器人：抱歉，{technician_name}技师在您选择的时间段不空闲。请选择其他时间，或者我可以为您推荐其他技师。\n"
         else:
             return "\n机器人：抱歉，该时间段没有合适的技师空闲，请选择其他时间或调整偏好。\n"
     
@@ -129,3 +126,25 @@ class MessageBuilder:
     def create_save_failure_message(self) -> str:
         """创建保存失败消息"""
         return "\n机器人：抱歉，预约保存失败，请重试。\n"
+
+    def create_appointment_conflict_message(self, technician_name: str) -> str:
+        """创建最终写入阶段发生并发冲突时的消息。"""
+        name = f"{technician_name}技师" if technician_name else "该技师"
+        return (
+            f"\n机器人：抱歉，{name}的这个时间段刚刚被其他用户预约了。"
+            "请更换时间，或者让我为您重新推荐技师。\n"
+        )
+
+    def create_backend_unavailable_message(self) -> str:
+        """创建预约领域服务不可用时的消息。"""
+        return (
+            "\n机器人：预约服务暂时无法连接，本次没有创建预约。"
+            "请稍后重试；如持续失败，请联系工作人员。\n"
+        )
+
+    def create_invalid_appointment_message(self) -> str:
+        """创建确定性业务校验失败时的消息。"""
+        return (
+            "\n机器人：预约时间或时长不符合规则。"
+            "请选择未来的整点或半点时间，时长应为30分钟的整数倍。\n"
+        )

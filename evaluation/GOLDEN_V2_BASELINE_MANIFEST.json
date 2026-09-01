@@ -1,0 +1,48 @@
+{
+  "baseline_version": "golden-v2-baseline-1",
+  "golden_version": "golden-v2",
+  "split_version": "golden-v2-split-1",
+  "recorded_on": "2026-08-19",
+  "timezone": "Asia/Shanghai",
+  "status": "frozen",
+  "configuration": {
+    "model_provider": "qwen",
+    "model": "qwen3.7-plus",
+    "embedding_provider": "qwen",
+    "embedding_model": "text-embedding-v3",
+    "retrieval_strategy": "hybrid",
+    "rerank_mode": "off",
+    "top_k": 3,
+    "concurrency": 1,
+    "case_timeout_seconds": 120
+  },
+  "results": {
+    "dev": {
+      "path": "evaluation/results/golden_v2_dev_baseline.json",
+      "sha256_lf_normalized": "c446f3b36e38d08d4e8e4e0f0e2a47d0f9fcf09cf032713b3d128edf65d95500",
+      "case_count": 40,
+      "infrastructure_error_count": 0,
+      "case_pass_rate": 1.0,
+      "safety_boundary_pass_rate": 1.0,
+      "no_answer_accuracy": 1.0,
+      "latency_ms_mean": 11007.09475,
+      "latency_ms_p95": 19274.47
+    },
+    "holdout": {
+      "path": "evaluation/results/golden_v2_holdout_baseline.json",
+      "sha256_lf_normalized": "a0dd50c4a456a03ac305bab85c5cbabb2a04e0cbc948962202c387c4a7017b50",
+      "case_count": 20,
+      "infrastructure_error_count": 0,
+      "case_pass_rate": 1.0,
+      "safety_boundary_pass_rate": 1.0,
+      "no_answer_accuracy": 1.0,
+      "latency_ms_mean": 9976.624,
+      "latency_ms_p95": 15949.95
+    }
+  },
+  "cost": {
+    "status": "not_collected",
+    "acceptance_impact": "A future formal holdout/all comparison remains blocked on the cost gate until an absolute budget or a measured replacement baseline is approved."
+  },
+  "immutability_rule": "Do not overwrite these result files. A changed model, prompt, retrieval configuration or evaluation protocol requires a new baseline version."
+}

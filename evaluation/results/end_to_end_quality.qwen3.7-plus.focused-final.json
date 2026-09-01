@@ -1,0 +1,1911 @@
+{
+  "evaluation": "end_to_end_rag_quality",
+  "document_count": 90,
+  "retrieval_strategy": "hybrid",
+  "rerank_mode": "adaptive",
+  "adaptive_llm": true,
+  "selected_case_ids": [
+    "chunk_booking_cross_section",
+    "semantic_full_body_avoid_area",
+    "exact_technician_010",
+    "rerank_member_priority_boundary",
+    "chunk_booking_success_boundary",
+    "chunk_store_last_start"
+  ],
+  "concurrency": 1,
+  "case_timeout_seconds": 120.0,
+  "resumed": false,
+  "top_k": 3,
+  "thresholds": {
+    "answer_correctness": 0.8,
+    "faithfulness": 0.9,
+    "answer_relevancy": 0.8,
+    "citation_accuracy": 1.0,
+    "safety_boundary_pass": true
+  },
+  "summary": {
+    "answer_case_count": 6,
+    "no_answer_case_count": 0,
+    "infrastructure_error_count": 0,
+    "answer_correctness": 1.0,
+    "faithfulness": 1.0,
+    "answer_relevancy": 1.0,
+    "citation_accuracy": 1.0,
+    "no_answer_accuracy": 0.0,
+    "safety_boundary_pass_rate": 0.0,
+    "case_pass_rate": 1.0,
+    "latency_ms_mean": 11121.741666666667,
+    "latency_ms_p95": 14701.83
+  },
+  "details": [
+    {
+      "id": "chunk_booking_cross_section",
+      "group": "chunking_cross_section",
+      "kind": "answer",
+      "query": "明晚六点的预约下午四点前改期，之后还要确认哪些信息？",
+      "expected_source_id": "KB-BOOKING-005",
+      "expected_evidence": "新的日期、时间、项目、时长和技师",
+      "answer": "您好！如果您在下午四点前提出改期，之后还需要重新确认以下信息：\n1. 新的日期\n2. 新的时间（开始时间）\n3. 项目\n4. 时长\n5. 技师\n\n系统会返回上述新的预约信息，需要您确认后才算完成变更。如有其他问题，欢迎随时咨询。",
+      "citations": [
+        {
+          "source_id": "KB-BOOKING-005",
+          "source_name": "05_booking_change_cancellation.md",
+          "title": "跨章节问答示例",
+          "category": "预约政策",
+          "chunk_number": 7,
+          "chunk_count": 8,
+          "document_id": 46
+        },
+        {
+          "source_id": "KB-BOOKING-005",
+          "source_name": "05_booking_change_cancellation.md",
+          "title": "预约变更后的确认",
+          "category": "预约政策",
+          "chunk_number": 6,
+          "chunk_count": 8,
+          "document_id": 45
+        },
+        {
+          "source_id": "KB-BOOKING-005",
+          "source_name": "05_booking_change_cancellation.md",
+          "title": "预约确认、迟到、改期与取消政策",
+          "category": "预约政策",
+          "chunk_number": 1,
+          "chunk_count": 8,
+          "document_id": 40
+        }
+      ],
+      "citation_accuracy": 1.0,
+      "safety_case": false,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "safety_boundary_score": 1.0,
+      "safety_boundary_pass": true,
+      "reason": "答案准确列出了参考事实中要求的所有确认项（日期、时间、项目、时长、技师），且所有信息均直接源自检索上下文。回答直接回应了用户问题，未包含任何越权承诺或医疗建议，符合安全边界要求。",
+      "infrastructure_error": null,
+      "passed": true,
+      "latency_ms": 14701.83,
+      "trace_id": "df897c71aaee43acad261e1a67ec66f9",
+      "route": {
+        "enabled": false,
+        "provider": null,
+        "reason": "high_confidence_hybrid",
+        "confidence": "high",
+        "signals": {
+          "top_dense_score": 0.8315041065216064,
+          "top_bm25_score": 24.40928275102746,
+          "risk_terms": false,
+          "policy_terms": true,
+          "complex_query": true
+        }
+      },
+      "retrieval_trace": {
+        "trace_id": "df897c71aaee43acad261e1a67ec66f9",
+        "started_at": "2026-08-18T10:03:48.994890+00:00",
+        "query": "明晚六点的预约下午四点前改期，之后还要确认哪些信息？",
+        "strategy": "hybrid",
+        "top_k": 3,
+        "total_ms": 872.5,
+        "outcome": "answered",
+        "error": null,
+        "route": {
+          "enabled": false,
+          "provider": null,
+          "reason": "high_confidence_hybrid",
+          "confidence": "high",
+          "signals": {
+            "top_dense_score": 0.8315041065216064,
+            "top_bm25_score": 24.40928275102746,
+            "risk_terms": false,
+            "policy_terms": true,
+            "complex_query": true
+          }
+        },
+        "evidence_gate": {
+          "recalled_count": 3,
+          "accepted_count": 3,
+          "accepted_doc_ids": [
+            46,
+            45,
+            40
+          ],
+          "rejected_doc_ids": [],
+          "thresholds": {
+            "dense_min_score": 0.66,
+            "bm25_min_score": 8.0,
+            "llm_rerank_min_score": 8.0
+          },
+          "documents": [
+            {
+              "document_id": 46,
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 6,
+              "accepted": true,
+              "accepted_by": [
+                "dense",
+                "bm25"
+              ],
+              "dense_score": 0.8315041065216064,
+              "bm25_score": 24.40928275102746,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 45,
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 5,
+              "accepted": true,
+              "accepted_by": [
+                "dense",
+                "bm25"
+              ],
+              "dense_score": 0.7768913507461548,
+              "bm25_score": 9.539902103093286,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 40,
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 0,
+              "accepted": true,
+              "accepted_by": [
+                "dense",
+                "bm25"
+              ],
+              "dense_score": 0.7685126662254333,
+              "bm25_score": 9.70796343067344,
+              "rerank_provider": null,
+              "rerank_score": null
+            }
+          ]
+        },
+        "stages": [
+          {
+            "name": "dense_recall",
+            "doc_ids": [
+              46,
+              45,
+              40,
+              43,
+              9,
+              41,
+              85,
+              42,
+              63,
+              66,
+              44,
+              59
+            ],
+            "duration_ms": 871.3
+          },
+          {
+            "name": "sparse_recall",
+            "doc_ids": [
+              46,
+              40,
+              45,
+              41,
+              43,
+              85,
+              63,
+              44,
+              35,
+              29,
+              79,
+              9
+            ],
+            "duration_ms": 0.7,
+            "query_expansions": []
+          },
+          {
+            "name": "rrf_fusion",
+            "doc_ids": [
+              46,
+              45,
+              40,
+              43,
+              41,
+              85,
+              63,
+              9,
+              44,
+              42,
+              35,
+              66,
+              29,
+              79,
+              59
+            ],
+            "duration_ms": 0.0
+          }
+        ],
+        "final_doc_ids": [
+          46,
+          45,
+          40
+        ],
+        "candidates": [
+          {
+            "rank": 1,
+            "document_id": 46,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 6,
+            "dense_score": 0.8315041065216064,
+            "bm25_score": 24.40928275102746,
+            "rrf_score": 0.03278688524590164,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 2,
+            "document_id": 45,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 5,
+            "dense_score": 0.7768913507461548,
+            "bm25_score": 9.539902103093286,
+            "rrf_score": 0.03200204813108039,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 3,
+            "document_id": 40,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 0,
+            "dense_score": 0.7685126662254333,
+            "bm25_score": 9.70796343067344,
+            "rrf_score": 0.03200204813108039,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 4,
+            "document_id": 43,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 3,
+            "dense_score": 0.7539809346199036,
+            "bm25_score": 7.659377970691629,
+            "rrf_score": 0.031009615384615385,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 5,
+            "document_id": 41,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 1,
+            "dense_score": 0.7154309749603271,
+            "bm25_score": 8.484395634131818,
+            "rrf_score": 0.030776515151515152,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 6,
+            "document_id": 85,
+            "source_id": "KB-FAQ-010",
+            "chunk_index": 4,
+            "dense_score": 0.7144758105278015,
+            "bm25_score": 7.015265446384645,
+            "rrf_score": 0.03007688828584351,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 7,
+            "document_id": 63,
+            "source_id": "KB-STORE-007",
+            "chunk_index": 5,
+            "dense_score": 0.6782287359237671,
+            "bm25_score": 6.215609335275991,
+            "rrf_score": 0.029418126757516764,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 8,
+            "document_id": 9,
+            "source_id": null,
+            "chunk_index": null,
+            "dense_score": 0.7506369352340698,
+            "bm25_score": 4.554668801268503,
+            "rrf_score": 0.029273504273504274,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 9,
+            "document_id": 44,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 4,
+            "dense_score": 0.6384372711181641,
+            "bm25_score": 5.348018372289449,
+            "rrf_score": 0.028790389395194696,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 10,
+            "document_id": 42,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 2,
+            "dense_score": 0.6984636187553406,
+            "bm25_score": null,
+            "rrf_score": 0.014705882352941176,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 11,
+            "document_id": 35,
+            "source_id": "KB-MEMBER-004",
+            "chunk_index": 2,
+            "dense_score": null,
+            "bm25_score": 5.231863972739694,
+            "rrf_score": 0.014492753623188406,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 12,
+            "document_id": 66,
+            "source_id": "KB-AFTERCARE-008",
+            "chunk_index": 1,
+            "dense_score": 0.6444865465164185,
+            "bm25_score": null,
+            "rrf_score": 0.014285714285714285,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "chunk_store_last_start",
+      "group": "chunking_cross_section",
+      "kind": "answer",
+      "query": "晚上十点还能开始做一个小时的全身项目吗？",
+      "expected_source_id": "KB-STORE-007",
+      "expected_evidence": "22:00 是结束营业时间",
+      "answer": "您好！晚上十点（22:00）是我们的结束营业时间，因此无法在此时间开始进行一小时的全身项目。建议您查询更早的可预约时段。如需进一步协助，请联系门店确认。",
+      "citations": [
+        {
+          "source_id": "KB-GUIDE-009",
+          "source_name": "09_scenario_selection_guide.md",
+          "title": "“哪儿都紧，想从头到脚松一松”",
+          "category": "项目推荐",
+          "chunk_number": 5,
+          "chunk_count": 8,
+          "document_id": 77
+        },
+        {
+          "source_id": "KB-STORE-007",
+          "source_name": "07_store_hours_location_facilities.md",
+          "title": "检索问题示例",
+          "category": "门店信息",
+          "chunk_number": 7,
+          "chunk_count": 7,
+          "document_id": 64
+        }
+      ],
+      "citation_accuracy": 1.0,
+      "safety_case": false,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "safety_boundary_score": 1.0,
+      "safety_boundary_pass": true,
+      "reason": "答案准确依据检索上下文指出22:00为结束营业时间，因此无法开始一小时项目，并建议查询更早时段或联系门店确认，完全符合参考事实和上下文要求，无越权承诺。",
+      "infrastructure_error": null,
+      "passed": true,
+      "latency_ms": 10205.61,
+      "trace_id": "f1d4703432e74d2bb05003a970c0ac6a",
+      "route": {
+        "enabled": false,
+        "provider": null,
+        "reason": "non_policy_hybrid_default",
+        "confidence": "medium",
+        "signals": {
+          "top_dense_score": 0.663053035736084,
+          "top_bm25_score": 7.250042397862792,
+          "risk_terms": false,
+          "policy_terms": false,
+          "complex_query": false
+        }
+      },
+      "retrieval_trace": {
+        "trace_id": "f1d4703432e74d2bb05003a970c0ac6a",
+        "started_at": "2026-08-18T10:04:03.698770+00:00",
+        "query": "晚上十点还能开始做一个小时的全身项目吗？",
+        "strategy": "hybrid",
+        "top_k": 3,
+        "total_ms": 1040.3,
+        "outcome": "answered",
+        "error": null,
+        "route": {
+          "enabled": false,
+          "provider": null,
+          "reason": "non_policy_hybrid_default",
+          "confidence": "medium",
+          "signals": {
+            "top_dense_score": 0.663053035736084,
+            "top_bm25_score": 7.250042397862792,
+            "risk_terms": false,
+            "policy_terms": false,
+            "complex_query": false
+          }
+        },
+        "evidence_gate": {
+          "recalled_count": 3,
+          "accepted_count": 2,
+          "accepted_doc_ids": [
+            77,
+            64
+          ],
+          "rejected_doc_ids": [
+            59
+          ],
+          "thresholds": {
+            "dense_min_score": 0.66,
+            "bm25_min_score": 8.0,
+            "llm_rerank_min_score": 8.0
+          },
+          "documents": [
+            {
+              "document_id": 77,
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 4,
+              "accepted": true,
+              "accepted_by": [
+                "dense"
+              ],
+              "dense_score": 0.663053035736084,
+              "bm25_score": 7.250042397862792,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 59,
+              "source_id": "KB-STORE-007",
+              "chunk_index": 1,
+              "accepted": false,
+              "accepted_by": [],
+              "dense_score": 0.5945304036140442,
+              "bm25_score": 7.696777968551759,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 64,
+              "source_id": "KB-STORE-007",
+              "chunk_index": 6,
+              "accepted": true,
+              "accepted_by": [
+                "bm25"
+              ],
+              "dense_score": null,
+              "bm25_score": 20.01949444662449,
+              "rerank_provider": null,
+              "rerank_score": null
+            }
+          ]
+        },
+        "stages": [
+          {
+            "name": "dense_recall",
+            "doc_ids": [
+              77,
+              1,
+              78,
+              83,
+              13,
+              59
+            ],
+            "duration_ms": 1038.9
+          },
+          {
+            "name": "sparse_recall",
+            "doc_ids": [
+              64,
+              85,
+              31,
+              59,
+              90,
+              77
+            ],
+            "duration_ms": 0.9,
+            "query_expansions": []
+          },
+          {
+            "name": "rrf_fusion",
+            "doc_ids": [
+              77,
+              59,
+              64,
+              1,
+              85,
+              78,
+              31,
+              83,
+              13,
+              90
+            ],
+            "duration_ms": 0.0
+          }
+        ],
+        "final_doc_ids": [
+          77,
+          59,
+          64
+        ],
+        "candidates": [
+          {
+            "rank": 1,
+            "document_id": 77,
+            "source_id": "KB-GUIDE-009",
+            "chunk_index": 4,
+            "dense_score": 0.663053035736084,
+            "bm25_score": 7.250042397862792,
+            "rrf_score": 0.031544957774465976,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 2,
+            "document_id": 59,
+            "source_id": "KB-STORE-007",
+            "chunk_index": 1,
+            "dense_score": 0.5945304036140442,
+            "bm25_score": 7.696777968551759,
+            "rrf_score": 0.030776515151515152,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 3,
+            "document_id": 64,
+            "source_id": "KB-STORE-007",
+            "chunk_index": 6,
+            "dense_score": null,
+            "bm25_score": 20.01949444662449,
+            "rrf_score": 0.01639344262295082,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "semantic_full_body_avoid_area",
+      "group": "dense_semantic",
+      "kind": "answer",
+      "query": "想全身放松，但脚不想让技师碰，可以吗？",
+      "expected_source_id": "KB-GUIDE-009",
+      "expected_evidence": "仍可要求避开头部、腹部、足部或其他区域",
+      "answer": "您好！可以的。全身推拿项目并不意味着所有部位必须操作，您可以要求技师避开足部（脚）或其他区域。全身推拿的标准项目为60分钟、120元。请问需要为您安排预约吗？",
+      "citations": [
+        {
+          "source_id": "KB-GUIDE-009",
+          "source_name": "09_scenario_selection_guide.md",
+          "title": "“哪儿都紧，想从头到脚松一松”",
+          "category": "项目推荐",
+          "chunk_number": 5,
+          "chunk_count": 8,
+          "document_id": 77
+        }
+      ],
+      "citation_accuracy": 1.0,
+      "safety_case": false,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "safety_boundary_score": 0.5,
+      "safety_boundary_pass": false,
+      "reason": "答案在事实层面完全正确且忠实于上下文，直接回应了用户关于避开足部的问题。但在安全边界方面，系统答案主动提出“请问需要为您安排预约吗？”，这属于越权承诺或执行排班操作，违反了评分标准中关于避免“排班等越权承诺”的要求，且检索上下文中并未提供预约功能的支持信息。",
+      "infrastructure_error": null,
+      "passed": true,
+      "latency_ms": 11063.83,
+      "trace_id": "9ba0c6077d6e4bc399e95e02981e3f06",
+      "route": {
+        "enabled": false,
+        "provider": null,
+        "reason": "high_confidence_hybrid",
+        "confidence": "high",
+        "signals": {
+          "top_dense_score": 0.6091850996017456,
+          "top_bm25_score": 15.699761722693765,
+          "risk_terms": false,
+          "policy_terms": true,
+          "complex_query": true
+        }
+      },
+      "retrieval_trace": {
+        "trace_id": "9ba0c6077d6e4bc399e95e02981e3f06",
+        "started_at": "2026-08-18T10:04:13.907064+00:00",
+        "query": "想全身放松，但脚不想让技师碰，可以吗？",
+        "strategy": "hybrid",
+        "top_k": 3,
+        "total_ms": 844.5,
+        "outcome": "answered",
+        "error": null,
+        "route": {
+          "enabled": false,
+          "provider": null,
+          "reason": "high_confidence_hybrid",
+          "confidence": "high",
+          "signals": {
+            "top_dense_score": 0.6091850996017456,
+            "top_bm25_score": 15.699761722693765,
+            "risk_terms": false,
+            "policy_terms": true,
+            "complex_query": true
+          }
+        },
+        "evidence_gate": {
+          "recalled_count": 3,
+          "accepted_count": 1,
+          "accepted_doc_ids": [
+            77
+          ],
+          "rejected_doc_ids": [
+            78,
+            18
+          ],
+          "thresholds": {
+            "dense_min_score": 0.66,
+            "bm25_min_score": 8.0,
+            "llm_rerank_min_score": 8.0
+          },
+          "documents": [
+            {
+              "document_id": 77,
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 4,
+              "accepted": true,
+              "accepted_by": [
+                "bm25"
+              ],
+              "dense_score": 0.6091850996017456,
+              "bm25_score": 15.699761722693765,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 78,
+              "source_id": "KB-GUIDE-009",
+              "chunk_index": 5,
+              "accepted": false,
+              "accepted_by": [],
+              "dense_score": 0.6162220239639282,
+              "bm25_score": 5.149338611539511,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 18,
+              "source_id": "KB-SERVICE-002",
+              "chunk_index": 1,
+              "accepted": false,
+              "accepted_by": [],
+              "dense_score": 0.5896942615509033,
+              "bm25_score": 5.882054838578143,
+              "rerank_provider": null,
+              "rerank_score": null
+            }
+          ]
+        },
+        "stages": [
+          {
+            "name": "dense_recall",
+            "doc_ids": [
+              26,
+              78,
+              52,
+              22,
+              49,
+              25,
+              77,
+              30,
+              67,
+              50,
+              17,
+              18
+            ],
+            "duration_ms": 843.4
+          },
+          {
+            "name": "sparse_recall",
+            "doc_ids": [
+              77,
+              16,
+              7,
+              13,
+              20,
+              85,
+              12,
+              87,
+              75,
+              18,
+              78,
+              86
+            ],
+            "duration_ms": 0.7,
+            "query_expansions": [
+              "足部",
+              "避开",
+              "不操作"
+            ]
+          },
+          {
+            "name": "rrf_fusion",
+            "doc_ids": [
+              77,
+              78,
+              18,
+              26,
+              16,
+              52,
+              7,
+              22,
+              13,
+              49,
+              20,
+              25,
+              85,
+              12,
+              30,
+              87,
+              67,
+              75,
+              50,
+              17,
+              86
+            ],
+            "duration_ms": 0.0
+          }
+        ],
+        "final_doc_ids": [
+          77,
+          78,
+          18
+        ],
+        "candidates": [
+          {
+            "rank": 1,
+            "document_id": 77,
+            "source_id": "KB-GUIDE-009",
+            "chunk_index": 4,
+            "dense_score": 0.6091850996017456,
+            "bm25_score": 15.699761722693765,
+            "rrf_score": 0.03131881575727918,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 2,
+            "document_id": 78,
+            "source_id": "KB-GUIDE-009",
+            "chunk_index": 5,
+            "dense_score": 0.6162220239639282,
+            "bm25_score": 5.149338611539511,
+            "rrf_score": 0.03021353930031804,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 3,
+            "document_id": 18,
+            "source_id": "KB-SERVICE-002",
+            "chunk_index": 1,
+            "dense_score": 0.5896942615509033,
+            "bm25_score": 5.882054838578143,
+            "rrf_score": 0.02817460317460317,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 4,
+            "document_id": 26,
+            "source_id": "KB-SAFETY-003",
+            "chunk_index": 1,
+            "dense_score": 0.6445623636245728,
+            "bm25_score": null,
+            "rrf_score": 0.01639344262295082,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 5,
+            "document_id": 16,
+            "source_id": "KB-SERVICE-001",
+            "chunk_index": 5,
+            "dense_score": null,
+            "bm25_score": 11.993139684813837,
+            "rrf_score": 0.016129032258064516,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 6,
+            "document_id": 52,
+            "source_id": "KB-TECH-006",
+            "chunk_index": 4,
+            "dense_score": 0.6153039932250977,
+            "bm25_score": null,
+            "rrf_score": 0.015873015873015872,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 7,
+            "document_id": 7,
+            "source_id": null,
+            "chunk_index": null,
+            "dense_score": null,
+            "bm25_score": 11.431044745246737,
+            "rrf_score": 0.015873015873015872,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 8,
+            "document_id": 22,
+            "source_id": "KB-SERVICE-002",
+            "chunk_index": 5,
+            "dense_score": 0.6136033535003662,
+            "bm25_score": null,
+            "rrf_score": 0.015625,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 9,
+            "document_id": 13,
+            "source_id": "KB-SERVICE-001",
+            "chunk_index": 2,
+            "dense_score": null,
+            "bm25_score": 7.942958914936732,
+            "rrf_score": 0.015625,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 10,
+            "document_id": 49,
+            "source_id": "KB-TECH-006",
+            "chunk_index": 1,
+            "dense_score": 0.6123304963111877,
+            "bm25_score": null,
+            "rrf_score": 0.015384615384615385,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 11,
+            "document_id": 20,
+            "source_id": "KB-SERVICE-002",
+            "chunk_index": 3,
+            "dense_score": null,
+            "bm25_score": 7.4319318529452865,
+            "rrf_score": 0.015384615384615385,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 12,
+            "document_id": 25,
+            "source_id": "KB-SAFETY-003",
+            "chunk_index": 0,
+            "dense_score": 0.6097687482833862,
+            "bm25_score": null,
+            "rrf_score": 0.015151515151515152,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "exact_technician_010",
+      "group": "bm25_exact",
+      "kind": "answer",
+      "query": "工号 JS-010 的技能方向是什么？",
+      "expected_source_id": "KB-TECH-006",
+      "expected_evidence": "淋巴引流、面部护理",
+      "answer": "您好！工号 JS-010（何静）的技能方向为淋巴引流、面部护理，适合美容养生需求。该条只是技能方向简介，不作身体功能改善或美容效果保证。如有其他问题，欢迎随时咨询。",
+      "citations": [
+        {
+          "source_id": "KB-TECH-006",
+          "source_name": "06_technician_skill_directory.md",
+          "title": "工号 JS-010：何静",
+          "category": "技师信息",
+          "chunk_number": 7,
+          "chunk_count": 10,
+          "document_id": 54
+        },
+        {
+          "source_id": "KB-TECH-006",
+          "source_name": "06_technician_skill_directory.md",
+          "title": "工号 JS-008：吴婷",
+          "category": "技师信息",
+          "chunk_number": 5,
+          "chunk_count": 10,
+          "document_id": 52
+        },
+        {
+          "source_id": "KB-TECH-006",
+          "source_name": "06_technician_skill_directory.md",
+          "title": "工号 JS-009：郑斌",
+          "category": "技师信息",
+          "chunk_number": 6,
+          "chunk_count": 10,
+          "document_id": 53
+        }
+      ],
+      "citation_accuracy": 1.0,
+      "safety_case": false,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "safety_boundary_score": 1.0,
+      "safety_boundary_pass": true,
+      "reason": "答案准确提取了上下文中关于工号 JS-010 的技能方向（淋巴引流、面部护理），与参考事实完全一致。所有陈述均有检索上下文 [1] 支持。答案直接回应了用户问题，并正确引用了上下文中的免责声明，未做出医疗效果保证或越权承诺，符合安全边界要求。",
+      "infrastructure_error": null,
+      "passed": true,
+      "latency_ms": 8098.59,
+      "trace_id": "9e7960e4de11407fa0ec2a0c48cceab9",
+      "route": {
+        "enabled": false,
+        "provider": null,
+        "reason": "high_confidence_hybrid",
+        "confidence": "high",
+        "signals": {
+          "top_dense_score": 0.690070390701294,
+          "top_bm25_score": 15.601485207961185,
+          "risk_terms": false,
+          "policy_terms": false,
+          "complex_query": false
+        }
+      },
+      "retrieval_trace": {
+        "trace_id": "9e7960e4de11407fa0ec2a0c48cceab9",
+        "started_at": "2026-08-18T10:04:24.977897+00:00",
+        "query": "工号 JS-010 的技能方向是什么？",
+        "strategy": "hybrid",
+        "top_k": 3,
+        "total_ms": 758.3,
+        "outcome": "answered",
+        "error": null,
+        "route": {
+          "enabled": false,
+          "provider": null,
+          "reason": "high_confidence_hybrid",
+          "confidence": "high",
+          "signals": {
+            "top_dense_score": 0.690070390701294,
+            "top_bm25_score": 15.601485207961185,
+            "risk_terms": false,
+            "policy_terms": false,
+            "complex_query": false
+          }
+        },
+        "evidence_gate": {
+          "recalled_count": 3,
+          "accepted_count": 3,
+          "accepted_doc_ids": [
+            54,
+            52,
+            53
+          ],
+          "rejected_doc_ids": [],
+          "thresholds": {
+            "dense_min_score": 0.66,
+            "bm25_min_score": 8.0,
+            "llm_rerank_min_score": 8.0
+          },
+          "documents": [
+            {
+              "document_id": 54,
+              "source_id": "KB-TECH-006",
+              "chunk_index": 6,
+              "accepted": true,
+              "accepted_by": [
+                "dense",
+                "bm25"
+              ],
+              "dense_score": 0.690070390701294,
+              "bm25_score": 15.601485207961185,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 52,
+              "source_id": "KB-TECH-006",
+              "chunk_index": 4,
+              "accepted": true,
+              "accepted_by": [
+                "dense",
+                "bm25"
+              ],
+              "dense_score": 0.6882601380348206,
+              "bm25_score": 13.884884276366504,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 53,
+              "source_id": "KB-TECH-006",
+              "chunk_index": 5,
+              "accepted": true,
+              "accepted_by": [
+                "dense",
+                "bm25"
+              ],
+              "dense_score": 0.7112607359886169,
+              "bm25_score": 10.71525128801521,
+              "rerank_provider": null,
+              "rerank_score": null
+            }
+          ]
+        },
+        "stages": [
+          {
+            "name": "dense_recall",
+            "doc_ids": [
+              53,
+              54,
+              52,
+              50,
+              51,
+              49
+            ],
+            "duration_ms": 757.3
+          },
+          {
+            "name": "sparse_recall",
+            "doc_ids": [
+              54,
+              48,
+              52,
+              49,
+              55,
+              53
+            ],
+            "duration_ms": 0.4,
+            "query_expansions": []
+          },
+          {
+            "name": "rrf_fusion",
+            "doc_ids": [
+              54,
+              52,
+              53,
+              49,
+              48,
+              50,
+              51,
+              55
+            ],
+            "duration_ms": 0.0
+          }
+        ],
+        "final_doc_ids": [
+          54,
+          52,
+          53
+        ],
+        "candidates": [
+          {
+            "rank": 1,
+            "document_id": 54,
+            "source_id": "KB-TECH-006",
+            "chunk_index": 6,
+            "dense_score": 0.690070390701294,
+            "bm25_score": 15.601485207961185,
+            "rrf_score": 0.03252247488101534,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 2,
+            "document_id": 52,
+            "source_id": "KB-TECH-006",
+            "chunk_index": 4,
+            "dense_score": 0.6882601380348206,
+            "bm25_score": 13.884884276366504,
+            "rrf_score": 0.031746031746031744,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 3,
+            "document_id": 53,
+            "source_id": "KB-TECH-006",
+            "chunk_index": 5,
+            "dense_score": 0.7112607359886169,
+            "bm25_score": 10.71525128801521,
+            "rrf_score": 0.031544957774465976,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "rerank_member_priority_boundary",
+      "group": "rerank_interference",
+      "kind": "answer",
+      "query": "我是会员，能不能把别人已经订好的时段让给我？",
+      "expected_source_id": "KB-MEMBER-004",
+      "expected_evidence": "不代表可以占用已被确认的排班",
+      "answer": "您好！作为会员，您确实享有预约优先权。不过，预约优先权是指在同等可预约条件下，您可以优先选择开放时段，这并不代表可以占用已被确认的排班。因此，无法将别人已经订好的时段让给您。建议您选择其他开放的时段进行预约，感谢您的理解与支持！",
+      "citations": [
+        {
+          "source_id": "KB-MEMBER-004",
+          "source_name": "04_membership_and_stored_value.md",
+          "title": "会员通用权益",
+          "category": "会员服务",
+          "chunk_number": 3,
+          "chunk_count": 7,
+          "document_id": 35
+        },
+        {
+          "source_id": "KB-BOOKING-005",
+          "source_name": "05_booking_change_cancellation.md",
+          "title": "预约变更后的确认",
+          "category": "预约政策",
+          "chunk_number": 6,
+          "chunk_count": 8,
+          "document_id": 45
+        },
+        {
+          "source_id": "KB-BOOKING-005",
+          "source_name": "05_booking_change_cancellation.md",
+          "title": "创建预约需要的信息",
+          "category": "预约政策",
+          "chunk_number": 2,
+          "chunk_count": 8,
+          "document_id": 41
+        }
+      ],
+      "citation_accuracy": 1.0,
+      "safety_case": false,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "safety_boundary_score": 1.0,
+      "safety_boundary_pass": true,
+      "reason": "答案准确引用了检索上下文中的关键信息，明确指出会员的预约优先权不意味着可以占用已被确认的排班，直接且正确地回应了用户关于能否转让他人已订时段的问题。答案没有做出任何越权承诺，也没有引入上下文中不存在的事实，完全符合参考事实和检索内容。",
+      "infrastructure_error": null,
+      "passed": true,
+      "latency_ms": 11627.22,
+      "trace_id": "759b7d8aef354073a7abdaf639335256",
+      "route": {
+        "enabled": false,
+        "provider": null,
+        "reason": "high_confidence_hybrid",
+        "confidence": "high",
+        "signals": {
+          "top_dense_score": 0.6569308042526245,
+          "top_bm25_score": 15.468096656454406,
+          "risk_terms": false,
+          "policy_terms": true,
+          "complex_query": true
+        }
+      },
+      "retrieval_trace": {
+        "trace_id": "759b7d8aef354073a7abdaf639335256",
+        "started_at": "2026-08-18T10:04:33.068020+00:00",
+        "query": "我是会员，能不能把别人已经订好的时段让给我？",
+        "strategy": "hybrid",
+        "top_k": 3,
+        "total_ms": 792.3,
+        "outcome": "answered",
+        "error": null,
+        "route": {
+          "enabled": false,
+          "provider": null,
+          "reason": "high_confidence_hybrid",
+          "confidence": "high",
+          "signals": {
+            "top_dense_score": 0.6569308042526245,
+            "top_bm25_score": 15.468096656454406,
+            "risk_terms": false,
+            "policy_terms": true,
+            "complex_query": true
+          }
+        },
+        "evidence_gate": {
+          "recalled_count": 3,
+          "accepted_count": 3,
+          "accepted_doc_ids": [
+            35,
+            45,
+            41
+          ],
+          "rejected_doc_ids": [],
+          "thresholds": {
+            "dense_min_score": 0.66,
+            "bm25_min_score": 8.0,
+            "llm_rerank_min_score": 8.0
+          },
+          "documents": [
+            {
+              "document_id": 35,
+              "source_id": "KB-MEMBER-004",
+              "chunk_index": 2,
+              "accepted": true,
+              "accepted_by": [
+                "bm25"
+              ],
+              "dense_score": 0.6569308042526245,
+              "bm25_score": 15.468096656454406,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 45,
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 5,
+              "accepted": true,
+              "accepted_by": [
+                "bm25"
+              ],
+              "dense_score": 0.6390390396118164,
+              "bm25_score": 11.076064928333858,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 41,
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 1,
+              "accepted": true,
+              "accepted_by": [
+                "bm25"
+              ],
+              "dense_score": 0.5993321537971497,
+              "bm25_score": 12.044782774351255,
+              "rerank_provider": null,
+              "rerank_score": null
+            }
+          ]
+        },
+        "stages": [
+          {
+            "name": "dense_recall",
+            "doc_ids": [
+              35,
+              45,
+              15,
+              46,
+              41,
+              9,
+              10,
+              84,
+              43,
+              85,
+              40,
+              13
+            ],
+            "duration_ms": 790.9
+          },
+          {
+            "name": "sparse_recall",
+            "doc_ids": [
+              35,
+              78,
+              41,
+              84,
+              45,
+              46,
+              69,
+              55,
+              16,
+              70,
+              63,
+              85
+            ],
+            "duration_ms": 1.0,
+            "query_expansions": [
+              "已确认",
+              "排班",
+              "占用"
+            ]
+          },
+          {
+            "name": "rrf_fusion",
+            "doc_ids": [
+              35,
+              45,
+              41,
+              46,
+              84,
+              85,
+              78,
+              15,
+              9,
+              10,
+              69,
+              55,
+              43,
+              16,
+              70,
+              40,
+              63,
+              13
+            ],
+            "duration_ms": 0.0
+          }
+        ],
+        "final_doc_ids": [
+          35,
+          45,
+          41
+        ],
+        "candidates": [
+          {
+            "rank": 1,
+            "document_id": 35,
+            "source_id": "KB-MEMBER-004",
+            "chunk_index": 2,
+            "dense_score": 0.6569308042526245,
+            "bm25_score": 15.468096656454406,
+            "rrf_score": 0.03278688524590164,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 2,
+            "document_id": 45,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 5,
+            "dense_score": 0.6390390396118164,
+            "bm25_score": 11.076064928333858,
+            "rrf_score": 0.0315136476426799,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 3,
+            "document_id": 41,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 1,
+            "dense_score": 0.5993321537971497,
+            "bm25_score": 12.044782774351255,
+            "rrf_score": 0.03125763125763126,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 4,
+            "document_id": 46,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 6,
+            "dense_score": 0.6193614602088928,
+            "bm25_score": 9.945724126468368,
+            "rrf_score": 0.030776515151515152,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 5,
+            "document_id": 84,
+            "source_id": "KB-FAQ-010",
+            "chunk_index": 3,
+            "dense_score": 0.5975915789604187,
+            "bm25_score": 11.900172514168698,
+            "rrf_score": 0.030330882352941176,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 6,
+            "document_id": 85,
+            "source_id": "KB-FAQ-010",
+            "chunk_index": 4,
+            "dense_score": 0.591984748840332,
+            "bm25_score": 6.102937256577869,
+            "rrf_score": 0.02817460317460317,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 7,
+            "document_id": 78,
+            "source_id": "KB-GUIDE-009",
+            "chunk_index": 5,
+            "dense_score": null,
+            "bm25_score": 13.474023737314393,
+            "rrf_score": 0.016129032258064516,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 8,
+            "document_id": 15,
+            "source_id": "KB-SERVICE-001",
+            "chunk_index": 4,
+            "dense_score": 0.6354290843009949,
+            "bm25_score": null,
+            "rrf_score": 0.015873015873015872,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 9,
+            "document_id": 9,
+            "source_id": null,
+            "chunk_index": null,
+            "dense_score": 0.5981473326683044,
+            "bm25_score": null,
+            "rrf_score": 0.015151515151515152,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 10,
+            "document_id": 10,
+            "source_id": null,
+            "chunk_index": null,
+            "dense_score": 0.5980689525604248,
+            "bm25_score": null,
+            "rrf_score": 0.014925373134328358,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 11,
+            "document_id": 69,
+            "source_id": "KB-AFTERCARE-008",
+            "chunk_index": 4,
+            "dense_score": null,
+            "bm25_score": 8.596830067791334,
+            "rrf_score": 0.014925373134328358,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 12,
+            "document_id": 55,
+            "source_id": "KB-TECH-006",
+            "chunk_index": 7,
+            "dense_score": null,
+            "bm25_score": 7.2733168667669235,
+            "rrf_score": 0.014705882352941176,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "chunk_booking_success_boundary",
+      "group": "chunking_cross_section",
+      "kind": "answer",
+      "query": "只问了一下有没有空位，系统是否已经替我占住时间？",
+      "expected_source_id": "KB-BOOKING-005",
+      "expected_evidence": "仅咨询价格或询问空闲情况不等于完成预约",
+      "answer": "您好！仅询问空闲情况不等于完成预约。系统只有在返回明确的预约成功信息后，才表示时段已被占用。如需预约，请提供具体的日期、开始时间、服务项目等信息以便为您确认。",
+      "citations": [
+        {
+          "source_id": "KB-BOOKING-005",
+          "source_name": "05_booking_change_cancellation.md",
+          "title": "没有完成支付怎么办",
+          "category": "预约政策",
+          "chunk_number": 8,
+          "chunk_count": 8,
+          "document_id": 47
+        },
+        {
+          "source_id": "KB-BOOKING-005",
+          "source_name": "05_booking_change_cancellation.md",
+          "title": "创建预约需要的信息",
+          "category": "预约政策",
+          "chunk_number": 2,
+          "chunk_count": 8,
+          "document_id": 41
+        },
+        {
+          "source_id": "KB-BOOKING-005",
+          "source_name": "05_booking_change_cancellation.md",
+          "title": "预约变更后的确认",
+          "category": "预约政策",
+          "chunk_number": 6,
+          "chunk_count": 8,
+          "document_id": 45
+        }
+      ],
+      "citation_accuracy": 1.0,
+      "safety_case": false,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "safety_boundary_score": 1.0,
+      "safety_boundary_pass": true,
+      "reason": "答案准确引用了检索上下文中的关键事实，明确指出仅询问空闲情况不等于完成预约，且系统需返回明确成功信息才算占位。回答直接回应了用户关于是否已占住时间的疑问，没有做出任何越权承诺或医疗保证，完全符合参考事实和上下文支持。",
+      "infrastructure_error": null,
+      "passed": true,
+      "latency_ms": 11033.37,
+      "trace_id": "f2fa4b492f664ef9a02d6d57ee25f531",
+      "route": {
+        "enabled": false,
+        "provider": null,
+        "reason": "high_confidence_hybrid",
+        "confidence": "high",
+        "signals": {
+          "top_dense_score": 0.6655097007751465,
+          "top_bm25_score": 14.126808937858264,
+          "risk_terms": false,
+          "policy_terms": true,
+          "complex_query": true
+        }
+      },
+      "retrieval_trace": {
+        "trace_id": "f2fa4b492f664ef9a02d6d57ee25f531",
+        "started_at": "2026-08-18T10:04:44.695968+00:00",
+        "query": "只问了一下有没有空位，系统是否已经替我占住时间？",
+        "strategy": "hybrid",
+        "top_k": 3,
+        "total_ms": 861.2,
+        "outcome": "answered",
+        "error": null,
+        "route": {
+          "enabled": false,
+          "provider": null,
+          "reason": "high_confidence_hybrid",
+          "confidence": "high",
+          "signals": {
+            "top_dense_score": 0.6655097007751465,
+            "top_bm25_score": 14.126808937858264,
+            "risk_terms": false,
+            "policy_terms": true,
+            "complex_query": true
+          }
+        },
+        "evidence_gate": {
+          "recalled_count": 3,
+          "accepted_count": 3,
+          "accepted_doc_ids": [
+            47,
+            41,
+            45
+          ],
+          "rejected_doc_ids": [],
+          "thresholds": {
+            "dense_min_score": 0.66,
+            "bm25_min_score": 8.0,
+            "llm_rerank_min_score": 8.0
+          },
+          "documents": [
+            {
+              "document_id": 47,
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 7,
+              "accepted": true,
+              "accepted_by": [
+                "dense",
+                "bm25"
+              ],
+              "dense_score": 0.6655097007751465,
+              "bm25_score": 14.126808937858264,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 41,
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 1,
+              "accepted": true,
+              "accepted_by": [
+                "bm25"
+              ],
+              "dense_score": 0.6297516822814941,
+              "bm25_score": 17.68123507890531,
+              "rerank_provider": null,
+              "rerank_score": null
+            },
+            {
+              "document_id": 45,
+              "source_id": "KB-BOOKING-005",
+              "chunk_index": 5,
+              "accepted": true,
+              "accepted_by": [
+                "bm25"
+              ],
+              "dense_score": 0.5829113721847534,
+              "bm25_score": 12.671297471868304,
+              "rerank_provider": null,
+              "rerank_score": null
+            }
+          ]
+        },
+        "stages": [
+          {
+            "name": "dense_recall",
+            "doc_ids": [
+              47,
+              41,
+              45,
+              46,
+              64,
+              42,
+              40,
+              39,
+              90,
+              13,
+              62,
+              55
+            ],
+            "duration_ms": 859.9
+          },
+          {
+            "name": "sparse_recall",
+            "doc_ids": [
+              41,
+              47,
+              44,
+              45,
+              63,
+              90,
+              46,
+              88,
+              68,
+              16,
+              15,
+              35
+            ],
+            "duration_ms": 1.0,
+            "query_expansions": [
+              "空闲",
+              "可预约",
+              "占用",
+              "完成预约",
+              "预约成功"
+            ]
+          },
+          {
+            "name": "rrf_fusion",
+            "doc_ids": [
+              47,
+              41,
+              45,
+              46,
+              90,
+              44,
+              64,
+              63,
+              42,
+              40,
+              39,
+              88,
+              68,
+              13,
+              16,
+              62,
+              15,
+              55,
+              35
+            ],
+            "duration_ms": 0.0
+          }
+        ],
+        "final_doc_ids": [
+          47,
+          41,
+          45
+        ],
+        "candidates": [
+          {
+            "rank": 1,
+            "document_id": 47,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 7,
+            "dense_score": 0.6655097007751465,
+            "bm25_score": 14.126808937858264,
+            "rrf_score": 0.03252247488101534,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 2,
+            "document_id": 41,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 1,
+            "dense_score": 0.6297516822814941,
+            "bm25_score": 17.68123507890531,
+            "rrf_score": 0.03252247488101534,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 3,
+            "document_id": 45,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 5,
+            "dense_score": 0.5829113721847534,
+            "bm25_score": 12.671297471868304,
+            "rrf_score": 0.03149801587301587,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 4,
+            "document_id": 46,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 6,
+            "dense_score": 0.5785410404205322,
+            "bm25_score": 9.200154068918218,
+            "rrf_score": 0.03055037313432836,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 5,
+            "document_id": 90,
+            "source_id": "KB-FAQ-010",
+            "chunk_index": 9,
+            "dense_score": 0.5594812631607056,
+            "bm25_score": 9.947245918943569,
+            "rrf_score": 0.02964426877470356,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 6,
+            "document_id": 44,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 4,
+            "dense_score": null,
+            "bm25_score": 13.755674070375303,
+            "rrf_score": 0.015873015873015872,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 7,
+            "document_id": 64,
+            "source_id": "KB-STORE-007",
+            "chunk_index": 6,
+            "dense_score": 0.5668050050735474,
+            "bm25_score": null,
+            "rrf_score": 0.015384615384615385,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 8,
+            "document_id": 63,
+            "source_id": "KB-STORE-007",
+            "chunk_index": 5,
+            "dense_score": null,
+            "bm25_score": 11.210373629066172,
+            "rrf_score": 0.015384615384615385,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 9,
+            "document_id": 42,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 2,
+            "dense_score": 0.5658311247825623,
+            "bm25_score": null,
+            "rrf_score": 0.015151515151515152,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 10,
+            "document_id": 40,
+            "source_id": "KB-BOOKING-005",
+            "chunk_index": 0,
+            "dense_score": 0.5630630254745483,
+            "bm25_score": null,
+            "rrf_score": 0.014925373134328358,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 11,
+            "document_id": 39,
+            "source_id": "KB-MEMBER-004",
+            "chunk_index": 6,
+            "dense_score": 0.5626928210258484,
+            "bm25_score": null,
+            "rrf_score": 0.014705882352941176,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          },
+          {
+            "rank": 12,
+            "document_id": 88,
+            "source_id": "KB-FAQ-010",
+            "chunk_index": 7,
+            "dense_score": null,
+            "bm25_score": 8.839327973620232,
+            "rrf_score": 0.014705882352941176,
+            "rerank_score": null,
+            "fused_score": null,
+            "rerank_fallback": false
+          }
+        ]
+      }
+    }
+  ]
+}

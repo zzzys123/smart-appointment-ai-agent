@@ -34,7 +34,7 @@ def test_category_filter_recalls_target_outside_normal_candidate_window():
     assert [result["id"] for result in results] == [4]
 
 
-def test_category_filter_caps_reranker_candidates():
+def test_category_filter_caps_reranker_candidates(monkeypatch):
     class FakeReranker:
         seen_count = 0
 
@@ -42,6 +42,9 @@ def test_category_filter_caps_reranker_candidates():
             self.seen_count = len(candidates)
             return candidates[:top_k]
 
+    # Keep this legacy rerank test independent from a developer's local
+    # adaptive-routing .env configuration.
+    monkeypatch.setenv("RAG_RERANK_MODE", "off")
     retriever = _OrderedRetriever()
     retriever.rerank_enabled = True
     retriever._reranker = FakeReranker()
